@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "akira", "akira\akira.csproj", "{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{F562869F-2D9B-4289-8F37-5D2BF18113AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
