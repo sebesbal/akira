@@ -5,6 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "akira", "akira\akira.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{F562869F-2D9B-4289-8F37-5D2BF18113AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "slp_parser", "slp_parser\slp_parser.csproj", "{507598C9-AC33-499D-8C41-2EAB3C79F905}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs_compiler", "cs_compiler\cs_compiler.csproj", "{CA8D2675-1476-48EC-90C4-08E6D217F196}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +23,14 @@ Global
 		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

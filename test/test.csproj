@@ -58,6 +58,14 @@
       <Project>{a143ba8d-c92a-4f82-b55b-d78f4f43c48b}</Project>
       <Name>akira</Name>
     </ProjectReference>
+    <ProjectReference Include="..\cs_compiler\cs_compiler.csproj">
+      <Project>{ca8d2675-1476-48ec-90c4-08e6d217f196}</Project>
+      <Name>cs_compiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\slp_parser\slp_parser.csproj">
+      <Project>{507598c9-ac33-499d-8c41-2eab3c79f905}</Project>
+      <Name>slp_parser</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

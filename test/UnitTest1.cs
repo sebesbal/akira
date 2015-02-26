@@ -25,7 +25,7 @@ namespace test
 //        }
 
         [TestMethod]
-        public void TestMethod1()
+        public void TestCsCompiler()
         {
             string code = @"using System; using akira;
                 public class TestRule : Exe

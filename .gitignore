@@ -2,3 +2,7 @@
 /akira/obj
 /test/bin
 /test/obj
+/cs_compiler/obj
+/cs_compiler/bin
+/slp_parser/bin
+/slp_parser/obj
