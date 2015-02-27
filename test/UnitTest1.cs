@@ -50,5 +50,12 @@ namespace test
             Assert.IsInstanceOfType(t, typeof(Text));
             Assert.AreEqual((t as Text).Content, "fasza!");
         }
+
+        [TestMethod]
+        public void TestCsCompiler2()
+        {
+            Akira a = new Akira();
+            a.Run("test.aki");
+        }
     }
 }

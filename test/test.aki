@@ -1,0 +1,19 @@
+<akira>
+  <apply src="cs"/>
+  <cs src="lofusz">
+    using System;
+    using akira;
+    using System.Xml.Linq;
+    public class TestRule2 : Rule2
+    {
+    public override bool Apply(XElement node)
+    {
+    if (node.Name == "lofusz") return false;
+    node.Name = "lofusz";
+    return true;
+    }
+    }
+  </cs>
+	<apply src="lofusz"/>
+  <alma>korte</alma>
+</akira>

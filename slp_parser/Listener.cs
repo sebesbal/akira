@@ -9,7 +9,7 @@ namespace slp_parser
 {
     class Listener: IslpListener
     {
-        Node Root { public get; protected set; }
+        public Node Root { get; protected set; }
 
         Antlr4.Runtime.Tree.ParseTreeProperty<Node> m = new Antlr4.Runtime.Tree.ParseTreeProperty<Node>();
 
@@ -158,12 +158,12 @@ namespace slp_parser
 
         public void ExitSing(slpParser.SingContext context)
         {
-            if (context.STRING() != null)
-            {
-                Node n = new Node();
-                 context.STRING().GetText()
-                m.Put(context,);
-            }
+            //if (context.STRING() != null)
+            //{
+            //    Node n = new Node();
+            //     context.STRING().GetText()
+            //    m.Put(context,);
+            //}
         }
 
         public void EnterQuestion(slpParser.QuestionContext context)
