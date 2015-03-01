@@ -1,10 +1,10 @@
 <akira>
-  <apply src="cs"/>
+  <apply src="cs_compiler"/>
   <cs src="lofusz">
     using System;
     using akira;
     using System.Xml.Linq;
-    public class TestRule2 : Rule2
+    public class TestRule2 : Rule
     {
     public override bool Apply(XElement node)
     {
