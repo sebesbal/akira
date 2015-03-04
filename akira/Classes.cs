@@ -19,22 +19,31 @@ namespace akira
         {
             Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/" + fileName);
             var types = assembly.GetTypes();
-            var ruleClass = types[0];
-            var rule = assembly.CreateInstance(ruleClass.FullName);
-            Rule result = rule as Rule;
-            if (result == null) throw new Exception("broke");
-            return result;
+
+            foreach (var ruleClass in types)
+            {
+                if (ruleClass.IsSubclassOf(typeof(Rule)))
+                {
+                    return (Rule)assembly.CreateInstance(ruleClass.FullName);
+                }
+            }
+            throw new Exception("Rule descendentant not found");
         }
     }
 
     public class Akira : Rule
     {
         List<Rule> Rules = new List<Rule>();
+        XDocument doc;
         public void Run(string fileName)
         {
-            XDocument doc = XDocument.Load(fileName);
+            doc = XDocument.Load(fileName);
             XElement e = doc.Root;
             Apply(e);
+        }
+        public void Save(string fileName)
+        {
+            doc.Save(fileName);
         }
         public override bool Apply(XElement node)
         {

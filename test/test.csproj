@@ -72,6 +72,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="test_parser.aki">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="test.aki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
