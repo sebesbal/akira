@@ -15,7 +15,7 @@ namespace slp_parser
     {
         slpLexer lexer;
         slpParser parser;
-        public override bool Apply(XElement node)
+        public override bool Apply(ref XElement node)
         {
             if (node.Name != "slp") return false;
 
@@ -27,6 +27,7 @@ namespace slp_parser
             IParseTree tree = parser.program();
             XElement elem = TreeToNode(null, tree);
             node.ReplaceWith(elem);
+            node = elem;
 
             return true;
         }
@@ -37,14 +38,14 @@ namespace slp_parser
             {
                 string name = parser.RuleNames[(tree as ParserRuleContext).RuleIndex];
                 XElement result = new XElement(name);
-                if (parent != null)
-                {
-                    parent.Add(result);
-                }
                 for (int i = 0; i < tree.ChildCount; ++i)
                 {
                     var child = tree.GetChild(i);
                     TreeToNode(result, child);
+                }
+                if (parent != null)
+                {
+                    parent.Add(result);
                 }
                 return result;
             }
@@ -52,8 +53,15 @@ namespace slp_parser
             {
                 string txt = (tree as TerminalNodeImpl).Payload.Text;
                 string name = lexer.RuleNames[(tree as TerminalNodeImpl).Payload.Type - 1];
-                parent.Value = txt;
-                parent.Name = name;
+                XElement result = new XElement(name);
+                result.Value = txt;
+                parent.Add(result);
+
+                ////parent.Value = txt;
+                //if (!name.StartsWith("T_"))
+                //{
+                //    parent.Name = name;
+                //}
                 return null;
             }
             else

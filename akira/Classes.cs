@@ -14,7 +14,7 @@ namespace akira
     public class Rule
     {
         public string ID;
-        public virtual bool Apply(XElement node) { return false; }
+        public virtual bool Apply(ref XElement node) { return false; }
         public static Rule Load(string fileName)
         {
             Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/" + fileName);
@@ -39,38 +39,38 @@ namespace akira
         {
             doc = XDocument.Load(fileName);
             XElement e = doc.Root;
-            Apply(e);
+            Apply(ref e);
         }
         public void Save(string fileName)
         {
             doc.Save(fileName);
         }
-        public override bool Apply(XElement node)
+        public override bool Apply(ref XElement node)
         {
             if (node.Name != "akira") return false;
 
-            var v = node.Elements();
+            var v = node.Elements().ToArray();
             foreach (XElement n in v)
             {
-                if (n.Name == "apply")
+                XElement m = n;
+                while (ApplyRules(ref m)) ;
+
+                if (m != null && m.Name == "apply")
                 {
-                    XAttribute a = n.Attribute("src");
+                    XAttribute a = m.Attribute("src");
                     Rule rule = Load(a.Value + ".dll");
                     Rules.Insert(0, rule);
-                }
-                else
-                {
-                    while (ApplyRules(n)) ;
+                    m.Remove();
                 }
             }
 
             return true;
         }
-        public bool ApplyRules(XElement node)
+        public bool ApplyRules(ref XElement node)
         {
             foreach (Rule r in Rules)
             {
-                if (r.Apply(node))
+                if (r.Apply(ref node))
                 {
                     return true;
                 }

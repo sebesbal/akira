@@ -6,7 +6,7 @@
     using System.Xml.Linq;
     public class TestRule2 : Rule
     {
-    public override bool Apply(XElement node)
+    public override bool Apply(ref XElement node)
     {
     if (node.Name == "lofusz") return false;
     node.Name = "lofusz";

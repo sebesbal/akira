@@ -12,7 +12,7 @@ namespace akira
 {
     public class Cs : Rule
     {
-        public override bool Apply(XElement node)
+        public override bool Apply(ref XElement node)
         {
             if (node.Name != "cs" || (node.Attribute("loaded") != null && node.Attribute("loaded").Value == "true")) return false;
             string code = node.Value;
