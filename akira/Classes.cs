@@ -11,10 +11,39 @@ using System.Xml.Linq;
 
 namespace akira
 {
+    public static class Extensions
+    {
+        public static bool GetAttribute(this XElement node, string name, out XAttribute attribute)
+        {
+            attribute = node.Attribute(name);
+            return attribute != null;
+        }
+
+        public static XElement DeepCopy(this XElement node)
+        {
+            return new XElement(node);
+        }
+
+        public static XElement ShallowCopy(this XElement node)
+        {
+            XElement result = new XElement(node.Name);
+            foreach (var item in node.Attributes())
+            {
+                result.SetAttributeValue(item.Name, item.Value);
+            }
+            return result;
+        }
+    }
+
+    public class Context
+    {
+        public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
+    }
+
     public class Rule
     {
         public string ID;
-        public virtual bool Apply(ref XElement node) { return false; }
+        public virtual bool Apply(Context ctx, ref XElement node) { return false; }
         public static Rule Load(string fileName)
         {
             Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/" + fileName);
@@ -39,13 +68,14 @@ namespace akira
         {
             doc = XDocument.Load(fileName);
             XElement e = doc.Root;
-            Apply(ref e);
+            Context ctx = new Context();
+            Apply(ctx, ref e);
         }
         public void Save(string fileName)
         {
             doc.Save(fileName);
         }
-        public override bool Apply(ref XElement node)
+        public override bool Apply(Context ctx, ref XElement node)
         {
             if (node.Name != "akira") return false;
 
@@ -53,12 +83,21 @@ namespace akira
             foreach (XElement n in v)
             {
                 XElement m = n;
-                while (ApplyRules(ref m)) ;
+                while (m != null && ApplyRules(ctx, ref m)) ;
 
                 if (m != null && m.Name == "apply")
                 {
                     XAttribute a = m.Attribute("src");
-                    Rule rule = Load(a.Value + ".dll");
+                    string ruleID = a.Value;
+                    Rule rule;
+                    if (ctx.Rules.ContainsKey(ruleID))
+                    {
+                        rule = ctx.Rules[ruleID];
+                    }
+                    else
+                    {
+                        rule = Load(ruleID + ".dll");
+                    }
                     Rules.Insert(0, rule);
                     m.Remove();
                 }
@@ -66,11 +105,11 @@ namespace akira
 
             return true;
         }
-        public bool ApplyRules(ref XElement node)
+        public bool ApplyRules(Context ctx, ref XElement node)
         {
             foreach (Rule r in Rules)
             {
-                if (r.Apply(ref node))
+                if (r.Apply(ctx, ref node))
                 {
                     return true;
                 }

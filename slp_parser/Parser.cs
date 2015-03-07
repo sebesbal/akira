@@ -15,7 +15,7 @@ namespace slp_parser
     {
         slpLexer lexer;
         slpParser parser;
-        public override bool Apply(ref XElement node)
+        public override bool Apply(Context ctx, ref XElement node)
         {
             if (node.Name != "slp") return false;
 
