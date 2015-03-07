@@ -1,0 +1,19 @@
+<akira>
+  <apply src="match"/>
+  <rule src="lofusz">
+    <sum>
+      <ref>a</ref>
+      <ref>b</ref>
+    </sum>
+    <mul>
+      <num>2</num>
+      <ref>a</ref>
+      <ref>b</ref>
+    </mul>
+  </rule>
+  <apply src="lofusz"/>
+  <sum>
+    <num>7</num>
+    <num>8</num>
+  </sum>
+</akira>

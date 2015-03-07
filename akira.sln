@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "slp_parser", "slp_parser\sl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs_compiler", "cs_compiler\cs_compiler.csproj", "{CA8D2675-1476-48EC-90C4-08E6D217F196}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "match", "match\match.csproj", "{0D9881D0-3DB6-45A1-9334-70BF771662B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA8D2675-1476-48EC-90C4-08E6D217F196}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D9881D0-3DB6-45A1-9334-70BF771662B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D9881D0-3DB6-45A1-9334-70BF771662B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D9881D0-3DB6-45A1-9334-70BF771662B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D9881D0-3DB6-45A1-9334-70BF771662B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
