@@ -78,6 +78,7 @@
   <ItemGroup>
     <None Include="test_match.aki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="test_parser.aki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

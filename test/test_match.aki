@@ -2,13 +2,14 @@
   <apply src="match"/>
   <rule src="lofusz">
     <sum>
-      <ref>a</ref>
-      <ref>b</ref>
+      <any ref="a">
+      </any>
+      <any ref="b"/>
     </sum>
     <mul>
       <num>2</num>
-      <ref>a</ref>
-      <ref>b</ref>
+      <any ref="a"/>
+      <any ref="b"/>
     </mul>
   </rule>
   <apply src="lofusz"/>

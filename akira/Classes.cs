@@ -38,6 +38,11 @@ namespace akira
     public class Context
     {
         public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
+        public string GenName()
+        {
+            return "gen" + nameCount++;
+        }
+        private int nameCount = 0;
     }
 
     public class Rule

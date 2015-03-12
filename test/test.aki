@@ -1,6 +1,6 @@
 <akira>
   <apply src="cs_compiler"/>
-  <cs src="lofusz">
+  <rule type="cs" src="lofusz">
     using System;
     using akira;
     using System.Xml.Linq;
@@ -13,7 +13,7 @@
     return true;
     }
     }
-  </cs>
+  </rule>
 	<apply src="lofusz"/>
   <alma>korte</alma>
 </akira>
