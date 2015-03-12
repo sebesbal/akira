@@ -3,6 +3,7 @@
   <rule src="lofusz">
     <sum>
       <any ref="a">
+        <cond>return true;</cond>
       </any>
       <any ref="b"/>
     </sum>
