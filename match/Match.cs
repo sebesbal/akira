@@ -23,7 +23,7 @@ namespace akira
             if (!(a == null || a.Value == "match")) return false;
 
             // Instance result = new Instance(node.Elements().ElementAt(0), node.Elements().ElementAt(1));
-            Instance result = GenerateInstance(ctx, node);
+            Rule result = GenerateInstance(ctx, node);
             ctx.Rules.Add(node.Attribute("src").Value, result);
 
             node.Remove();
@@ -77,7 +77,7 @@ namespace akira
             + "namespace akira {"
             + "public class " + name + " : akira.Instance"
             + "{ "
-            // + refDefs
+            + refDefs
             + "public " + name + "(){ " + condDefs + "}"
             + "}} ";
 
@@ -89,25 +89,42 @@ namespace akira
 
         //}
 
-        protected Instance GenerateInstance(Context ctx, XElement node)
+        //protected Instance GenerateInstance(Context ctx, XElement node)
+        //{
+        //    string code = GenerateClass(ctx, node);
+
+        //    // var a = Akira.AssemblyFromCode(code);
+
+        //    Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/gen0.dll");
+
+        //    Type t = assembly.GetTypes()[0];
+        //    if (t.IsSubclassOf(typeof(Instance)))
+        //    {
+        //        var o = assembly.CreateInstance(t.FullName);
+        //        Instance i = o as Instance;
+        //        i.left = node.Elements().ElementAt(0);
+        //        i.right = node.Elements().ElementAt(1);
+        //        return i;
+        //    }
+        //    return null;
+            
+        //}
+
+        protected Rule GenerateInstance(Context ctx, XElement node)
         {
             string code = GenerateClass(ctx, node);
 
-            // var a = Akira.AssemblyFromCode(code);
+            var a = Akira.AssemblyFromCode(code);
 
-            Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/gen0.dll");
+            // Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/gen0.dll");
 
-            Type t = assembly.GetTypes()[0];
-            if (t.IsSubclassOf(typeof(Instance)))
-            {
-                var o = assembly.CreateInstance(t.FullName);
-                Instance i = o as Instance;
-                i.left = node.Elements().ElementAt(0);
-                i.right = node.Elements().ElementAt(1);
-                return i;
-            }
-            return null;
-            
+            Type t = a.GetTypes()[0];
+            var o = a.CreateInstance(t.FullName);
+
+            t.GetField("left").SetValue(o, node.Elements().ElementAt(0));
+            t.GetField("right").SetValue(o, node.Elements().ElementAt(1));
+
+            return (Rule)o;
         }
     }
 
@@ -160,8 +177,6 @@ namespace akira
 
         bool unify(XElement a, XElement b)
         {
-            return false;
-
             if (a.Name == "any")
             {
                 string av = a.Attribute("ref").Value;
@@ -208,7 +223,7 @@ namespace akira
 
         XElement getVar(string name)
         {
-            return (XElement)typeof(Instance).GetField(name).GetValue(this);
+            return (XElement)GetType().GetField(name).GetValue(this);
         }
 
         bool varDefined(string name)
@@ -242,10 +257,10 @@ namespace akira
 
         void ReplaceRefs(XElement elem)
         {
-            if (elem.Name == "ref")
+            if (elem.Name == "any")
             {
                 // elem.ReplaceWith(map[elem.Value].DeepCopy());
-                elem.ReplaceWith(getVar(elem.Value).DeepCopy());
+                elem.ReplaceWith(getVar(elem.Attribute("ref").Value).DeepCopy());
             }
             else
             {
