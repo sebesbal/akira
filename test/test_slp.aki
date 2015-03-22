@@ -1,0 +1,26 @@
+﻿<akira>
+  <apply src="match"/>
+  <rule src="lofusz2">
+    <rule>
+      <conj>
+        <cs ref="a" det="false"/>
+        <cs ref="b" det="false"/>
+      </conj>
+      <cs ref="c" det="false">
+        $(a.code)
+        if (br)
+        {
+			$(b.code)
+			if (!br) goto $(a.again);
+        }
+      </cs>
+      <com>c.again = b.again;</com>
+    </rule>
+
+  </rule>
+  <apply src="lofusz2"/>
+  <sum>
+    <num>7</num>
+    <num>8</num>
+  </sum>
+</akira>
