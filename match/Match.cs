@@ -17,7 +17,6 @@ namespace akira
         public override bool Apply(Context ctx, ref XElement node)
         {
             if (node.Name != "rule") return false;
-
             XAttribute a = node.Attribute("type");
 
             if (!(a == null || a.Value == "match")) return false;
@@ -43,10 +42,19 @@ namespace akira
             {
                 refs.Add(a.Value);
             }
-            if (node.Name == "cond")
+            if (node.GetAttribute("pre", out a))
             {
-                conds.Add(node.Value);
+                conds.Add(a.Value);
             }
+            if (node.GetAttribute("post", out a))
+            {
+                conds.Add(a.Value);
+            }
+
+            //if (node.Name == "cond")
+            //{
+            //    conds.Add(node.Value);
+            //}
             foreach (var item in node.Elements())
             {
                 FindRefs(item, refs, conds);
@@ -196,7 +204,8 @@ namespace akira
                 bitem.MoveNext();
                 foreach (var aitem in a.Elements())
                 {
-                    if (aitem.Name == "cond")
+                    XAttribute att;
+                    if (aitem.GetAttribute("pre", out att))
                     {
                         var cond = conds[condIndex++];
                         if (!cond())
@@ -204,10 +213,21 @@ namespace akira
                             return false;
                         }
                     }
-                    else if (!unify(aitem, bitem.Current))
+
+                    if (!unify(aitem, bitem.Current))
                     {
                         return false;
                     }
+
+                    if (aitem.GetAttribute("post", out att))
+                    {
+                        var cond = conds[condIndex++];
+                        if (!cond())
+                        {
+                            return false;
+                        }
+                    }
+
                     bitem.MoveNext();
                 }
                 return true;

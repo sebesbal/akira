@@ -16,7 +16,8 @@ namespace akira
         {
             //if (node.Name != "cs" || (node.Attribute("loaded") != null && node.Attribute("loaded").Value == "true")) return false;
             if (!(node.Name == "rule" && node.Attribute("type") != null && node.Attribute("type").Value == "cs")) return false;
-            string code = node.Value;
+            // string code = node.Value;
+            string code = node.Attribute("code").Value;
             string path = node.Attribute("src").Value;
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
             var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll" }, path + ".dll", true);

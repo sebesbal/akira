@@ -2,10 +2,8 @@
   <apply src="match"/>
   <rule src="lofusz">
     <sum>
-      <any ref="a">
-        <cond>return a.Name == "num";</cond>
-      </any>
-      <any ref="b"/>
+      <any ref="a" post="return a.Name == &quot;num&quot;;"/>
+      <any ref="b"/> 
     </sum>
     <mul>
       <num>2</num>

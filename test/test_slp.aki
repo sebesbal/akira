@@ -6,14 +6,13 @@
         <cs ref="a" det="false"/>
         <cs ref="b" det="false"/>
       </conj>
-      <cs ref="c" det="false">
+      <cs ref="c" det="false" code="
         $(a.code)
         if (br)
         {
-			$(b.code)
-			if (!br) goto $(a.again);
-        }
-      </cs>
+			    $(b.code)
+			    if (!br) goto $(a.again);
+        }" post="c.again = b.again;"/>
       <com>c.again = b.again;</com>
     </rule>
 
