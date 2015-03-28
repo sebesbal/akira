@@ -9,9 +9,9 @@ using System.IO;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 
-namespace slp_parser
+namespace akira
 {
-    class Parser: Rule
+    class slp_ast: Rule
     {
         slpLexer lexer;
         slpParser parser;

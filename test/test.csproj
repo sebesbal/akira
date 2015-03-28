@@ -62,17 +62,9 @@
       <Project>{a143ba8d-c92a-4f82-b55b-d78f4f43c48b}</Project>
       <Name>akira</Name>
     </ProjectReference>
-    <ProjectReference Include="..\cs_compiler\cs_compiler.csproj">
-      <Project>{ca8d2675-1476-48ec-90c4-08e6d217f196}</Project>
-      <Name>cs_compiler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\match\match.csproj">
-      <Project>{0d9881d0-3db6-45a1-9334-70bf771662b3}</Project>
-      <Name>match</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\slp_parser\slp_parser.csproj">
+    <ProjectReference Include="..\slp_parser\slp_ast.csproj">
       <Project>{507598c9-ac33-499d-8c41-2eab3c79f905}</Project>
-      <Name>slp_parser</Name>
+      <Name>slp_ast</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +82,7 @@
     </None>
     <None Include="test_slp.aki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <Choose>

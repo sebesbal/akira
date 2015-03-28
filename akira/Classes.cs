@@ -45,7 +45,12 @@ namespace akira
         private int nameCount = 0;
     }
 
-    public class Rule
+    public class exe
+    {
+
+    }
+
+    public class Rule: exe
     {
         public string ID;
         public virtual bool Apply(Context ctx, ref XElement node) { return false; }
@@ -65,10 +70,15 @@ namespace akira
         }
     }
 
-    public class Akira : Rule
+    public class akira : Rule
     {
         List<Rule> Rules = new List<Rule>();
         XDocument doc;
+        public akira()
+        {
+            Rules.Add(new cs_exe());
+            Rules.Add(new match_exe());
+        }
         public void Run(string fileName)
         {
             doc = XDocument.Load(fileName);
@@ -125,7 +135,7 @@ namespace akira
         public static Assembly AssemblyFromCode(string code)
         {
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "match.dll"}, "gen0.dll", true);
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll"}, "gen0.dll", true);
             parameters.GenerateExecutable = false;
             
             CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);

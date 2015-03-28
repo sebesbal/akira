@@ -1,5 +1,4 @@
 <akira>
-  <apply src="cs_compiler"/>
   <rule type="cs" src="lofusz" code="
     using System;
     using akira;

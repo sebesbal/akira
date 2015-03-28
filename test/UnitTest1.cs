@@ -15,14 +15,14 @@ namespace test
         [TestMethod]
         public void TestCsCompiler()
         {
-            Akira a = new Akira();
+            akira.akira a = new akira.akira();
             a.Run("test.aki");
         }
 
         [TestMethod]
         public void TestSlpParser()
         {
-            Akira a = new Akira();
+            akira.akira a = new akira.akira();
             a.Run("test_parser.aki");
             a.Save("result.xml");
         }
@@ -30,7 +30,7 @@ namespace test
         [TestMethod]
         public void TestMatch()
         {
-            Akira a = new Akira();
+            akira.akira a = new akira.akira();
             a.Run("test_match.aki");
             a.Save("result.xml");
         }

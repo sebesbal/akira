@@ -1,5 +1,5 @@
 <akira>
-  <apply src="slp_parser"/>
+  <apply src="slp_ast"/>
   <slp>
      (alma(x) := x = 2)
   </slp>

@@ -3,20 +3,35 @@
   <rule src="lofusz2">
     <rule>
       <conj>
-        <cs ref="a" det="false"/>
-        <cs ref="b" det="false"/>
+        <cs ref="a" ind="true"/>
+        <cs ref="b" ind="true"/>
       </conj>
-      <cs ref="c" det="false" code="
+      <cs ref="c" ind="true" code="
         $(a.code)
         if (br)
         {
 			    $(b.code)
 			    if (!br) goto $(a.again);
         }" post="c.again = b.again;"/>
-      <com>c.again = b.again;</com>
     </rule>
-
-  </rule>
+    
+    <rule>
+      <conj>
+        <cs ref="a" ind="true"/>
+        <cs ref="b" ind="true"/>
+      </conj>
+      <cs ref="c" ind="true" code="
+        $1
+        if (br)
+        {
+			    $2
+			    if (!br) goto $3;
+        }" post="c.again = b.again;">
+        
+        <eval code=""/>
+        
+      </cs>
+    </rule>  </rule>
   <apply src="lofusz2"/>
   <sum>
     <num>7</num>
