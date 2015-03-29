@@ -9,12 +9,15 @@ using System.Xml.Linq;
 
 namespace akira
 {
+    /// <summary>
+    /// <rule type="cs"> --> <rule type="exe"/>
+    /// </summary>
     class cs_exe: Rule
     {
         public override bool Apply(Context ctx, ref XElement node)
         {
             //if (node.Name != "cs" || (node.Attribute("loaded") != null && node.Attribute("loaded").Value == "true")) return false;
-            if (!(node.Name == "rule" && node.Attribute("type") != null && node.Attribute("type").Value == "cs")) return false;
+            if (!(node.Name == "rule" && node.MatchAttribute("type", "cs"))) return false;
             // string code = node.Value;
             string code = node.Attribute("code").Value;
             string path = node.Attribute("src").Value;

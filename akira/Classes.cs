@@ -19,6 +19,12 @@ namespace akira
             return attribute != null;
         }
 
+        public static bool MatchAttribute(this XElement node, string name, string value)
+        {
+            var attribute = node.Attribute(name);
+            return attribute != null && attribute.Value == value;
+        }
+
         public static XElement DeepCopy(this XElement node)
         {
             return new XElement(node);
