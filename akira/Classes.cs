@@ -79,11 +79,12 @@ namespace akira
     public class akira : Rule
     {
         List<Rule> Rules = new List<Rule>();
-        XDocument doc;
+        public XDocument doc { get; protected set; }
         public akira()
         {
             Rules.Add(new cs_exe());
             Rules.Add(new match_exe());
+            Rules.Add(new cs_cs());
         }
         public void Run(string fileName)
         {

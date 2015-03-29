@@ -1,5 +1,5 @@
 <akira>
-  <rule src="lofusz">
+  <rule type="match" src="lofusz">
     <sum>
       <any ref="a" post="return a.Name == &quot;num&quot;;"/>
       <any ref="b"/> 

@@ -14,11 +14,7 @@ namespace akira
     {
         public override bool Apply(Context ctx, ref XElement node)
         {
-            if (node.Name != "rule") return false;
-            XAttribute a = node.Attribute("type");
-
-            if (!(a == null || a.Value == "match")) return false;
-
+            if (!(node.Name == "rule" && node.MatchAttribute("type", "match"))) return false;
             // Instance result = new Instance(node.Elements().ElementAt(0), node.Elements().ElementAt(1));
             Rule result = GenerateInstance(ctx, node);
             ctx.Rules.Add(node.Attribute("src").Value, result);

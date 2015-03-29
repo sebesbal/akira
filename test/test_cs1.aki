@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<akira>
+  <cs code="a $1 b $2 c $1">
+      <cs code="1"/>
+      <cs code="2"/>
+  </cs>
+</akira>
