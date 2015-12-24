@@ -31,6 +31,14 @@ namespace test
         }
 
         [TestMethod]
+        public void test_parser2()
+        {
+            akira.akira a = new akira.akira();
+            a.Run("test_parser.aki");
+            a.Save("result.xml");
+        }
+
+        [TestMethod]
         public void test_match()
         {
             akira.akira a = new akira.akira();
@@ -52,6 +60,17 @@ namespace test
             a.Save("result.xml");
             var node = a.doc.Descendants("cs").First();
             Assert.AreEqual(node.Attribute("code").Value, "a 1 b 2 c 1");
+        }
+
+        [TestMethod]
+        public void test_xml()
+        {
+            var doc = XDocument.Load("test_xml.xml");
+            XElement e = doc.Root;
+            foreach (var item in e.Elements())
+            {
+                Console.WriteLine(item.ToString());
+            }
         }
     }
 }

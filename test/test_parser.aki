@@ -1,6 +1,7 @@
 <akira>
   <apply src="slp_ast"/>
   <slp>
-     (alma(x) := x = 2)
-  </slp>
+//(alma(x):=x=2)
+a+3
+</slp>
 </akira>
