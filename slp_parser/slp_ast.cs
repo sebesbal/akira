@@ -52,7 +52,10 @@ namespace akira
             else if (tree is TerminalNodeImpl)
             {
                 string txt = (tree as TerminalNodeImpl).Payload.Text;
-                string name = lexer.RuleNames[(tree as TerminalNodeImpl).Payload.Type - 1];
+
+                int id = (tree as TerminalNodeImpl).Payload.Type -1;
+                // string name = id < lexer.RuleNames.Count() ? lexer.RuleNames[id] : "fos";
+                string name = lexer.RuleIndexMap.FirstOrDefault(x => x.Value == id).Key;
                 XElement result = new XElement(name);
                 result.Value = txt;
                 parent.Add(result);
