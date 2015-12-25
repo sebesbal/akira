@@ -34,7 +34,7 @@ tokens { INDENT, DEDENT }
   private CommonToken commonToken(int type, String text) {
     int stop = this.CharIndex - 1;
     int start = string.IsNullOrEmpty(text) ? stop : stop - text.Length + 1;
-    return new CommonToken(this._tokenFactorySourcePair, type + 1, DefaultTokenChannel, start, stop);
+    return new CommonToken(this._tokenFactorySourcePair, type, DefaultTokenChannel, start, stop);
   }
   
   private IToken createDedent() {
@@ -83,9 +83,10 @@ tokens { INDENT, DEDENT }
       this.lastToken = next;
 	}
 
+	if (tokens.Count == 0) return next;
 	var first = tokens[0];
 	tokens.RemoveAt(0);
-    return tokens.Count == 0 ? next : first;
+    return first;
   }
   
 }
@@ -102,8 +103,8 @@ TRUE
     :   'true'
     ;
 
-FAIL
-    :   'fail'
+FALSE
+    :   'false'
     ;
 
 NULL
@@ -123,9 +124,12 @@ FLOAT
     ;
 
 ID  
-    // :   ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     :   ('a'..'z'|'A'..'Z'|'0'..'9'|'_')+
     ;
+	
+OP
+	:   ('+'|'*'|'/'|'='|'-'|'!'|'?'|'|'|'~'|'%'|'&'|'#'|'@')+
+	;
 
 NATIVE
     :   '{' ( NATIVE | ~[{}] )* '}'
@@ -139,7 +143,7 @@ LINE_COMMENT
     : '//' ~[\r\n]* '\r'? '\n' -> channel(HIDDEN)
     ;
 
-fragment SPACES
+SPACES
  : [ \t]+
  ;
 
@@ -151,8 +155,8 @@ OPEN_PAREN : '(' {opened++;};
 CLOSE_PAREN : ')' {opened--;};
 OPEN_BRACK : '[' {opened++;};
 CLOSE_BRACK : ']' {opened--;};
-// OPEN_BRACE : '{' {opened++;};
-// CLOSE_BRACE : '}' {opened--;};
+OPEN_BRACE : '<' {opened++;};
+CLOSE_BRACE : '>' {opened--;};
 
 NEWLINE
  : ( {atStartOfInput()}?   SPACES
@@ -193,118 +197,24 @@ NEWLINE
 WS  :   [ \r\t\u000C\n]+ -> channel(HIDDEN)
    ;
 
-program : NEWLINE? exp
-    ;
-
-predicate
-    :   EXPORT? ID '(' inParams=decList? (';' outParams=decList)? ')' ':-' exp '.' 
-    ;
-
-decList
-    : declaration (',' declaration)*
-    ;
-
-declaration
-    :   exp
-    ;
-
-exp
-    :   
-       ('<' call '>')+ (id | nat)  #Attribute
-    |    (   id
-        |   call
-        |   nat 
-        |   ( INT       
-            |   FLOAT
-            |   STRING
-            |   TRUE
-            |   FAIL
-            |   NULL
-            )
-        )                   #Sing
-    // |   id '[' exp ']'      #Child
-    // |  'export' '(' exp ')' #Export
-    |   '(' exp ')'         #Para
-    |   exp '.' ID          #Member
-    
-    //|   ('<' call '>')+ id #Attribute
-    |   exp '?'             #Question
-    |   '!' exp             #Not
-    |   exp '^' exp         #Binary
-    |   exp '/' exp         #Binary
-    |   exp '*' exp         #Associative
-    |   exp '**' exp        #Associative
-    |   exp '*?' exp        #Sugar
-    |   exp '*!' exp        #Sugar
-    |   exp '*-' exp        #Sugar   
-    |   '-' exp             #Min
-    |   '\\+-' exp          #Min
-    |   '+-' exp            #OpVarUnary
-    |   exp '-' exp         #Associative
-    |   exp '+' exp         #Associative
-    |   exp '+-' exp        #OpVar
-    |   exp '\\+-' exp      #Associative
-    |   exp '-+' exp        #OpVar
-    |   exp '++' exp        #Associative
-    |   exp '==' exp        #Binary
-    |   exp '=' exp         #Binary
-    |   exp ':=' exp        #Binary
-    |   exp '<' exp         #Binary
-    |   exp '>' exp         #Binary
-    |   exp '<=' exp        #Binary
-    |   exp '>=' exp        #Binary
-    |   exp '@' id          #Switch
-    |   exp ',' exp         #Associative
-    |   exp '::' exp        #Binary
-    |   '?->' exp           #Sugar
-    |   '-->' exp           #Sugar
-    |   '->' exp            #Sugar
-    |   exp '?->' exp       #Sugar
-    |   exp '-->' exp       #Sugar
-    |   exp '->' exp        #Sugar
-    |   exp ';' exp         #Associative
-    |   exp '||' exp        #Associative
-    |   exp ','             #Para
-    |   ';' exp             #Para
-    |   (   '(' '+' ')'
-        |   '(' '-' ')'
-        |   '(' '*' ')'
-        |   '(' '/' ')'
-        )                   #Operator
-    //|   exp ':=' exp        #Binary
-   //  |   '(' exp exp ')'     #Concatenation
-    ;
-
-id
-    :   ID
-    ;
-
-nat
-    :   ID? NATIVE
-    ;
-
-call
-    :   ('<' call '>')* ID ('(' expList? ')')?      #NormalCall
-    |   ('<' call '>')* ID '!' ('(' expList? ')')?  #DeclareCall
-    |   ('<' call '>')* ID '[' expList? ']'         #DelayedCall1
-    |   ('<' call '>')* ID '?' '(' expList? ')'     #DelayedCall2
-    |   ('<' call '>')* ID '<' expList? '>'         #DelayedCall2
-    ;
-
-/*
-call2
-    :   ID '[' expList? ']'
-    ;
-
-call3
-    :   ID '<' expList? '>'
-    ;
-*/
-
-expList
-    :   exp (',' exp)*
-    ;
-
-rul
-    :   'export'? exp ':=' exp
+program
+	:	list+
+	;
+   
+list
+	:	token+
+	;
+   
+token
+    :   INT       
+    |   FLOAT
+	|   STRING
+	|   TRUE
+	|   FALSE
+	|   ID
+	|	OP
+	|	NEWLINE
+	|	'(' list ')'
+	|	'{' list '}'
+	|	'[' list ']'
     ;

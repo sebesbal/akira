@@ -23,6 +23,7 @@ namespace akira
             AntlrInputStream input = new AntlrInputStream(code);
             lexer = new slpLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+
             parser = new slpParser(tokens);
             IParseTree tree = parser.program();
             XElement elem = TreeToNode(null, tree);
@@ -31,6 +32,11 @@ namespace akira
 
             return true;
         }
+
+        //XElement TokensToNode(XElement parent, CommonTokenStream tree)
+        //{
+
+        //}
 
         XElement TreeToNode(XElement parent, IParseTree tree)
         {
@@ -53,7 +59,7 @@ namespace akira
             {
                 string txt = (tree as TerminalNodeImpl).Payload.Text;
 
-                int id = (tree as TerminalNodeImpl).Payload.Type -1;
+                int id = (tree as TerminalNodeImpl).Payload.Type - 1;
                 // string name = id < lexer.RuleNames.Count() ? lexer.RuleNames[id] : "fos";
                 string name = lexer.RuleIndexMap.FirstOrDefault(x => x.Value == id).Key;
                 XElement result = new XElement(name);
