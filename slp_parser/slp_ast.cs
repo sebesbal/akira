@@ -8,6 +8,7 @@ using akira;
 using System.IO;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using slp_parser;
 
 namespace akira
 {
@@ -15,6 +16,7 @@ namespace akira
     {
         slpLexer lexer;
         slpParser parser;
+        Listener listener;
         public override bool Apply(Context ctx, ref XElement node)
         {
             if (node.Name != "slp") return false;
@@ -26,20 +28,46 @@ namespace akira
 
             parser = new slpParser(tokens);
             IParseTree tree = parser.program();
-            XElement elem = TreeToNode(null, tree);
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            listener = new Listener();
+            walker.Walk(listener, tree);
+
+            //XElement elem = TreeToNode(null, tree);
+            XElement elem = listener.program;
+
             node.ReplaceWith(elem);
             node = elem;
 
             return true;
         }
 
-        //XElement TokensToNode(XElement parent, CommonTokenStream tree)
-        //{
+        XElement ListToNode(XElement parent, slpParser.ListContext tree)
+        {
+            var list = new LinkedList<Tuple<Operator, ParserRuleContext>>();
+            var oprerators = listener.operators;
 
-        //}
+            foreach (var item in tree.children)
+            {
+                var text = item.GetText();
+                Operator op = item.Payload as Operator;
+                if (op != null)
+                {
+                }
+            }
+
+            return null;
+        }
+
+
 
         XElement TreeToNode(XElement parent, IParseTree tree)
         {
+            //if (tree is slpParser.ListContext)
+            //{
+            //    return ListToNode(parent, (slpParser.ListContext)tree);
+            //}
+            //else 
             if (tree is ParserRuleContext)
             {
                 string name = parser.RuleNames[(tree as ParserRuleContext).RuleIndex];

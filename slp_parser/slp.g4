@@ -91,14 +91,6 @@ tokens { INDENT, DEDENT }
   
 }
 
-EXPORT
-    :   'export'
-    ;
-
-CLASS
-    :   'class'
-    ;
-
 TRUE
     :   'true'
     ;
@@ -147,10 +139,6 @@ SPACES
  : [ \t]+
  ;
 
-// fragment COMMENT
-// : '#' ~[\r\n]*
-// ;
-
 OPEN_PAREN : '(' {opened++;};
 CLOSE_PAREN : ')' {opened--;};
 OPEN_BRACK : '[' {opened++;};
@@ -195,14 +183,22 @@ NEWLINE
  ;
 
 WS  :   [ \r\t\u000C\n]+ -> channel(HIDDEN)
-   ;
+	;
 
 program
-	:	list+
+	:	list
+	;
+   
+assoc
+	:	'fx' | 'fy' | 'xf' | 'yf' | 'xfx' | 'xfy' | 'yfx' | 'yfy'
+	;
+   
+opdef
+	:	'op' '(' INT ',' assoc ',' OP ')' NEWLINE
 	;
    
 list
-	:	token+
+	:	(token | block | opdef)+
 	;
    
 token
@@ -214,7 +210,10 @@ token
 	|   ID
 	|	OP
 	|	NEWLINE
-	|	'(' list ')'
+	;
+	
+block
+	:	'(' list ')'
 	|	'{' list '}'
 	|	'[' list ']'
     ;

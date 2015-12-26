@@ -1,9 +1,9 @@
 <akira>
   <apply src="slp_ast"/>
-  <slp>a+b
-  e+f
-    2*x
-  4
-3
-</slp>
+  <slp>
+    op(200,yfy,+)
+    op(100,yfy,*)
+    op(50,yfy,/)
+    a*b+(c+e)*d
+  </slp>
 </akira>

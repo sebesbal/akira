@@ -31,26 +31,30 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 [System.CLSCompliant(false)]
 public partial class slpParser : Parser {
 	public const int
-		T__0=1, T__1=2, EXPORT=3, CLASS=4, TRUE=5, FALSE=6, NULL=7, STRING=8, 
-		INT=9, FLOAT=10, ID=11, OP=12, NATIVE=13, COMMENT=14, LINE_COMMENT=15, 
-		SPACES=16, OPEN_PAREN=17, CLOSE_PAREN=18, OPEN_BRACK=19, CLOSE_BRACK=20, 
-		OPEN_BRACE=21, CLOSE_BRACE=22, NEWLINE=23, WS=24, INDENT=25, DEDENT=26;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, T__10=11, T__11=12, TRUE=13, FALSE=14, NULL=15, STRING=16, INT=17, 
+		FLOAT=18, ID=19, OP=20, NATIVE=21, COMMENT=22, LINE_COMMENT=23, SPACES=24, 
+		OPEN_PAREN=25, CLOSE_PAREN=26, OPEN_BRACK=27, CLOSE_BRACK=28, OPEN_BRACE=29, 
+		CLOSE_BRACE=30, NEWLINE=31, WS=32, INDENT=33, DEDENT=34;
 	public const int
-		RULE_program = 0, RULE_list = 1, RULE_token = 2;
+		RULE_program = 0, RULE_assoc = 1, RULE_opdef = 2, RULE_list = 3, RULE_token = 4, 
+		RULE_block = 5;
 	public static readonly string[] ruleNames = {
-		"program", "list", "token"
+		"program", "assoc", "opdef", "list", "token", "block"
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, "'{'", "'}'", "'export'", "'class'", "'true'", "'false'", "'<>'", 
-		null, null, null, null, null, null, null, null, null, "'('", "')'", "'['", 
-		"']'", "'<'", "'>'"
+		null, "'fx'", "'fy'", "'xf'", "'yf'", "'xfx'", "'xfy'", "'yfx'", "'yfy'", 
+		"'op'", "','", "'{'", "'}'", "'true'", "'false'", "'<>'", null, null, 
+		null, null, null, null, null, null, null, "'('", "')'", "'['", "']'", 
+		"'<'", "'>'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, null, null, "EXPORT", "CLASS", "TRUE", "FALSE", "NULL", "STRING", 
-		"INT", "FLOAT", "ID", "OP", "NATIVE", "COMMENT", "LINE_COMMENT", "SPACES", 
-		"OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACK", "CLOSE_BRACK", "OPEN_BRACE", 
-		"CLOSE_BRACE", "NEWLINE", "WS", "INDENT", "DEDENT"
+		null, null, null, null, null, null, null, null, null, null, null, null, 
+		null, "TRUE", "FALSE", "NULL", "STRING", "INT", "FLOAT", "ID", "OP", "NATIVE", 
+		"COMMENT", "LINE_COMMENT", "SPACES", "OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACK", 
+		"CLOSE_BRACK", "OPEN_BRACE", "CLOSE_BRACE", "NEWLINE", "WS", "INDENT", 
+		"DEDENT"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -75,11 +79,8 @@ public partial class slpParser : Parser {
 		Interpreter = new ParserATNSimulator(this,_ATN);
 	}
 	public partial class ProgramContext : ParserRuleContext {
-		public ListContext[] list() {
-			return GetRuleContexts<ListContext>();
-		}
-		public ListContext list(int i) {
-			return GetRuleContext<ListContext>(i);
+		public ListContext list() {
+			return GetRuleContext<ListContext>(0);
 		}
 		public ProgramContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -100,23 +101,106 @@ public partial class slpParser : Parser {
 	public ProgramContext program() {
 		ProgramContext _localctx = new ProgramContext(Context, State);
 		EnterRule(_localctx, 0, RULE_program);
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 12; list();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class AssocContext : ParserRuleContext {
+		public AssocContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_assoc; } }
+		public override void EnterRule(IParseTreeListener listener) {
+			IslpListener typedListener = listener as IslpListener;
+			if (typedListener != null) typedListener.EnterAssoc(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			IslpListener typedListener = listener as IslpListener;
+			if (typedListener != null) typedListener.ExitAssoc(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public AssocContext assoc() {
+		AssocContext _localctx = new AssocContext(Context, State);
+		EnterRule(_localctx, 2, RULE_assoc);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 7;
-			ErrorHandler.Sync(this);
+			State = 14;
 			_la = TokenStream.La(1);
-			do {
-				{
-				{
-				State = 6; list();
-				}
-				}
-				State = 9;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.La(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7))) != 0)) ) {
+			ErrorHandler.RecoverInline(this);
+			}
+			else {
+			    Consume();
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class OpdefContext : ParserRuleContext {
+		public ITerminalNode INT() { return GetToken(slpParser.INT, 0); }
+		public AssocContext assoc() {
+			return GetRuleContext<AssocContext>(0);
+		}
+		public ITerminalNode OP() { return GetToken(slpParser.OP, 0); }
+		public ITerminalNode NEWLINE() { return GetToken(slpParser.NEWLINE, 0); }
+		public OpdefContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_opdef; } }
+		public override void EnterRule(IParseTreeListener listener) {
+			IslpListener typedListener = listener as IslpListener;
+			if (typedListener != null) typedListener.EnterOpdef(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			IslpListener typedListener = listener as IslpListener;
+			if (typedListener != null) typedListener.ExitOpdef(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public OpdefContext opdef() {
+		OpdefContext _localctx = new OpdefContext(Context, State);
+		EnterRule(_localctx, 4, RULE_opdef);
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 16; Match(T__8);
+			State = 17; Match(OPEN_PAREN);
+			State = 18; Match(INT);
+			State = 19; Match(T__9);
+			State = 20; assoc();
+			State = 21; Match(T__9);
+			State = 22; Match(OP);
+			State = 23; Match(CLOSE_PAREN);
+			State = 24; Match(NEWLINE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -137,6 +221,18 @@ public partial class slpParser : Parser {
 		public TokenContext token(int i) {
 			return GetRuleContext<TokenContext>(i);
 		}
+		public BlockContext[] block() {
+			return GetRuleContexts<BlockContext>();
+		}
+		public BlockContext block(int i) {
+			return GetRuleContext<BlockContext>(i);
+		}
+		public OpdefContext[] opdef() {
+			return GetRuleContexts<OpdefContext>();
+		}
+		public OpdefContext opdef(int i) {
+			return GetRuleContext<OpdefContext>(i);
+		}
 		public ListContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -155,30 +251,50 @@ public partial class slpParser : Parser {
 	[RuleVersion(0)]
 	public ListContext list() {
 		ListContext _localctx = new ListContext(Context, State);
-		EnterRule(_localctx, 2, RULE_list);
+		EnterRule(_localctx, 6, RULE_list);
+		int _la;
 		try {
-			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 12;
+			State = 29;
 			ErrorHandler.Sync(this);
-			_alt = 1;
+			_la = TokenStream.La(1);
 			do {
-				switch (_alt) {
-				case 1:
+				{
+				State = 29;
+				switch (TokenStream.La(1)) {
+				case TRUE:
+				case FALSE:
+				case STRING:
+				case INT:
+				case FLOAT:
+				case ID:
+				case OP:
+				case NEWLINE:
 					{
-					{
-					State = 11; token();
+					State = 26; token();
 					}
+					break;
+				case T__10:
+				case OPEN_PAREN:
+				case OPEN_BRACK:
+					{
+					State = 27; block();
+					}
+					break;
+				case T__8:
+					{
+					State = 28; opdef();
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
-				State = 14;
+				}
+				State = 31;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,1,Context);
-			} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber );
+				_la = TokenStream.La(1);
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -201,9 +317,6 @@ public partial class slpParser : Parser {
 		public ITerminalNode ID() { return GetToken(slpParser.ID, 0); }
 		public ITerminalNode OP() { return GetToken(slpParser.OP, 0); }
 		public ITerminalNode NEWLINE() { return GetToken(slpParser.NEWLINE, 0); }
-		public ListContext list() {
-			return GetRuleContext<ListContext>(0);
-		}
 		public TokenContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -222,80 +335,80 @@ public partial class slpParser : Parser {
 	[RuleVersion(0)]
 	public TokenContext token() {
 		TokenContext _localctx = new TokenContext(Context, State);
-		EnterRule(_localctx, 4, RULE_token);
+		EnterRule(_localctx, 8, RULE_token);
+		int _la;
 		try {
-			State = 36;
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 33;
+			_la = TokenStream.La(1);
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NEWLINE))) != 0)) ) {
+			ErrorHandler.RecoverInline(this);
+			}
+			else {
+			    Consume();
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class BlockContext : ParserRuleContext {
+		public ListContext list() {
+			return GetRuleContext<ListContext>(0);
+		}
+		public BlockContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_block; } }
+		public override void EnterRule(IParseTreeListener listener) {
+			IslpListener typedListener = listener as IslpListener;
+			if (typedListener != null) typedListener.EnterBlock(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			IslpListener typedListener = listener as IslpListener;
+			if (typedListener != null) typedListener.ExitBlock(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public BlockContext block() {
+		BlockContext _localctx = new BlockContext(Context, State);
+		EnterRule(_localctx, 10, RULE_block);
+		try {
+			State = 47;
 			switch (TokenStream.La(1)) {
-			case INT:
+			case OPEN_PAREN:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 16; Match(INT);
+				State = 35; Match(OPEN_PAREN);
+				State = 36; list();
+				State = 37; Match(CLOSE_PAREN);
 				}
 				break;
-			case FLOAT:
+			case T__10:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 17; Match(FLOAT);
-				}
-				break;
-			case STRING:
-				EnterOuterAlt(_localctx, 3);
-				{
-				State = 18; Match(STRING);
-				}
-				break;
-			case TRUE:
-				EnterOuterAlt(_localctx, 4);
-				{
-				State = 19; Match(TRUE);
-				}
-				break;
-			case FALSE:
-				EnterOuterAlt(_localctx, 5);
-				{
-				State = 20; Match(FALSE);
-				}
-				break;
-			case ID:
-				EnterOuterAlt(_localctx, 6);
-				{
-				State = 21; Match(ID);
-				}
-				break;
-			case OP:
-				EnterOuterAlt(_localctx, 7);
-				{
-				State = 22; Match(OP);
-				}
-				break;
-			case NEWLINE:
-				EnterOuterAlt(_localctx, 8);
-				{
-				State = 23; Match(NEWLINE);
-				}
-				break;
-			case OPEN_PAREN:
-				EnterOuterAlt(_localctx, 9);
-				{
-				State = 24; Match(OPEN_PAREN);
-				State = 25; list();
-				State = 26; Match(CLOSE_PAREN);
-				}
-				break;
-			case T__0:
-				EnterOuterAlt(_localctx, 10);
-				{
-				State = 28; Match(T__0);
-				State = 29; list();
-				State = 30; Match(T__1);
+				State = 39; Match(T__10);
+				State = 40; list();
+				State = 41; Match(T__11);
 				}
 				break;
 			case OPEN_BRACK:
-				EnterOuterAlt(_localctx, 11);
+				EnterOuterAlt(_localctx, 3);
 				{
-				State = 32; Match(OPEN_BRACK);
-				State = 33; list();
-				State = 34; Match(CLOSE_BRACK);
+				State = 43; Match(OPEN_BRACK);
+				State = 44; list();
+				State = 45; Match(CLOSE_BRACK);
 				}
 				break;
 			default:
@@ -314,23 +427,24 @@ public partial class slpParser : Parser {
 	}
 
 	public static readonly string _serializedATN =
-		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3\x1C)\x4\x2\t\x2"+
-		"\x4\x3\t\x3\x4\x4\t\x4\x3\x2\x6\x2\n\n\x2\r\x2\xE\x2\v\x3\x3\x6\x3\xF"+
-		"\n\x3\r\x3\xE\x3\x10\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3"+
-		"\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4"+
-		"\x5\x4\'\n\x4\x3\x4\x2\x2\x5\x2\x4\x6\x2\x2\x31\x2\t\x3\x2\x2\x2\x4\xE"+
-		"\x3\x2\x2\x2\x6&\x3\x2\x2\x2\b\n\x5\x4\x3\x2\t\b\x3\x2\x2\x2\n\v\x3\x2"+
-		"\x2\x2\v\t\x3\x2\x2\x2\v\f\x3\x2\x2\x2\f\x3\x3\x2\x2\x2\r\xF\x5\x6\x4"+
-		"\x2\xE\r\x3\x2\x2\x2\xF\x10\x3\x2\x2\x2\x10\xE\x3\x2\x2\x2\x10\x11\x3"+
-		"\x2\x2\x2\x11\x5\x3\x2\x2\x2\x12\'\a\v\x2\x2\x13\'\a\f\x2\x2\x14\'\a\n"+
-		"\x2\x2\x15\'\a\a\x2\x2\x16\'\a\b\x2\x2\x17\'\a\r\x2\x2\x18\'\a\xE\x2\x2"+
-		"\x19\'\a\x19\x2\x2\x1A\x1B\a\x13\x2\x2\x1B\x1C\x5\x4\x3\x2\x1C\x1D\a\x14"+
-		"\x2\x2\x1D\'\x3\x2\x2\x2\x1E\x1F\a\x3\x2\x2\x1F \x5\x4\x3\x2 !\a\x4\x2"+
-		"\x2!\'\x3\x2\x2\x2\"#\a\x15\x2\x2#$\x5\x4\x3\x2$%\a\x16\x2\x2%\'\x3\x2"+
-		"\x2\x2&\x12\x3\x2\x2\x2&\x13\x3\x2\x2\x2&\x14\x3\x2\x2\x2&\x15\x3\x2\x2"+
-		"\x2&\x16\x3\x2\x2\x2&\x17\x3\x2\x2\x2&\x18\x3\x2\x2\x2&\x19\x3\x2\x2\x2"+
-		"&\x1A\x3\x2\x2\x2&\x1E\x3\x2\x2\x2&\"\x3\x2\x2\x2\'\a\x3\x2\x2\x2\x5\v"+
-		"\x10&";
+		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3$\x34\x4\x2\t\x2"+
+		"\x4\x3\t\x3\x4\x4\t\x4\x4\x5\t\x5\x4\x6\t\x6\x4\a\t\a\x3\x2\x3\x2\x3\x3"+
+		"\x3\x3\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3"+
+		"\x5\x3\x5\x3\x5\x6\x5 \n\x5\r\x5\xE\x5!\x3\x6\x3\x6\x3\a\x3\a\x3\a\x3"+
+		"\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x5\a\x32\n\a\x3\a\x2\x2\b\x2"+
+		"\x4\x6\b\n\f\x2\x4\x3\x2\x3\n\x5\x2\xF\x10\x12\x16!!\x32\x2\xE\x3\x2\x2"+
+		"\x2\x4\x10\x3\x2\x2\x2\x6\x12\x3\x2\x2\x2\b\x1F\x3\x2\x2\x2\n#\x3\x2\x2"+
+		"\x2\f\x31\x3\x2\x2\x2\xE\xF\x5\b\x5\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2"+
+		"\x2\x2\x11\x5\x3\x2\x2\x2\x12\x13\a\v\x2\x2\x13\x14\a\x1B\x2\x2\x14\x15"+
+		"\a\x13\x2\x2\x15\x16\a\f\x2\x2\x16\x17\x5\x4\x3\x2\x17\x18\a\f\x2\x2\x18"+
+		"\x19\a\x16\x2\x2\x19\x1A\a\x1C\x2\x2\x1A\x1B\a!\x2\x2\x1B\a\x3\x2\x2\x2"+
+		"\x1C \x5\n\x6\x2\x1D \x5\f\a\x2\x1E \x5\x6\x4\x2\x1F\x1C\x3\x2\x2\x2\x1F"+
+		"\x1D\x3\x2\x2\x2\x1F\x1E\x3\x2\x2\x2 !\x3\x2\x2\x2!\x1F\x3\x2\x2\x2!\""+
+		"\x3\x2\x2\x2\"\t\x3\x2\x2\x2#$\t\x3\x2\x2$\v\x3\x2\x2\x2%&\a\x1B\x2\x2"+
+		"&\'\x5\b\x5\x2\'(\a\x1C\x2\x2(\x32\x3\x2\x2\x2)*\a\r\x2\x2*+\x5\b\x5\x2"+
+		"+,\a\xE\x2\x2,\x32\x3\x2\x2\x2-.\a\x1D\x2\x2./\x5\b\x5\x2/\x30\a\x1E\x2"+
+		"\x2\x30\x32\x3\x2\x2\x2\x31%\x3\x2\x2\x2\x31)\x3\x2\x2\x2\x31-\x3\x2\x2"+
+		"\x2\x32\r\x3\x2\x2\x2\x5\x1F!\x31";
 	public static readonly ATN _ATN =
 		new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
 }

@@ -39,6 +39,26 @@ public interface IslpListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitProgram([NotNull] slpParser.ProgramContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.assoc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAssoc([NotNull] slpParser.AssocContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.assoc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAssoc([NotNull] slpParser.AssocContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.opdef"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterOpdef([NotNull] slpParser.OpdefContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.opdef"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitOpdef([NotNull] slpParser.OpdefContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="slpParser.list"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -58,4 +78,14 @@ public interface IslpListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitToken([NotNull] slpParser.TokenContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBlock([NotNull] slpParser.BlockContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBlock([NotNull] slpParser.BlockContext context);
 }

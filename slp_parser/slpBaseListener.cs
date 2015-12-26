@@ -45,6 +45,30 @@ public partial class slpBaseListener : IslpListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitProgram([NotNull] slpParser.ProgramContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.assoc"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAssoc([NotNull] slpParser.AssocContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.assoc"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAssoc([NotNull] slpParser.AssocContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.opdef"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterOpdef([NotNull] slpParser.OpdefContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.opdef"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitOpdef([NotNull] slpParser.OpdefContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="slpParser.list"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -68,6 +92,18 @@ public partial class slpBaseListener : IslpListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitToken([NotNull] slpParser.TokenContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterBlock([NotNull] slpParser.BlockContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitBlock([NotNull] slpParser.BlockContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
