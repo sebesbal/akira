@@ -270,6 +270,7 @@ public partial class slpParser : Parser {
 				case FLOAT:
 				case ID:
 				case OP:
+				case NATIVE:
 				case NEWLINE:
 					{
 					State = 26; token();
@@ -294,7 +295,7 @@ public partial class slpParser : Parser {
 				State = 31;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.La(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -317,6 +318,7 @@ public partial class slpParser : Parser {
 		public ITerminalNode ID() { return GetToken(slpParser.ID, 0); }
 		public ITerminalNode OP() { return GetToken(slpParser.OP, 0); }
 		public ITerminalNode NEWLINE() { return GetToken(slpParser.NEWLINE, 0); }
+		public ITerminalNode NATIVE() { return GetToken(slpParser.NATIVE, 0); }
 		public TokenContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -342,7 +344,7 @@ public partial class slpParser : Parser {
 			{
 			State = 33;
 			_la = TokenStream.La(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NEWLINE))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << NEWLINE))) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -432,7 +434,7 @@ public partial class slpParser : Parser {
 		"\x3\x3\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3"+
 		"\x5\x3\x5\x3\x5\x6\x5 \n\x5\r\x5\xE\x5!\x3\x6\x3\x6\x3\a\x3\a\x3\a\x3"+
 		"\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x5\a\x32\n\a\x3\a\x2\x2\b\x2"+
-		"\x4\x6\b\n\f\x2\x4\x3\x2\x3\n\x5\x2\xF\x10\x12\x16!!\x32\x2\xE\x3\x2\x2"+
+		"\x4\x6\b\n\f\x2\x4\x3\x2\x3\n\x5\x2\xF\x10\x12\x17!!\x32\x2\xE\x3\x2\x2"+
 		"\x2\x4\x10\x3\x2\x2\x2\x6\x12\x3\x2\x2\x2\b\x1F\x3\x2\x2\x2\n#\x3\x2\x2"+
 		"\x2\f\x31\x3\x2\x2\x2\xE\xF\x5\b\x5\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2"+
 		"\x2\x2\x11\x5\x3\x2\x2\x2\x12\x13\a\v\x2\x2\x13\x14\a\x1B\x2\x2\x14\x15"+

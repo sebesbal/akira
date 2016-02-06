@@ -210,6 +210,7 @@ token
 	|   ID
 	|	OP
 	|	NEWLINE
+	|	NATIVE
 	;
 	
 block

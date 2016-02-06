@@ -214,7 +214,7 @@ namespace slp_parser
                 l.SetAttributeValue("id", "list");
                 foreach (var x in closed)
                 {
-                    l.Add(x);
+                    l.AddFirst(x);
                 }
                 return l;
                 // throw new Exception("Closed.Count > 0: " + closed.Count);
@@ -283,6 +283,15 @@ namespace slp_parser
                 //name = "list";
                 // return;
                 XElement n = new XElement("op");
+                n.SetAttributeValue("id", "list");
+                m.Put(context, n);
+                return;
+            }
+            else if (context.NATIVE() != null)
+            {
+                //name = "list";
+                // return;
+                XElement n = new XElement("nat");
                 n.SetAttributeValue("id", "list");
                 m.Put(context, n);
                 return;
