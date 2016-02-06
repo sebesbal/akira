@@ -101,6 +101,14 @@ namespace slp_parser
         Antlr4.Runtime.Tree.ParseTreeProperty<XElement> m = new Antlr4.Runtime.Tree.ParseTreeProperty<XElement>();
         public XElement program;
 
+        public Listener()
+        {
+            Operator op = new Operator();
+            op.Name = "list";
+            op.Precedence = 1000;
+            op.Associativity = Associativity.yfy;
+            operators.Add(op.Name, op);
+        }
 
         //public void EnterEveryRule(Antlr4.Runtime.ParserRuleContext ctx)
         //{
@@ -202,7 +210,14 @@ namespace slp_parser
             }
             else
             {
-                throw new Exception("Closed.Count > 0: " + closed.Count);
+                var l = new XElement("op");
+                l.SetAttributeValue("id", "list");
+                foreach (var x in closed)
+                {
+                    l.Add(x);
+                }
+                return l;
+                // throw new Exception("Closed.Count > 0: " + closed.Count);
             }
         }
 
@@ -265,8 +280,14 @@ namespace slp_parser
             }
             else if (context.NEWLINE() != null)
             {
+                //name = "list";
+                // return;
+                XElement n = new XElement("op");
+                n.SetAttributeValue("id", "list");
+                m.Put(context, n);
                 return;
             }
+
             XElement node = new XElement(name);
             
             if (context.OP() == null)

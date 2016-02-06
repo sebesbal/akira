@@ -88,6 +88,20 @@ namespace akira
         }
         public void Run(string fileName)
         {
+            doc = new XDocument();
+            doc.Add(new XElement("akira"));
+            XElement e = doc.Root;
+            XElement apply = new XElement("apply");
+            apply.SetAttributeValue("src", "slp_ast");
+            e.Add(apply);
+            XElement slp = new XElement("slp");
+            slp.Value = File.ReadAllText(fileName);
+            e.Add(slp);
+            Context ctx = new Context();
+            Apply(ctx, ref e);
+        }
+        public void RunXml(string fileName)
+        {
             doc = XDocument.Load(fileName);
             XElement e = doc.Root;
             Context ctx = new Context();

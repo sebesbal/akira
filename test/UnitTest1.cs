@@ -16,7 +16,7 @@ namespace test
         public void test_cs_rule()
         {
             akira.akira a = new akira.akira();
-            a.Run("test_cs_rule.aki");
+            a.RunXml("test_cs_rule.aki");
             a.Save("result.xml");
             var lof = a.doc.Descendants("lofusz");
             Assert.IsNotNull(lof);
@@ -26,7 +26,7 @@ namespace test
         public void test_parser()
         {
             akira.akira a = new akira.akira();
-            a.Run("test_parser.aki");
+            a.RunXml("test_parser.aki");
             a.Save("result.xml");
         }
 
@@ -34,7 +34,15 @@ namespace test
         public void test_parser2()
         {
             akira.akira a = new akira.akira();
-            a.Run("test_parser.aki");
+            a.RunXml("test_parser.aki");
+            a.Save("result.xml");
+        }
+
+        [TestMethod]
+        public void test_0()
+        {
+            akira.akira a = new akira.akira();
+            a.Run("test_0.aki");
             a.Save("result.xml");
         }
 
@@ -42,7 +50,7 @@ namespace test
         public void test_match()
         {
             akira.akira a = new akira.akira();
-            a.Run("test_match.aki");
+            a.RunXml("test_match.aki");
             a.Save("result.xml");
 
             var mul = a.doc.Descendants("mul").First();
@@ -56,7 +64,7 @@ namespace test
         public void test_cs1()
         {
             akira.akira a = new akira.akira();
-            a.Run("test_cs1.aki");
+            a.RunXml("test_cs1.aki");
             a.Save("result.xml");
             var node = a.doc.Descendants("cs").First();
             Assert.AreEqual(node.Attribute("code").Value, "a 1 b 2 c 1");

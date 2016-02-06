@@ -1,7 +1,7 @@
 <akira>
   <apply src="slp_ast"/>
   <slp>
-    op(200,yfy,+)
+    op(200, yfy,+)
     op(100,yfy,*)
     op(50,yfy,/)
     a*b+(c+e)*d

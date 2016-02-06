@@ -68,6 +68,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="test_0.aki">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="test_1.aki">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="test_match.aki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
