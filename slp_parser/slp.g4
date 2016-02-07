@@ -139,6 +139,7 @@ SPACES
  : [ \t]+
  ;
 
+TREE : ':';
 OPEN_PAREN : '(' {opened++;};
 CLOSE_PAREN : ')' {opened--;};
 OPEN_BRACK : '[' {opened++;};
@@ -169,6 +170,7 @@ NEWLINE
        }
        else if (indent > previous) {
          indents.Push(indent);
+		 Emit(commonToken(slpParser.TREE, ":"));
 		 Emit(commonToken(slpParser.OPEN_PAREN, spaces));
        }
        else {
@@ -186,7 +188,7 @@ WS  :   [ \r\t\u000C\n]+ -> channel(HIDDEN)
 	;
 
 program
-	:	list
+	:	exp
 	;
    
 assoc
@@ -195,10 +197,6 @@ assoc
    
 opdef
 	:	'op' '(' INT ',' assoc ',' OP ')' NEWLINE
-	;
-   
-list
-	:	(token | block | opdef)+
 	;
    
 token
@@ -213,8 +211,12 @@ token
 	|	NATIVE
 	;
 	
-block
-	:	'(' list ')'
-	|	'{' list '}'
-	|	'[' list ']'
+exp
+	:	'(' exp+ ')'
+	|	'{' exp+ '}'
+	|	'[' exp+ ']'
+	|	exp TREE exp	#Tree
+	|	token
+	|	opdef
+	|	exp exp			#List
     ;

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Diagnostics;
 
 namespace test
 {
@@ -20,6 +21,14 @@ namespace test
             a.Save("result.xml");
             var lof = a.doc.Descendants("lofusz");
             Assert.IsNotNull(lof);
+        }
+
+        [TestMethod]
+        public void test_run()
+        {
+            akira.akira a = new akira.akira();
+            a.RunXml("test_run.aki");
+            a.Save("result.xml");
         }
 
         [TestMethod]
@@ -43,6 +52,14 @@ namespace test
         {
             akira.akira a = new akira.akira();
             a.Run("test_0.aki");
+            a.Save("result.xml");
+        }
+
+        [TestMethod]
+        public void test_1()
+        {
+            akira.akira a = new akira.akira();
+            a.Run("test_1.aki");
             a.Save("result.xml");
         }
 

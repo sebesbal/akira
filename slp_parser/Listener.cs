@@ -280,8 +280,6 @@ namespace slp_parser
             }
             else if (context.NEWLINE() != null)
             {
-                //name = "list";
-                // return;
                 XElement n = new XElement("op");
                 n.SetAttributeValue("id", "list");
                 m.Put(context, n);
@@ -289,10 +287,10 @@ namespace slp_parser
             }
             else if (context.NATIVE() != null)
             {
-                //name = "list";
-                // return;
-                XElement n = new XElement("nat");
-                n.SetAttributeValue("id", "list");
+                XElement n = new XElement("run");
+                n.SetAttributeValue("type", "cs");
+                string code = context.NATIVE().GetText();
+                n.SetAttributeValue("code", code.Substring(1, code.Length - 2));
                 m.Put(context, n);
                 return;
             }
@@ -325,9 +323,8 @@ namespace slp_parser
 
         public override void ExitProgram(slpParser.ProgramContext context)
         {
-            XElement node = new XElement("program");
-            add(context, node);
-            program = node;
+            program = m.Get(context.list());
+            m.Put(context, program);
         }
     }
 }

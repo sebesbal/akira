@@ -1,4 +1,5 @@
-﻿{
+﻿<akira>
+  <run type="cs" code="
     using System;
     using akira;
     using System.Xml.Linq;
@@ -8,7 +9,9 @@
     {
       public override void Run(Context ctx)
       {
-          ctx.dummy = "fasza!";
+          Trace.WriteLine(&quot;fasza!&quot;);
+          ctx.dummy = &quot;fasza!&quot;;
       }
     }
-}
+  "/>
+</akira>

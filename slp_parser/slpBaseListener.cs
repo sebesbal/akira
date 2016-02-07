@@ -69,18 +69,6 @@ public partial class slpBaseListener : IslpListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitOpdef([NotNull] slpParser.OpdefContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="slpParser.list"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterList([NotNull] slpParser.ListContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="slpParser.list"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitList([NotNull] slpParser.ListContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="slpParser.token"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -93,17 +81,17 @@ public partial class slpBaseListener : IslpListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitToken([NotNull] slpParser.TokenContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="slpParser.block"/>.
+	/// Enter a parse tree produced by <see cref="slpParser.exp"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterBlock([NotNull] slpParser.BlockContext context) { }
+	public virtual void EnterExp([NotNull] slpParser.ExpContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="slpParser.block"/>.
+	/// Exit a parse tree produced by <see cref="slpParser.exp"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitBlock([NotNull] slpParser.BlockContext context) { }
+	public virtual void ExitExp([NotNull] slpParser.ExpContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

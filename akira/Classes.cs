@@ -49,31 +49,39 @@ namespace akira
             return "gen" + nameCount++;
         }
         private int nameCount = 0;
+        public string dummy;
     }
 
     public class exe
     {
-
+        public static exe Load(string fileName)
+        {
+            Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/" + fileName);
+            return Load(assembly);
+        }
+        public static exe Load(Assembly assembly)
+        {
+            var types = assembly.GetTypes();
+            foreach (var ruleClass in types)
+            {
+                if (ruleClass.IsSubclassOf(typeof(exe)))
+                {
+                    return (exe)assembly.CreateInstance(ruleClass.FullName);
+                }
+            }
+            throw new Exception("exe descendentant not found");
+        }
     }
 
-    public class Rule: exe
+    public class Program : exe
+    {
+        public virtual void Run(Context ctx) { }
+    }
+
+    public class Rule : exe
     {
         public string ID;
         public virtual bool Apply(Context ctx, ref XElement node) { return false; }
-        public static Rule Load(string fileName)
-        {
-            Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/" + fileName);
-            var types = assembly.GetTypes();
-
-            foreach (var ruleClass in types)
-            {
-                if (ruleClass.IsSubclassOf(typeof(Rule)))
-                {
-                    return (Rule)assembly.CreateInstance(ruleClass.FullName);
-                }
-            }
-            throw new Exception("Rule descendentant not found");
-        }
     }
 
     public class akira : Rule
@@ -85,6 +93,7 @@ namespace akira
             Rules.Add(new cs_exe());
             Rules.Add(new match_exe());
             Rules.Add(new cs_cs());
+            Rules.Add(new cs_run());
         }
         public void Run(string fileName)
         {
@@ -121,7 +130,11 @@ namespace akira
                 XElement m = n;
                 while (m != null && ApplyRules(ctx, ref m)) ;
 
-                if (m != null && m.Name == "apply")
+                if (m == null)
+                {
+                    // Skip
+                }
+                else if (m.Name == "apply")
                 {
                     XAttribute a = m.Attribute("src");
                     string ruleID = a.Value;
@@ -129,14 +142,30 @@ namespace akira
                     if (ctx.Rules.ContainsKey(ruleID))
                     {
                         rule = ctx.Rules[ruleID];
-                    }
+                    } 
                     else
                     {
-                        rule = Load(ruleID + ".dll");
+                        rule = Load(ruleID + ".dll") as Rule;
                     }
                     Rules.Insert(0, rule);
                     m.Remove();
                 }
+                //else if (m.Name == "run")
+                //{
+                //    XAttribute a = m.Attribute("src");
+                //    string ruleID = a.Value;
+                //    Rule rule;
+                //    if (ctx.Rules.ContainsKey(ruleID))
+                //    {
+                //        rule = ctx.Rules[ruleID];
+                //    }
+                //    else
+                //    {
+                //        rule = Load(ruleID + ".dll");
+                //    }
+                //    Rules.Insert(0, rule);
+                //    m.Remove();
+                //}
             }
 
             return true;

@@ -34,27 +34,26 @@ public partial class slpParser : Parser {
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
 		T__9=10, T__10=11, T__11=12, TRUE=13, FALSE=14, NULL=15, STRING=16, INT=17, 
 		FLOAT=18, ID=19, OP=20, NATIVE=21, COMMENT=22, LINE_COMMENT=23, SPACES=24, 
-		OPEN_PAREN=25, CLOSE_PAREN=26, OPEN_BRACK=27, CLOSE_BRACK=28, OPEN_BRACE=29, 
-		CLOSE_BRACE=30, NEWLINE=31, WS=32, INDENT=33, DEDENT=34;
+		TREE=25, OPEN_PAREN=26, CLOSE_PAREN=27, OPEN_BRACK=28, CLOSE_BRACK=29, 
+		OPEN_BRACE=30, CLOSE_BRACE=31, NEWLINE=32, WS=33, INDENT=34, DEDENT=35;
 	public const int
-		RULE_program = 0, RULE_assoc = 1, RULE_opdef = 2, RULE_list = 3, RULE_token = 4, 
-		RULE_block = 5;
+		RULE_program = 0, RULE_assoc = 1, RULE_opdef = 2, RULE_token = 3, RULE_exp = 4;
 	public static readonly string[] ruleNames = {
-		"program", "assoc", "opdef", "list", "token", "block"
+		"program", "assoc", "opdef", "token", "exp"
 	};
 
 	private static readonly string[] _LiteralNames = {
 		null, "'fx'", "'fy'", "'xf'", "'yf'", "'xfx'", "'xfy'", "'yfx'", "'yfy'", 
 		"'op'", "','", "'{'", "'}'", "'true'", "'false'", "'<>'", null, null, 
-		null, null, null, null, null, null, null, "'('", "')'", "'['", "']'", 
-		"'<'", "'>'"
+		null, null, null, null, null, null, null, "':'", "'('", "')'", "'['", 
+		"']'", "'<'", "'>'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, "TRUE", "FALSE", "NULL", "STRING", "INT", "FLOAT", "ID", "OP", "NATIVE", 
-		"COMMENT", "LINE_COMMENT", "SPACES", "OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACK", 
-		"CLOSE_BRACK", "OPEN_BRACE", "CLOSE_BRACE", "NEWLINE", "WS", "INDENT", 
-		"DEDENT"
+		"COMMENT", "LINE_COMMENT", "SPACES", "TREE", "OPEN_PAREN", "CLOSE_PAREN", 
+		"OPEN_BRACK", "CLOSE_BRACK", "OPEN_BRACE", "CLOSE_BRACE", "NEWLINE", "WS", 
+		"INDENT", "DEDENT"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -79,8 +78,8 @@ public partial class slpParser : Parser {
 		Interpreter = new ParserATNSimulator(this,_ATN);
 	}
 	public partial class ProgramContext : ParserRuleContext {
-		public ListContext list() {
-			return GetRuleContext<ListContext>(0);
+		public ExpContext exp() {
+			return GetRuleContext<ExpContext>(0);
 		}
 		public ProgramContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -104,7 +103,7 @@ public partial class slpParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 12; list();
+			State = 10; exp(0);
 			}
 		}
 		catch (RecognitionException re) {
@@ -142,7 +141,7 @@ public partial class slpParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 14;
+			State = 12;
 			_la = TokenStream.La(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7))) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -192,110 +191,15 @@ public partial class slpParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 16; Match(T__8);
-			State = 17; Match(OPEN_PAREN);
-			State = 18; Match(INT);
+			State = 14; Match(T__8);
+			State = 15; Match(OPEN_PAREN);
+			State = 16; Match(INT);
+			State = 17; Match(T__9);
+			State = 18; assoc();
 			State = 19; Match(T__9);
-			State = 20; assoc();
-			State = 21; Match(T__9);
-			State = 22; Match(OP);
-			State = 23; Match(CLOSE_PAREN);
-			State = 24; Match(NEWLINE);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class ListContext : ParserRuleContext {
-		public TokenContext[] token() {
-			return GetRuleContexts<TokenContext>();
-		}
-		public TokenContext token(int i) {
-			return GetRuleContext<TokenContext>(i);
-		}
-		public BlockContext[] block() {
-			return GetRuleContexts<BlockContext>();
-		}
-		public BlockContext block(int i) {
-			return GetRuleContext<BlockContext>(i);
-		}
-		public OpdefContext[] opdef() {
-			return GetRuleContexts<OpdefContext>();
-		}
-		public OpdefContext opdef(int i) {
-			return GetRuleContext<OpdefContext>(i);
-		}
-		public ListContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_list; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			IslpListener typedListener = listener as IslpListener;
-			if (typedListener != null) typedListener.EnterList(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			IslpListener typedListener = listener as IslpListener;
-			if (typedListener != null) typedListener.ExitList(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public ListContext list() {
-		ListContext _localctx = new ListContext(Context, State);
-		EnterRule(_localctx, 6, RULE_list);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 29;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.La(1);
-			do {
-				{
-				State = 29;
-				switch (TokenStream.La(1)) {
-				case TRUE:
-				case FALSE:
-				case STRING:
-				case INT:
-				case FLOAT:
-				case ID:
-				case OP:
-				case NATIVE:
-				case NEWLINE:
-					{
-					State = 26; token();
-					}
-					break;
-				case T__10:
-				case OPEN_PAREN:
-				case OPEN_BRACK:
-					{
-					State = 27; block();
-					}
-					break;
-				case T__8:
-					{
-					State = 28; opdef();
-					}
-					break;
-				default:
-					throw new NoViableAltException(this);
-				}
-				}
-				State = 31;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.La(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+			State = 20; Match(OP);
+			State = 21; Match(CLOSE_PAREN);
+			State = 22; Match(NEWLINE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -337,12 +241,12 @@ public partial class slpParser : Parser {
 	[RuleVersion(0)]
 	public TokenContext token() {
 		TokenContext _localctx = new TokenContext(Context, State);
-		EnterRule(_localctx, 8, RULE_token);
+		EnterRule(_localctx, 6, RULE_token);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 33;
+			State = 24;
 			_la = TokenStream.La(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << NEWLINE))) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -363,58 +267,170 @@ public partial class slpParser : Parser {
 		return _localctx;
 	}
 
-	public partial class BlockContext : ParserRuleContext {
-		public ListContext list() {
-			return GetRuleContext<ListContext>(0);
+	public partial class ExpContext : ParserRuleContext {
+		public ExpContext[] exp() {
+			return GetRuleContexts<ExpContext>();
 		}
-		public BlockContext(ParserRuleContext parent, int invokingState)
+		public ExpContext exp(int i) {
+			return GetRuleContext<ExpContext>(i);
+		}
+		public TokenContext token() {
+			return GetRuleContext<TokenContext>(0);
+		}
+		public OpdefContext opdef() {
+			return GetRuleContext<OpdefContext>(0);
+		}
+		public ITerminalNode TREE() { return GetToken(slpParser.TREE, 0); }
+		public ExpContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_block; } }
+		public override int RuleIndex { get { return RULE_exp; } }
 		public override void EnterRule(IParseTreeListener listener) {
 			IslpListener typedListener = listener as IslpListener;
-			if (typedListener != null) typedListener.EnterBlock(this);
+			if (typedListener != null) typedListener.EnterExp(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			IslpListener typedListener = listener as IslpListener;
-			if (typedListener != null) typedListener.ExitBlock(this);
+			if (typedListener != null) typedListener.ExitExp(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public BlockContext block() {
-		BlockContext _localctx = new BlockContext(Context, State);
-		EnterRule(_localctx, 10, RULE_block);
+	public ExpContext exp() {
+		return exp(0);
+	}
+
+	private ExpContext exp(int _p) {
+		ParserRuleContext _parentctx = Context;
+		int _parentState = State;
+		ExpContext _localctx = new ExpContext(Context, _parentState);
+		ExpContext _prevctx = _localctx;
+		int _startState = 8;
+		EnterRecursionRule(_localctx, 8, RULE_exp, _p);
+		int _la;
 		try {
-			State = 47;
+			int _alt;
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 53;
 			switch (TokenStream.La(1)) {
 			case OPEN_PAREN:
-				EnterOuterAlt(_localctx, 1);
 				{
-				State = 35; Match(OPEN_PAREN);
-				State = 36; list();
-				State = 37; Match(CLOSE_PAREN);
+				State = 27; Match(OPEN_PAREN);
+				State = 29;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.La(1);
+				do {
+					{
+					{
+					State = 28; exp(0);
+					}
+					}
+					State = 31;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.La(1);
+				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+				State = 33; Match(CLOSE_PAREN);
 				}
 				break;
 			case T__10:
-				EnterOuterAlt(_localctx, 2);
 				{
-				State = 39; Match(T__10);
-				State = 40; list();
+				State = 35; Match(T__10);
+				State = 37;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.La(1);
+				do {
+					{
+					{
+					State = 36; exp(0);
+					}
+					}
+					State = 39;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.La(1);
+				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
 				State = 41; Match(T__11);
 				}
 				break;
 			case OPEN_BRACK:
-				EnterOuterAlt(_localctx, 3);
 				{
 				State = 43; Match(OPEN_BRACK);
-				State = 44; list();
-				State = 45; Match(CLOSE_BRACK);
+				State = 45;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.La(1);
+				do {
+					{
+					{
+					State = 44; exp(0);
+					}
+					}
+					State = 47;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.La(1);
+				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+				State = 49; Match(CLOSE_BRACK);
+				}
+				break;
+			case TRUE:
+			case FALSE:
+			case STRING:
+			case INT:
+			case FLOAT:
+			case ID:
+			case OP:
+			case NATIVE:
+			case NEWLINE:
+				{
+				State = 51; token();
+				}
+				break;
+			case T__8:
+				{
+				State = 52; opdef();
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+			Context.Stop = TokenStream.Lt(-1);
+			State = 62;
+			ErrorHandler.Sync(this);
+			_alt = Interpreter.AdaptivePredict(TokenStream,5,Context);
+			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber ) {
+				if ( _alt==1 ) {
+					if ( ParseListeners!=null )
+						TriggerExitRuleEvent();
+					_prevctx = _localctx;
+					{
+					State = 60;
+					switch ( Interpreter.AdaptivePredict(TokenStream,4,Context) ) {
+					case 1:
+						{
+						_localctx = new ExpContext(_parentctx, _parentState);
+						PushNewRecursionContext(_localctx, _startState, RULE_exp);
+						State = 55;
+						if (!(Precpred(Context, 4))) throw new FailedPredicateException(this, "Precpred(Context, 4)");
+						State = 56; Match(TREE);
+						State = 57; exp(5);
+						}
+						break;
+					case 2:
+						{
+						_localctx = new ExpContext(_parentctx, _parentState);
+						PushNewRecursionContext(_localctx, _startState, RULE_exp);
+						State = 58;
+						if (!(Precpred(Context, 1))) throw new FailedPredicateException(this, "Precpred(Context, 1)");
+						State = 59; exp(2);
+						}
+						break;
+					}
+					} 
+				}
+				State = 64;
+				ErrorHandler.Sync(this);
+				_alt = Interpreter.AdaptivePredict(TokenStream,5,Context);
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -423,30 +439,51 @@ public partial class slpParser : Parser {
 			ErrorHandler.Recover(this, re);
 		}
 		finally {
-			ExitRule();
+			UnrollRecursionContexts(_parentctx);
 		}
 		return _localctx;
 	}
 
+	public override bool Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+		switch (ruleIndex) {
+		case 4: return exp_sempred((ExpContext)_localctx, predIndex);
+		}
+		return true;
+	}
+	private bool exp_sempred(ExpContext _localctx, int predIndex) {
+		switch (predIndex) {
+		case 0: return Precpred(Context, 4);
+		case 1: return Precpred(Context, 1);
+		}
+		return true;
+	}
+
 	public static readonly string _serializedATN =
-		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3$\x34\x4\x2\t\x2"+
-		"\x4\x3\t\x3\x4\x4\t\x4\x4\x5\t\x5\x4\x6\t\x6\x4\a\t\a\x3\x2\x3\x2\x3\x3"+
-		"\x3\x3\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3"+
-		"\x5\x3\x5\x3\x5\x6\x5 \n\x5\r\x5\xE\x5!\x3\x6\x3\x6\x3\a\x3\a\x3\a\x3"+
-		"\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x5\a\x32\n\a\x3\a\x2\x2\b\x2"+
-		"\x4\x6\b\n\f\x2\x4\x3\x2\x3\n\x5\x2\xF\x10\x12\x17!!\x32\x2\xE\x3\x2\x2"+
-		"\x2\x4\x10\x3\x2\x2\x2\x6\x12\x3\x2\x2\x2\b\x1F\x3\x2\x2\x2\n#\x3\x2\x2"+
-		"\x2\f\x31\x3\x2\x2\x2\xE\xF\x5\b\x5\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2"+
-		"\x2\x2\x11\x5\x3\x2\x2\x2\x12\x13\a\v\x2\x2\x13\x14\a\x1B\x2\x2\x14\x15"+
-		"\a\x13\x2\x2\x15\x16\a\f\x2\x2\x16\x17\x5\x4\x3\x2\x17\x18\a\f\x2\x2\x18"+
-		"\x19\a\x16\x2\x2\x19\x1A\a\x1C\x2\x2\x1A\x1B\a!\x2\x2\x1B\a\x3\x2\x2\x2"+
-		"\x1C \x5\n\x6\x2\x1D \x5\f\a\x2\x1E \x5\x6\x4\x2\x1F\x1C\x3\x2\x2\x2\x1F"+
-		"\x1D\x3\x2\x2\x2\x1F\x1E\x3\x2\x2\x2 !\x3\x2\x2\x2!\x1F\x3\x2\x2\x2!\""+
-		"\x3\x2\x2\x2\"\t\x3\x2\x2\x2#$\t\x3\x2\x2$\v\x3\x2\x2\x2%&\a\x1B\x2\x2"+
-		"&\'\x5\b\x5\x2\'(\a\x1C\x2\x2(\x32\x3\x2\x2\x2)*\a\r\x2\x2*+\x5\b\x5\x2"+
-		"+,\a\xE\x2\x2,\x32\x3\x2\x2\x2-.\a\x1D\x2\x2./\x5\b\x5\x2/\x30\a\x1E\x2"+
-		"\x2\x30\x32\x3\x2\x2\x2\x31%\x3\x2\x2\x2\x31)\x3\x2\x2\x2\x31-\x3\x2\x2"+
-		"\x2\x32\r\x3\x2\x2\x2\x5\x1F!\x31";
+		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3%\x44\x4\x2\t\x2"+
+		"\x4\x3\t\x3\x4\x4\t\x4\x4\x5\t\x5\x4\x6\t\x6\x3\x2\x3\x2\x3\x3\x3\x3\x3"+
+		"\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x5\x3\x5"+
+		"\x3\x6\x3\x6\x3\x6\x6\x6 \n\x6\r\x6\xE\x6!\x3\x6\x3\x6\x3\x6\x3\x6\x6"+
+		"\x6(\n\x6\r\x6\xE\x6)\x3\x6\x3\x6\x3\x6\x3\x6\x6\x6\x30\n\x6\r\x6\xE\x6"+
+		"\x31\x3\x6\x3\x6\x3\x6\x3\x6\x5\x6\x38\n\x6\x3\x6\x3\x6\x3\x6\x3\x6\x3"+
+		"\x6\a\x6?\n\x6\f\x6\xE\x6\x42\v\x6\x3\x6\x2\x3\n\a\x2\x4\x6\b\n\x2\x4"+
+		"\x3\x2\x3\n\x5\x2\xF\x10\x12\x17\"\"G\x2\f\x3\x2\x2\x2\x4\xE\x3\x2\x2"+
+		"\x2\x6\x10\x3\x2\x2\x2\b\x1A\x3\x2\x2\x2\n\x37\x3\x2\x2\x2\f\r\x5\n\x6"+
+		"\x2\r\x3\x3\x2\x2\x2\xE\xF\t\x2\x2\x2\xF\x5\x3\x2\x2\x2\x10\x11\a\v\x2"+
+		"\x2\x11\x12\a\x1C\x2\x2\x12\x13\a\x13\x2\x2\x13\x14\a\f\x2\x2\x14\x15"+
+		"\x5\x4\x3\x2\x15\x16\a\f\x2\x2\x16\x17\a\x16\x2\x2\x17\x18\a\x1D\x2\x2"+
+		"\x18\x19\a\"\x2\x2\x19\a\x3\x2\x2\x2\x1A\x1B\t\x3\x2\x2\x1B\t\x3\x2\x2"+
+		"\x2\x1C\x1D\b\x6\x1\x2\x1D\x1F\a\x1C\x2\x2\x1E \x5\n\x6\x2\x1F\x1E\x3"+
+		"\x2\x2\x2 !\x3\x2\x2\x2!\x1F\x3\x2\x2\x2!\"\x3\x2\x2\x2\"#\x3\x2\x2\x2"+
+		"#$\a\x1D\x2\x2$\x38\x3\x2\x2\x2%\'\a\r\x2\x2&(\x5\n\x6\x2\'&\x3\x2\x2"+
+		"\x2()\x3\x2\x2\x2)\'\x3\x2\x2\x2)*\x3\x2\x2\x2*+\x3\x2\x2\x2+,\a\xE\x2"+
+		"\x2,\x38\x3\x2\x2\x2-/\a\x1E\x2\x2.\x30\x5\n\x6\x2/.\x3\x2\x2\x2\x30\x31"+
+		"\x3\x2\x2\x2\x31/\x3\x2\x2\x2\x31\x32\x3\x2\x2\x2\x32\x33\x3\x2\x2\x2"+
+		"\x33\x34\a\x1F\x2\x2\x34\x38\x3\x2\x2\x2\x35\x38\x5\b\x5\x2\x36\x38\x5"+
+		"\x6\x4\x2\x37\x1C\x3\x2\x2\x2\x37%\x3\x2\x2\x2\x37-\x3\x2\x2\x2\x37\x35"+
+		"\x3\x2\x2\x2\x37\x36\x3\x2\x2\x2\x38@\x3\x2\x2\x2\x39:\f\x6\x2\x2:;\a"+
+		"\x1B\x2\x2;?\x5\n\x6\a<=\f\x3\x2\x2=?\x5\n\x6\x4>\x39\x3\x2\x2\x2><\x3"+
+		"\x2\x2\x2?\x42\x3\x2\x2\x2@>\x3\x2\x2\x2@\x41\x3\x2\x2\x2\x41\v\x3\x2"+
+		"\x2\x2\x42@\x3\x2\x2\x2\b!)\x31\x37>@";
 	public static readonly ATN _ATN =
 		new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
 }
