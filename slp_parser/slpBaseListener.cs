@@ -92,6 +92,18 @@ public partial class slpBaseListener : IslpListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitExp([NotNull] slpParser.ExpContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterBlock([NotNull] slpParser.BlockContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitBlock([NotNull] slpParser.BlockContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

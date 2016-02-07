@@ -42,7 +42,7 @@ namespace akira
             return true;
         }
 
-        XElement ListToNode(XElement parent, slpParser.ListContext tree)
+        XElement ListToNode(XElement parent, slpParser.ExpContext tree)
         {
             var list = new LinkedList<Tuple<Operator, ParserRuleContext>>();
             var oprerators = listener.operators;

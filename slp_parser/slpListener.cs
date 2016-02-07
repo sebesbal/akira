@@ -78,4 +78,14 @@ public interface IslpListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitExp([NotNull] slpParser.ExpContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="slpParser.block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBlock([NotNull] slpParser.BlockContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="slpParser.block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBlock([NotNull] slpParser.BlockContext context);
 }

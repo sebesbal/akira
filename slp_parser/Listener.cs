@@ -7,6 +7,7 @@ using akira;
 using System.Xml.Linq;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 
 namespace slp_parser
 {
@@ -221,7 +222,7 @@ namespace slp_parser
             }
         }
 
-        public override void ExitList(slpParser.ListContext context)
+        public override void ExitExp([NotNull] slpParser.ExpContext context)
         {
             var list = new List<Tuple<Operator, XElement>>();
             foreach (var item in context.children)
@@ -247,7 +248,11 @@ namespace slp_parser
                     list.Add(new Tuple<Operator, XElement>(Operator.nullop, n));
                 }
             }
-            if (list.Count > 0)
+            if (list.Count == 1)
+            {
+                m.Put(context, list.First().Item2);
+            }
+            else if (list.Count > 0)
             {
                 list.Add(new Tuple<Operator, XElement>(null, null));
                 m.Put(context, ParseOperators(list));
@@ -280,9 +285,9 @@ namespace slp_parser
             }
             else if (context.NEWLINE() != null)
             {
-                XElement n = new XElement("op");
-                n.SetAttributeValue("id", "list");
-                m.Put(context, n);
+                //XElement n = new XElement("op");
+                //n.SetAttributeValue("id", "list");
+                //m.Put(context, n);
                 return;
             }
             else if (context.NATIVE() != null)
@@ -323,8 +328,26 @@ namespace slp_parser
 
         public override void ExitProgram(slpParser.ProgramContext context)
         {
-            program = m.Get(context.list());
+            program = m.Get(context.exp());
             m.Put(context, program);
         }
+
+        //public override void ExitLList([NotNull] slpParser.LListContext context)
+        //{
+        //    XElement n = m.Get(context.GetChild(0));
+        //    XAttribute id;
+        //    if (n.GetAttribute("id", out id) && id.Value == "list")
+        //    {
+        //        n.Add(m.Get(context.GetChild(1)));
+        //        m.Put(context, n);
+        //    }
+        //    else
+        //    {
+        //        XElement list = new XElement("op");
+        //        list.SetAttributeValue("id", "list");
+        //        add(context, list);
+        //    }
+        //}
     }
 }
+

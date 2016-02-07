@@ -1,4 +1,5 @@
-﻿op(200, yfy, +)
+﻿op(1000, yfy, :)
+op(200, yfy, +)
 op(100, yfy, *)
 op(50, yfy, /)
 a

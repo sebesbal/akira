@@ -120,7 +120,7 @@ ID
     ;
 	
 OP
-	:   ('+'|'*'|'/'|'='|'-'|'!'|'?'|'|'|'~'|'%'|'&'|'#'|'@')+
+	:   (':'|'+'|'*'|'/'|'='|'-'|'!'|'?'|'|'|'~'|'%'|'&'|'#'|'@')+
 	;
 
 NATIVE
@@ -139,7 +139,7 @@ SPACES
  : [ \t]+
  ;
 
-TREE : ':';
+// TREE : ':';
 OPEN_PAREN : '(' {opened++;};
 CLOSE_PAREN : ')' {opened--;};
 OPEN_BRACK : '[' {opened++;};
@@ -170,7 +170,7 @@ NEWLINE
        }
        else if (indent > previous) {
          indents.Push(indent);
-		 Emit(commonToken(slpParser.TREE, ":"));
+		 Emit(new CommonToken(slpParser.OP, ":"));
 		 Emit(commonToken(slpParser.OPEN_PAREN, spaces));
        }
        else {
@@ -212,11 +212,11 @@ token
 	;
 	
 exp
-	:	'(' exp+ ')'
-	|	'{' exp+ '}'
-	|	'[' exp+ ']'
-	|	exp TREE exp	#Tree
-	|	token
-	|	opdef
-	|	exp exp			#List
+	: (block | token | opdef)+
+	;
+
+block
+	:	'(' exp ')'
+	|	'{' exp '}'
+	|	'[' exp ']'
     ;
