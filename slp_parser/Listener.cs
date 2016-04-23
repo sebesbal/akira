@@ -168,7 +168,7 @@ namespace slp_parser
             foreach (var x in list)
             {
                 Operator op = x.Item1;
-                if (op == Operator.nullop || x.Item2 != null && x.Item2.Nodes().Count() > 0)
+                if (op == Operator.nullop || x.Item2 != null && x.Item2.Elements().Count() > 0)
                 {
                     closed.Push(x.Item2);
                 }

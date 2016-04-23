@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="GUI.AkiTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Width="50">Add</Button>
+            <Button Width="50">Delete</Button> 
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TreeView Grid.Column="0" x:Name="treeView" HorizontalContentAlignment="Stretch" SelectedItemChanged="treeView_SelectedItemChanged">
+                <TreeViewItem Header="test2"/>
+                <TreeViewItem Header="test2">
+                    <TreeViewItem Header="sub test">
+                        <TreeViewItem Header="sub test1-1"/>
+                        <TreeViewItem Header="sub test1-2"/>
+                    </TreeViewItem>
+                    <TreeViewItem Header="sub test2"/>
+                </TreeViewItem>
+                <TreeViewItem Header="test3"/>
+            </TreeView>
+            <ListView Grid.Column="1" x:Name="attributes">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <TextBox Grid.Row="2" x:Name="codeView" Text="{Binding Path=Value}" />
+    </Grid>
+</UserControl>
