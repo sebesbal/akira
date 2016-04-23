@@ -23,7 +23,7 @@ namespace GUI
         public MainWindow()
         {
             InitializeComponent();
-            //treeView.Load("test_cs1.aki");
+            treeView.Load("test_cs1.aki");
         }
     }
 }

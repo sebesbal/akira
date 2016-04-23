@@ -23,16 +23,8 @@
             </Grid.ColumnDefinitions>
 
             <TreeView Grid.Column="0" x:Name="treeView" HorizontalContentAlignment="Stretch" SelectedItemChanged="treeView_SelectedItemChanged">
-                <TreeViewItem Header="test2"/>
-                <TreeViewItem Header="test2">
-                    <TreeViewItem Header="sub test">
-                        <TreeViewItem Header="sub test1-1"/>
-                        <TreeViewItem Header="sub test1-2"/>
-                    </TreeViewItem>
-                    <TreeViewItem Header="sub test2"/>
-                </TreeViewItem>
-                <TreeViewItem Header="test3"/>
             </TreeView>
+
             <ListView Grid.Column="1" x:Name="attributes">
                 <ListView.View>
                     <GridView>

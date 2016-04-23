@@ -39,6 +39,7 @@ namespace GUI
             var item = new TreeViewItem();
             item.DataContext = e;
             item.Header = e.Name;
+            item.IsExpanded = true;
 
             foreach (var child_element in e.Elements())
             {
@@ -51,20 +52,21 @@ namespace GUI
         
         private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            //attributes.Items.Clear();
-            //var item = (TreeViewItem)e.NewValue;
-            //var element = (XElement)item.DataContext;
-            //foreach (var attribute in element.Attributes())
-            //{
-            //    if (attribute.Name == "code")
-            //    {
-            //        codeView.DataContext = attribute;
-            //    }
-            //    else
-            //    {
-            //        attributes.Items.Add(attribute);
-            //    }
-            //}
+            attributes.Items.Clear();
+            var item = (TreeViewItem)e.NewValue;
+            var element = (XElement)item.DataContext;
+            codeView.DataContext = null;
+            foreach (var attribute in element.Attributes())
+            {
+                if (attribute.Name == "code")
+                {
+                    codeView.DataContext = attribute;
+                }
+                else
+                {
+                    attributes.Items.Add(attribute);
+                }
+            }
         }
     }
 }
