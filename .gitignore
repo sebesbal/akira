@@ -10,3 +10,5 @@
 /match/obj
 /match/bin
 /Debug
+*.v12.suo
+/.vs/
