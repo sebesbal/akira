@@ -23,6 +23,12 @@ namespace GUI
             var item = CreateItem(doc.Root);
             treeView.Items.Clear();
             treeView.Items.Add(item);
+
+            //foreach (var child_element in doc.Root.Elements())
+            //{
+            //    var child_item = CreateItem(child_element);
+            //    treeView.Items.Add(child_item);
+            //}
         }
 
         public TreeViewItem CreateItem(XElement e)
@@ -40,46 +46,6 @@ namespace GUI
 
             return item;
         }
-
-        //private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        //{
-        //    attributes.Items.Clear();
-        //    var item = (TreeViewItem)e.NewValue;
-        //    var element = (XElement)item.DataContext;
-        //    codeView.DataContext = null;
-        //    foreach (var attribute in element.Attributes())
-        //    {
-        //        if (attribute.Name == "code")
-        //        {
-        //            codeView.DataContext = attribute;
-        //        }
-        //        else
-        //        {
-        //            attributes.Items.Add(attribute);
-        //        }
-        //    }
-        //}
-
-        //private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        //{
-        //    attributes.Items.Clear();
-        //    var item = (TreeViewItem)e.NewValue;
-        //    var element = (XElement)item.DataContext;
-        //    codeView.DataContext = null;
-        //    foreach (var attribute in element.Attributes())
-        //    {
-        //        if (attribute.Name == "code")
-        //        {
-        //            codeView.DataContext = attribute;
-        //        }
-        //        else
-        //        {
-        //            attributes.Items.Add(attribute);
-        //        }
-        //    }
-        //}
-
-
         
         private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -100,6 +66,18 @@ namespace GUI
             var new_item = CreateItem(new_element);
             item.Items.Add(new_item);
             new_item.IsSelected = true;
+        }
+
+        public void DeleteSelected()
+        {
+            var item = (TreeViewItem)treeView.SelectedItem;
+            if (item == null) return;
+            var p = (TreeViewItem)item.Parent;
+            if (p == null) return;
+            p.Items.Remove(item);
+
+            var element = (XElement)item.DataContext;
+            element.Remove();
         }
     }
 }

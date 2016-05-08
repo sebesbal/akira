@@ -14,7 +14,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button Width="50" Click="Button_Click_1">Add</Button>
-            <Button Width="50">Delete</Button>
+            <Button Width="50" Click="Button_Click_3">Delete</Button>
             <Button Width="50" Content="Save" Click="Button_Click"/>
             <Button Width="50" Content="Play" Click="Button_Click_2"/>
         </StackPanel>

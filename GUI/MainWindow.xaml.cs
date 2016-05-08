@@ -45,5 +45,10 @@ namespace GUI
             a.Save("result.xml");
             treeView2.Load("result.xml");
         }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            treeView1.DeleteSelected();
+        }
     }
 }
