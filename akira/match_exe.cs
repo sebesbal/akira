@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ namespace akira
 
         delegate bool check();
 
-        protected string GenerateClass(Context ctx, XElement node)
+        protected string GenerateCode(Context ctx, XElement node)
         {
             List<string> refs = new List<string>();
             List<string> conds = new List<string>();
@@ -68,67 +69,42 @@ namespace akira
             string refDefs = "";
             foreach (var item in refs)
             {
-                refDefs += "[IsVar()] public XElement " + item + "; ";
+                refDefs += "[IsVar()] public XElement " + item + "; \n";
             }
 
             string condDefs = "";
             foreach (var item in conds)
             {
-                condDefs += "conds.Add(delegate(){ " + item + "}); ";
+                condDefs += "conds.Add(delegate(){ " + item + "}); \n";
             }
 
-            string name = ctx.GenName();
+            string name = node.Attribute("src").Value; // ctx.GenName();
             string code = "using System; using akira; using System.Xml.Linq;"
-            + "namespace akira {"
-            + "public class " + name + " : match"
-            + "{ "
+            + "namespace akira {\n"
+            + "public class " + name + " : match\n"
+            + "{ \n"
             + refDefs
-            + "public " + name + "(){ " + condDefs + "}"
-            + "}} ";
+            + "public " + name + "(){ \n" + condDefs + "\n}\n"
+            + "}}\n ";
 
             return code;
         }
 
-        //public class gen0 : akira.Match.Instance
-        //{
-
-        //}
-
-        //protected Instance GenerateInstance(Context ctx, XElement node)
-        //{
-        //    string code = GenerateClass(ctx, node);
-
-        //    // var a = Akira.AssemblyFromCode(code);
-
-        //    Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/gen0.dll");
-
-        //    Type t = assembly.GetTypes()[0];
-        //    if (t.IsSubclassOf(typeof(Instance)))
-        //    {
-        //        var o = assembly.CreateInstance(t.FullName);
-        //        Instance i = o as Instance;
-        //        i.left = node.Elements().ElementAt(0);
-        //        i.right = node.Elements().ElementAt(1);
-        //        return i;
-        //    }
-        //    return null;
-
-        //}
-
         protected Rule GenerateInstance(Context ctx, XElement node)
         {
-            string code = GenerateClass(ctx, node);
-
-            var a = akira.AssemblyFromCode(code);
-
-            // Assembly assembly = Assembly.LoadFile(Directory.GetCurrentDirectory() + "/gen0.dll");
-
-            Type t = a.GetTypes()[0];
+            string name = node.Attribute("src").Value;
+            System.Reflection.Assembly a = System.Reflection.Assembly.GetCallingAssembly();
+            Type t = a.GetType("akira." + name);
+            if (t == null)
+            {
+                string code = GenerateCode(ctx, node);
+                a = akira.AssemblyFromCode(code);
+                t = a.GetTypes()[0];
+                File.WriteAllText("../akira/gen/" + name + ".cs", code);
+            }
             var o = a.CreateInstance(t.FullName);
-
             t.GetField("left").SetValue(o, node.Elements().ElementAt(0));
             t.GetField("right").SetValue(o, node.Elements().ElementAt(1));
-
             return (Rule)o;
         }
     }

@@ -1,6 +1,6 @@
 ﻿<akira>
   <apply src="match"/>
-  <rule src="lofusz2">
+  <rule src="lofusz3">
     <rule>
       <conj>
         <cs ref="a" ind="true"/>
@@ -32,7 +32,7 @@
         
       </cs>
     </rule>  </rule>
-  <apply src="lofusz2"/>
+  <apply src="lofusz3"/>
   <sum>
     <num>7</num>
     <num>8</num>

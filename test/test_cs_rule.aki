@@ -1,5 +1,5 @@
 <akira>
-  <rule type="cs" src="lofusz" code="
+  <rule type="cs" src="lofusz2" code="
     using System;
     using akira;
     using System.Xml.Linq;
