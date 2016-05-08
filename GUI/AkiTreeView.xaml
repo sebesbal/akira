@@ -7,33 +7,22 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Width="50">Add</Button>
-            <Button Width="50">Delete</Button> 
-        </StackPanel>
-        <Grid Grid.Row="1">
+        <!--<Grid Grid.Row="1" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
+            <TreeView Grid.Column="0" x:Name="treeView" HorizontalContentAlignment="Stretch" SelectedItemChanged="treeView_SelectedItemChanged"/>
+            <local:AkiNodeView Grid.Column="1" x:Name="nodeView" />
+        </Grid>-->
 
-            <TreeView Grid.Column="0" x:Name="treeView" HorizontalContentAlignment="Stretch" SelectedItemChanged="treeView_SelectedItemChanged">
-            </TreeView>
-
-            <ListView Grid.Column="1" x:Name="attributes">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TreeView Grid.Row="0" x:Name="treeView" HorizontalContentAlignment="Stretch" SelectedItemChanged="treeView_SelectedItemChanged"/>
+            <local:AkiNodeView Grid.Row="1" x:Name="nodeView" />
         </Grid>
-        <TextBox Grid.Row="2" x:Name="codeView" Text="{Binding Path=Value}" />
     </Grid>
 </UserControl>

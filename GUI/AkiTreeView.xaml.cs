@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 
 namespace GUI
@@ -26,11 +14,14 @@ namespace GUI
             InitializeComponent();
         }
 
+        string file_xml;
+        XDocument doc;
         public void Load(string file_xml)
         {
-            var doc = XDocument.Load(file_xml);
-            XElement e = doc.Root;
-            var item = CreateItem(e);
+            this.file_xml = file_xml;
+            doc = XDocument.Load(file_xml);
+            var item = CreateItem(doc.Root);
+            treeView.Items.Clear();
             treeView.Items.Add(item);
         }
 
@@ -49,24 +40,66 @@ namespace GUI
 
             return item;
         }
+
+        //private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        //{
+        //    attributes.Items.Clear();
+        //    var item = (TreeViewItem)e.NewValue;
+        //    var element = (XElement)item.DataContext;
+        //    codeView.DataContext = null;
+        //    foreach (var attribute in element.Attributes())
+        //    {
+        //        if (attribute.Name == "code")
+        //        {
+        //            codeView.DataContext = attribute;
+        //        }
+        //        else
+        //        {
+        //            attributes.Items.Add(attribute);
+        //        }
+        //    }
+        //}
+
+        //private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        //{
+        //    attributes.Items.Clear();
+        //    var item = (TreeViewItem)e.NewValue;
+        //    var element = (XElement)item.DataContext;
+        //    codeView.DataContext = null;
+        //    foreach (var attribute in element.Attributes())
+        //    {
+        //        if (attribute.Name == "code")
+        //        {
+        //            codeView.DataContext = attribute;
+        //        }
+        //        else
+        //        {
+        //            attributes.Items.Add(attribute);
+        //        }
+        //    }
+        //}
+
+
         
         private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            attributes.Items.Clear();
-            var item = (TreeViewItem)e.NewValue;
+            nodeView.DataContext = ((TreeViewItem)e.NewValue).DataContext;
+        }
+
+        public void Save()
+        {
+            doc.Save(file_xml);
+        }
+
+        public void Add()
+        {
+            var item = (TreeViewItem)treeView.SelectedItem;
             var element = (XElement)item.DataContext;
-            codeView.DataContext = null;
-            foreach (var attribute in element.Attributes())
-            {
-                if (attribute.Name == "code")
-                {
-                    codeView.DataContext = attribute;
-                }
-                else
-                {
-                    attributes.Items.Add(attribute);
-                }
-            }
+            var new_element = new XElement("fos");
+            element.Add(new_element);
+            var new_item = CreateItem(new_element);
+            item.Items.Add(new_item);
+            new_item.IsSelected = true;
         }
     }
 }

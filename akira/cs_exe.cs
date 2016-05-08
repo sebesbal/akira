@@ -32,4 +32,23 @@ namespace akira
             return true;
         }
     }
+
+    class cs_rule : Rule
+    {
+        public override bool Apply(Context ctx, ref XElement node)
+        {
+            if (!(node.Name == "rule" && node.Attribute("type") == null)) return false;
+            string code = node.Attribute("code").Value;
+            string path = node.Attribute("src").Value;
+            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll" }, path + ".dll", true);
+            parameters.GenerateExecutable = false;
+            CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
+            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+            var assembly = results.CompiledAssembly;
+            //node.SetAttributeValue("loaded", "true");
+            node = null;
+            return true;
+        }
+    }
 }

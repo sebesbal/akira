@@ -7,6 +7,26 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1200">
     <Grid>
-        <local:AkiTreeView x:Name="treeView"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Width="50" Click="Button_Click_1">Add</Button>
+            <Button Width="50">Delete</Button>
+            <Button Width="50" Content="Save" Click="Button_Click"/>
+            <Button Width="50" Content="Play" Click="Button_Click_2"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <local:AkiTreeView Grid.Column="0" x:Name="treeView1"/>
+            <local:AkiTreeView Grid.Column="1" x:Name="treeView2"/>
+        </Grid>
     </Grid>
 </Window>
