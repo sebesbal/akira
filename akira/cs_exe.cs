@@ -71,6 +71,15 @@ namespace akira
             + "}}";
             return code;
         }
+
+        protected string GetRuleBody(Context ctx, XElement node)
+        {
+            string s = "";
+
+
+
+            return s;
+        }
         
         protected string Content()
         {

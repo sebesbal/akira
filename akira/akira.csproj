@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="apply.cs" />
     <Compile Include="Classes.cs" />
     <Compile Include="cs_cs.cs" />
     <Compile Include="cs_exe.cs" />

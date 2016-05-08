@@ -17,7 +17,10 @@ namespace akira
             if (!(node.Name == "rule" && node.MatchAttribute("type", "match"))) return false;
             // Instance result = new Instance(node.Elements().ElementAt(0), node.Elements().ElementAt(1));
             Rule result = GenerateInstance(ctx, node);
-            ctx.Rules.Add(node.Attribute("src").Value, result);
+            result.ID = node.Attribute("src").Value;
+            // ctx.Rules.Add(node.Attribute("src").Value, result);
+            ctx.DefineRule(result);
+
 
             node.Remove();
             node = null;

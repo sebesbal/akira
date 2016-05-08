@@ -41,15 +41,74 @@ namespace akira
         }
     }
 
+    class Block
+    {
+        // public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
+        public Stack<Rule> DefinedRules = new Stack<Rule>();
+        public Stack<Rule> ActiveRules = new Stack<Rule>();
+    }
+
     public class Context
     {
-        public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
+        //public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
+        public Context()
+        {
+            PushBlock();
+        }
+        private Stack<Block> blocks = new Stack<Block>();
+        private Block currentBlock;
         public string GenName()
         {
             return "gen" + nameCount++;
         }
         private int nameCount = 0;
         public string dummy;
+        public void PushBlock()
+        {
+            currentBlock = new Block();
+            blocks.Push(currentBlock);
+        }
+        public void PopBlock()
+        {
+            blocks.Pop();
+            currentBlock = blocks.Peek();
+        }
+        public void DefineRule(Rule r)
+        {
+            currentBlock.DefinedRules.Push(r);
+        }
+        public void ActivateRule(Rule r)
+        {
+            currentBlock.ActiveRules.Push(r);
+        }
+        public System.Collections.Generic.IEnumerable<Rule> DefinedRules()
+        {
+            foreach (var block in blocks)
+            {
+                foreach (var Rule in block.DefinedRules)
+                {
+                    yield return Rule;
+                }
+            }
+        }
+        public System.Collections.Generic.IEnumerable<Rule> ActiveRules()
+        {
+            foreach (var block in blocks)
+            {
+                foreach (var Rule in block.ActiveRules)
+                {
+                    yield return Rule;
+                }
+            }
+        }
+        public Rule DefinedRule(string id)
+        {
+            foreach (var rule in DefinedRules())
+            {
+                if (rule.ID == id) return rule;
+            }
+            return null;
+        }
     }
 
     public class exe
@@ -86,14 +145,16 @@ namespace akira
 
     public class akira : Rule
     {
-        List<Rule> Rules = new List<Rule>();
+        // List<Rule> Rules = new List<Rule>();
+        Context ctx = new Context();
         public XDocument doc { get; protected set; }
         public akira()
         {
-            Rules.Add(new cs_exe());
-            Rules.Add(new match_exe());
-            Rules.Add(new cs_cs());
-            Rules.Add(new cs_run());
+            ctx.ActivateRule(new cs_exe());
+            ctx.ActivateRule(new match_exe());
+            ctx.ActivateRule(new cs_cs());
+            ctx.ActivateRule(new cs_run());
+            ctx.ActivateRule(new apply());
         }
         public void Run(string fileName)
         {
@@ -106,14 +167,14 @@ namespace akira
             XElement slp = new XElement("slp");
             slp.Value = File.ReadAllText(fileName);
             e.Add(slp);
-            Context ctx = new Context();
+            // Context ctx = new Context();
             Apply(ctx, ref e);
         }
         public void RunXml(string fileName)
         {
             doc = XDocument.Load(fileName);
             XElement e = doc.Root;
-            Context ctx = new Context();
+            // Context ctx = new Context();
             Apply(ctx, ref e);
         }
         public void Save(string fileName)
@@ -129,50 +190,13 @@ namespace akira
             {
                 XElement m = n;
                 while (m != null && ApplyRules(ctx, ref m)) ;
-
-                if (m == null)
-                {
-                    // Skip
-                }
-                else if (m.Name == "apply")
-                {
-                    XAttribute a = m.Attribute("src");
-                    string ruleID = a.Value;
-                    Rule rule;
-                    if (ctx.Rules.ContainsKey(ruleID))
-                    {
-                        rule = ctx.Rules[ruleID];
-                    } 
-                    else
-                    {
-                        rule = Load(ruleID + ".dll") as Rule;
-                    }
-                    Rules.Insert(0, rule);
-                    m.Remove();
-                }
-                //else if (m.Name == "run")
-                //{
-                //    XAttribute a = m.Attribute("src");
-                //    string ruleID = a.Value;
-                //    Rule rule;
-                //    if (ctx.Rules.ContainsKey(ruleID))
-                //    {
-                //        rule = ctx.Rules[ruleID];
-                //    }
-                //    else
-                //    {
-                //        rule = Load(ruleID + ".dll");
-                //    }
-                //    Rules.Insert(0, rule);
-                //    m.Remove();
-                //}
             }
 
             return true;
         }
         public bool ApplyRules(Context ctx, ref XElement node)
         {
-            foreach (Rule r in Rules)
+            foreach (Rule r in ctx.ActiveRules().ToArray())
             {
                 if (r.Apply(ctx, ref node))
                 {
