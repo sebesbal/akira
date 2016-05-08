@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -75,15 +76,15 @@ namespace akira
             string condDefs = "";
             foreach (var item in conds)
             {
-                condDefs += "conds.Add(delegate(){ " + item + "}); \n";
+                condDefs += "conds.Add(delegate(){\n" + item + "\n}); \n";
             }
 
             string name = node.Attribute("src").Value; // ctx.GenName();
-            string code = "using System; using akira; using System.Xml.Linq;"
+            string code = "using System; using akira; using System.Xml.Linq;\n"
             + "namespace akira {\n"
             + "public class " + name + " : match\n"
             + "{ \n"
-            + refDefs
+            + refDefs + "\n"
             + "public " + name + "(){ \n" + condDefs + "\n}\n"
             + "}}\n ";
 
@@ -93,14 +94,11 @@ namespace akira
         protected Rule GenerateInstance(Context ctx, XElement node)
         {
             string name = node.Attribute("src").Value;
-            System.Reflection.Assembly a = System.Reflection.Assembly.GetCallingAssembly();
-            Type t = a.GetType("akira." + name);
-            if (t == null)
+            Assembly a = null;
+            Type t = null;
+            if (! ctx.GetType(name, ref t, ref a))
             {
-                string code = GenerateCode(ctx, node);
-                a = akira.AssemblyFromCode(code);
-                t = a.GetTypes()[0];
-                File.WriteAllText("../akira/gen/" + name + ".cs", code);
+                ctx.GetType(name, GenerateCode(ctx, node), ref t, ref a);
             }
             var o = a.CreateInstance(t.FullName);
             t.GetField("left").SetValue(o, node.Elements().ElementAt(0));

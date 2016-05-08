@@ -109,6 +109,19 @@ namespace akira
             }
             return null;
         }
+        public bool GetType(string name, ref Type type, ref System.Reflection.Assembly assembly)
+        {
+            assembly = System.Reflection.Assembly.GetCallingAssembly();
+            type = assembly.GetType("akira." + name);
+            return type != null;
+        }
+
+        public void GetType(string name, string code, ref Type type, ref System.Reflection.Assembly assembly)
+        {
+            assembly = akira.AssemblyFromCode(code);
+            type = assembly.GetTypes()[0];
+            File.WriteAllText("../akira/gen/" + name + ".cs", code);
+        }
     }
 
     public class exe
