@@ -24,6 +24,14 @@ namespace test
         }
 
         [TestMethod]
+        public void test_cs_rule2()
+        {
+            akira.akira a = new akira.akira();
+            a.RunXml("test_cs_rule2.aki");
+            a.Save("result.xml");
+        }
+
+        [TestMethod]
         public void test_run()
         {
             akira.akira a = new akira.akira();
@@ -85,6 +93,16 @@ namespace test
             a.Save("result.xml");
             var node = a.doc.Descendants("cs").First();
             Assert.AreEqual(node.Attribute("code").Value, "a 1 b 2 c 1");
+        }
+
+        [TestMethod]
+        public void test_if()
+        {
+            akira.akira a = new akira.akira();
+            a.RunXml("test_if.aki");
+            a.Save("result.xml");
+            var node = a.doc.Descendants("cs").First();
+            // Assert.AreEqual(node.Attribute("code").Value, "a 1 b 2 c 1");
         }
 
         [TestMethod]

@@ -1,0 +1,6 @@
+<akira>
+  <rule src="rule_1" code="that.Name == &quot;num&quot;">
+    <cs code="that.Value = &quot;3&quot;;" />
+  </rule>
+  <num>2</num>
+</akira>

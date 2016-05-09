@@ -154,6 +154,7 @@ namespace akira
     {
         public string ID;
         public virtual bool Apply(Context ctx, ref XElement node) { return false; }
+        public virtual bool ApplyAfter(Context ctx, ref XElement node) { return false; }
     }
 
     public class akira : Rule
@@ -163,9 +164,11 @@ namespace akira
         public XDocument doc { get; protected set; }
         public akira()
         {
+            ctx.ActivateRule(new cs_rule());
             ctx.ActivateRule(new cs_exe());
             ctx.ActivateRule(new match_exe());
             ctx.ActivateRule(new cs_cs());
+            ctx.ActivateRule(new if_cs());
             ctx.ActivateRule(new cs_run());
             ctx.ActivateRule(new apply());
         }
@@ -190,10 +193,12 @@ namespace akira
             // Context ctx = new Context();
             Apply(ctx, ref e);
         }
+
         public void Save(string fileName)
         {
             doc.Save(fileName);
         }
+
         public override bool Apply(Context ctx, ref XElement node)
         {
             if (node.Name != "akira") return false;
@@ -203,15 +208,38 @@ namespace akira
             {
                 XElement m = n;
                 while (m != null && ApplyRules(ctx, ref m)) ;
-            }
 
+                if (m != null)
+                {
+                    foreach (XElement u in m.Elements())
+                    {
+                        XElement u1 = u;
+                        Apply(ctx, ref u1);
+                    }
+
+                    while (m != null && ApplyRulesAfter(ctx, ref m)) ;
+                }
+            }
             return true;
         }
+
         public bool ApplyRules(Context ctx, ref XElement node)
         {
             foreach (Rule r in ctx.ActiveRules().ToArray())
             {
                 if (r.Apply(ctx, ref node))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool ApplyRulesAfter(Context ctx, ref XElement node)
+        {
+            foreach (Rule r in ctx.ActiveRules().ToArray())
+            {
+                if (r.ApplyAfter(ctx, ref node))
                 {
                     return true;
                 }

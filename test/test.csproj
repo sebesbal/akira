@@ -68,6 +68,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="test_cs_rule2.aki">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="test_if.aki">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="test_0.aki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

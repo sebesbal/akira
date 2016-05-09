@@ -38,4 +38,33 @@ namespace akira
             return true;
         }
     }
+
+    class if_cs : Rule
+    {
+        public override bool ApplyAfter(Context ctx, ref XElement node)
+        {
+            if (!(node.Name == "if")) return false;
+            node.Name = "cs";
+            node.RemoveNodes();
+            string code = GetBody(ctx, node);
+            if (code == "") return false;
+            node.SetAttributeValue("code", code);
+            return true;
+        }
+
+        public static string GetBody(Context ctx, XElement node)
+        {
+            string code = "";
+
+            code = "if (" + node.Attribute("code").Value + ") {\n";
+            foreach (var item in node.Elements())
+            {
+                if (item.Name != "cs") return "";
+                code += item.Attribute("code") + "\n";
+            }
+            code += "}\n";
+
+            return code;
+        }
+    }
 }

@@ -3,6 +3,7 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -40,33 +41,31 @@ namespace akira
     /// </summary>
     class cs_rule : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool ApplyAfter(Context ctx, ref XElement node)
         {
             if (!(node.Name == "rule" && node.Attribute("type") == null)) return false;
-            string code = node.Attribute("code").Value;
-            // string path = node.Attribute("src").Value;
-            string path = ctx.GenName();
-            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll" }, path + ".dll", true);
-            parameters.GenerateExecutable = false;
-            CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
-            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
-            var assembly = results.CompiledAssembly;
+            ruleName = node.Attribute("src").Value;
+            Rule rule = GenerateInstance(ctx, node);
+            ctx.ActivateRule(rule);
+            node.Remove();
             node = null;
             return true;
         }
 
+        bool after = false;
+        string ruleName;
 
-        protected string GenerateClass(Context ctx, XElement node)
+        protected string GenerateCode(Context ctx, XElement node)
         {
-            string name = ctx.GenName();
             string code = "using System; using akira; using System.Xml.Linq;"
             + "namespace akira {"
-            + "public class " + name + " : match"
+            + "public class " + ruleName + " : Rule"
             + "{ "
-            + "public " + name + "(){" + "" + "}"
-            + "public override bool Apply(Context ctx, ref XElement node)"
+            + "public " + ruleName + "(){" + "" + "}"
+            + (after ? "public override bool ApplyAfter(Context ctx, ref XElement that)"
+                     : "public override bool Apply(Context ctx, ref XElement that)")
             + "{"
+            + GetRuleBody(ctx, node)
             + "}"
             + "}}";
             return code;
@@ -74,27 +73,31 @@ namespace akira
 
         protected string GetRuleBody(Context ctx, XElement node)
         {
-            string s = "";
+            string code = "";
 
+            code = "if (" + node.Attribute("code").Value + ") {\n";
+            foreach (var item in node.Elements())
+            {
+                if (item.Name != "cs") return "";
+                code += item.Attribute("code").Value + "\n";
+            }
+            code += "that = null;\n";
+            code += "return true;\n";
+            code += "}\n";
+            code += "else return false;\n";
 
-
-            return s;
-        }
-        
-        protected string Content()
-        {
-            string cs = "";
-            return cs;
+            return code;
         }
 
         protected Rule GenerateInstance(Context ctx, XElement node)
         {
-            string code = GenerateClass(ctx, node);
-            var a = akira.AssemblyFromCode(code);
-            Type t = a.GetTypes()[0];
+            Assembly a = null;
+            Type t = null;
+            if (!ctx.GetType(ruleName, ref t, ref a))
+            {
+                ctx.GetType(ruleName, GenerateCode(ctx, node), ref t, ref a);
+            }
             var o = a.CreateInstance(t.FullName);
-            t.GetField("left").SetValue(o, node.Elements().ElementAt(0));
-            t.GetField("right").SetValue(o, node.Elements().ElementAt(1));
             return (Rule)o;
         }
     }

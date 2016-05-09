@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<akira>
+  <if code="a == 3">
+      <cs code="print(hello)"/>
+      <cs code="print(world)"/>
+  </if>
+</akira>

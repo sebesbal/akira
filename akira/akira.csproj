@@ -45,6 +45,7 @@
     <Compile Include="cs_exe.cs" />
     <Compile Include="cs_run.cs" />
     <Compile Include="gen\lofusz.cs" />
+    <Compile Include="gen\rule_1.cs" />
     <Compile Include="match.cs" />
     <Compile Include="match_exe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
