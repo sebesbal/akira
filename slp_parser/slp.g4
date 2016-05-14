@@ -149,19 +149,19 @@ CLOSE_BRACE : '>' {opened--;};
 
 NEWLINE
  : ( {atStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' ) SPACES?
+   | ( '\r'? '\n' | '\r' )+ SPACES?
    )
    {
      string newLine = Regex.Replace(Text, "[^\r\n]", "");
      string spaces = Regex.Replace(Text, "[\r\n]", "");
      int next = InputStream.La(1);
-     if (opened > 0 || next == '\r' || next == '\n' || next == '#') {
+     if (opened > 0 || next == '\r' || next == '\n' ||next == '#') {
        // If we're inside a list or on a blank line, ignore all indents, 
        // dedents and line breaks.
        Skip();
      }
      else {
-       Emit(commonToken(NEWLINE, newLine));
+       // Emit(commonToken(NEWLINE, newLine));
        int indent = getIndentationCount(spaces);
        int previous = indents.Count == 0 ? 0 : indents.Peek();
        if (indent == previous) {
@@ -181,8 +181,7 @@ NEWLINE
          }
        }
      }
-   }
- ;
+   };
 
 WS  :   [ \r\t\u000C\n]+ -> channel(HIDDEN)
 	;
@@ -196,7 +195,7 @@ assoc
 	;
    
 opdef
-	:	'op' '(' INT ',' assoc ',' OP ')' NEWLINE
+	:	'op' '(' INT ',' assoc ',' OP ')' // NEWLINE
 	;
    
 token
@@ -212,7 +211,7 @@ token
 	;
 	
 exp
-	: (block | token | opdef)+
+	: (block | token | opdef | NEWLINE)+
 	;
 
 block
