@@ -160,6 +160,69 @@ namespace slp_parser
             base.EnterOpdef(context);
         }
 
+        // rally : to list
+        void rally(XElement e)
+        {
+            if (e.Name == "id")
+            {
+                e.Name = e.Value;
+                e.Value = "";
+            }
+
+            if (e.Name == "op" && e.MatchAttribute("id", ":"))
+            {
+                e.SetAttributeValue("id", "list");
+                //e.Attribute("id").Remove();
+                //e.Name = "list";
+
+                var f = e.Elements().ElementAt(1);
+                if (f.Name == "op" && e.MatchAttribute("id", "list"))
+                {
+                    f.Remove();
+                    foreach (var g in f.Elements())
+                    {
+                        e.Add(g);
+                    }
+                }
+            }
+
+            foreach (var f in e.Elements())
+            {
+                rally(f);
+            }
+        }
+
+        //// rally : to list
+        //void rally(XElement e)
+        //{
+        //    if (e.Name == "id")
+        //    {
+        //        e.Name = e.Value;
+        //        e.Value = "";
+        //    }
+
+        //    if (e.Name == "op" && e.MatchAttribute("id", ":"))
+        //    {
+        //        e.Attribute("id").Remove();
+        //        e.Name = "list";
+
+        //        var f = e.Elements().ElementAt(1);
+        //        if (f.Name == "op" && e.MatchAttribute("id", "list"))
+        //        {
+        //            f.Remove();
+        //            foreach (var g in f.Elements())
+        //            {
+        //                e.Add(g);
+        //            }
+        //        }
+        //    }
+
+        //    foreach (var f in e.Elements())
+        //    {
+        //        rally(f);
+        //    }
+        //}
+
         protected XElement ParseOperators(List<Tuple<Operator, XElement>> list)
         {
             Stack<Tuple<Operator, XElement>> open = new Stack<Tuple<Operator, XElement>>();
@@ -207,20 +270,21 @@ namespace slp_parser
                 }
             }
 
+            XElement e = null;
             if (closed.Count == 1)
             {
-                return closed.Peek();
+                e = closed.Peek();
             }
             else
             {
-                var l = new XElement("op");
-                l.SetAttributeValue("id", "list");
+                e = new XElement("op");
+                e.SetAttributeValue("id", "list");
                 foreach (var x in closed)
                 {
-                    l.AddFirst(x);
+                    e.AddFirst(x);
                 }
-                return l;
             }
+            return e;
         }
 
         public override void ExitExp([NotNull] slpParser.ExpContext context)
@@ -249,13 +313,13 @@ namespace slp_parser
                     list.Add(new Tuple<Operator, XElement>(Operator.nullop, n));
                 }
             }
+
             if (list.Count == 1)
             {
                 m.Put(context, list.First().Item2);
             }
             else if (list.Count > 0)
             {
-                //list.Add(new Tuple<Operator, XElement>(null, null));
                 m.Put(context, ParseOperators(list));
             }
         }
@@ -330,6 +394,7 @@ namespace slp_parser
         public override void ExitProgram(slpParser.ProgramContext context)
         {
             program = m.Get(context.exp());
+            rally(program);
             m.Put(context, program);
         }
 
