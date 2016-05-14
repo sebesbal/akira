@@ -26,7 +26,7 @@ namespace slp_parser
         static Operator()
         {
             nullop.Name = "nullop";
-            nullop.Precedence = 0;
+            nullop.Precedence = 1100;
             nullop.Associativity = Associativity.f;
         }
 
@@ -106,7 +106,7 @@ namespace slp_parser
         {
             Operator op = new Operator();
             op.Name = "list";
-            op.Precedence = 1000;
+            op.Precedence = Operator.nullop.Precedence;
             op.Associativity = Associativity.yfy;
             operators.Add(op.Name, op);
         }
@@ -168,40 +168,42 @@ namespace slp_parser
             foreach (var x in list)
             {
                 Operator op = x.Item1;
+
                 if (op == Operator.nullop || x.Item2 != null && x.Item2.Elements().Count() > 0)
                 {
                     closed.Push(x.Item2);
                 }
                 else
                 {
-                    while (true)
-                    {
-                        if (open.Count == 0) break;
-                        var top = open.Peek();
-                        var o = top.Item1;
-                        if (op != null && (o.Precedence > op.Precedence
-                            || o.Precedence == op.Precedence && o.right == AssociativitySide.y))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            open.Pop();
-                            var l = new List<XElement>();
-                            for (int i = 0; i < o.Count; ++i)
-                            {
-                                l.Add(closed.Pop());
-                            }
-                            l.Reverse();
-                            foreach (var item in l)
-                            {
-                                top.Item2.Add(item);
-                            }
-                            closed.Push(top.Item2);
-                        }
-                    }
-
                     open.Push(x);
+                }
+
+                while (true)
+                {
+                    if (open.Count == 0) break;
+                    var top = open.Peek();
+                    var o = top.Item1;
+                    if ((o.Precedence > op.Precedence
+                        || o.Precedence == op.Precedence
+                            && o.right == AssociativitySide.y))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        open.Pop();
+                        var l = new List<XElement>();
+                        for (int i = 0; i < o.Count; ++i)
+                        {
+                            l.Add(closed.Pop());
+                        }
+                        l.Reverse();
+                        foreach (var item in l)
+                        {
+                            top.Item2.Add(item);
+                        }
+                        closed.Push(top.Item2);
+                    }
                 }
             }
 
@@ -218,7 +220,6 @@ namespace slp_parser
                     l.AddFirst(x);
                 }
                 return l;
-                // throw new Exception("Closed.Count > 0: " + closed.Count);
             }
         }
 
@@ -254,7 +255,7 @@ namespace slp_parser
             }
             else if (list.Count > 0)
             {
-                list.Add(new Tuple<Operator, XElement>(null, null));
+                //list.Add(new Tuple<Operator, XElement>(null, null));
                 m.Put(context, ParseOperators(list));
             }
         }
