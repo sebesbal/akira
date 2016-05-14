@@ -136,7 +136,7 @@ LINE_COMMENT
     ;
 
 SPACES
- : [ \t]+
+ : [ \t]+  -> channel(HIDDEN)
  ;
 
 // TREE : ':';

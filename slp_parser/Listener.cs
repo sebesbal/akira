@@ -159,69 +159,80 @@ namespace slp_parser
             operators.Add(op.Name, op);
             base.EnterOpdef(context);
         }
-
-        // rally : to list
-        void rally(XElement e)
+        
+        void traverse0(XElement e)
         {
             if (e.Name == "id")
             {
                 e.Name = e.Value;
-                e.Value = "";
+                e.RemoveNodes();
             }
-
-            if (e.Name == "op" && e.MatchAttribute("id", ":"))
+            else if (e.Name == "op" && e.MatchAttribute("id", "list"))
             {
-                e.SetAttributeValue("id", "list");
-                //e.Attribute("id").Remove();
-                //e.Name = "list";
-
-                var f = e.Elements().ElementAt(1);
-                if (f.Name == "op" && e.MatchAttribute("id", "list"))
-                {
-                    f.Remove();
-                    foreach (var g in f.Elements())
-                    {
-                        e.Add(g);
-                    }
-                }
+                e.Name = "list";
+                e.Attribute("id").Remove();
             }
 
             foreach (var f in e.Elements())
             {
-                rally(f);
+                traverse0(f);
             }
         }
 
-        //// rally : to list
-        //void rally(XElement e)
-        //{
-        //    if (e.Name == "id")
-        //    {
-        //        e.Name = e.Value;
-        //        e.Value = "";
-        //    }
+        void traverse1(XElement e)
+        {
+            if (e.Name == "op" && e.MatchAttribute("id", ":"))
+            {
+                var f = e.Elements().ElementAt(1);
+                
+                e.Attribute("id").Remove();
+                e.Name = "list";
 
-        //    if (e.Name == "op" && e.MatchAttribute("id", ":"))
-        //    {
-        //        e.Attribute("id").Remove();
-        //        e.Name = "list";
+                if (f.Name == "list")
+                {
+                    f.Remove();
+                    foreach (var h in f.Elements())
+                    {
+                        e.Add(h);
+                    }
+                }
+            }
+            
+            foreach (var f in e.Elements())
+            {
+                traverse1(f);
+            }
+        }
 
-        //        var f = e.Elements().ElementAt(1);
-        //        if (f.Name == "op" && e.MatchAttribute("id", "list"))
-        //        {
-        //            f.Remove();
-        //            foreach (var g in f.Elements())
-        //            {
-        //                e.Add(g);
-        //            }
-        //        }
-        //    }
-
-        //    foreach (var f in e.Elements())
-        //    {
-        //        rally(f);
-        //    }
-        //}
+        void traverse2(ref XElement e)
+        {
+            var h = e.FirstNode;
+            while (h != null)
+            {
+                if (h is XElement)
+                {
+                    XElement i = (XElement)h;
+                    traverse2(ref i);
+                    h = i;
+                }
+                h = h.NextNode;
+            }
+            
+            if (e.Name == "list")
+            {
+                var f = e.Elements().ElementAt(0);
+                if (f.Elements().Count() == 0)
+                {
+                    f.Remove();
+                    e.ReplaceWith(f);
+                    foreach (var g in e.Elements())
+                    {
+                        f.Add(g);
+                    }
+                    e = f;
+                }
+            }
+        }
 
         protected XElement ParseOperators(List<Tuple<Operator, XElement>> list)
         {
@@ -394,7 +405,9 @@ namespace slp_parser
         public override void ExitProgram(slpParser.ProgramContext context)
         {
             program = m.Get(context.exp());
-            rally(program);
+            traverse0(program);
+            traverse1(program);
+            traverse2(ref program);
             m.Put(context, program);
         }
 
