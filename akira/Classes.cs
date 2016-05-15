@@ -164,6 +164,7 @@ namespace akira
         public XDocument doc { get; protected set; }
         public akira()
         {
+            ctx.ActivateRule(new misc_atttribute());
             ctx.ActivateRule(new cs_rule());
             ctx.ActivateRule(new cs_exe());
             ctx.ActivateRule(new match_exe());
@@ -171,8 +172,22 @@ namespace akira
             ctx.ActivateRule(new if_cs());
             ctx.ActivateRule(new cs_run());
             ctx.ActivateRule(new apply());
+            //ctx.ActivateRule(new misc_variables());
         }
         public void Run(string fileName)
+        {
+            string ext = Path.GetExtension(fileName);
+            if (ext == ".slp")
+            {
+                RunSlp(fileName);
+            }
+            else if (ext == ".aki")
+            {
+                RunXml(fileName);
+            }
+        }
+
+        public void RunSlp(string fileName)
         {
             doc = new XDocument();
             doc.Add(new XElement("akira"));
@@ -186,6 +201,7 @@ namespace akira
             // Context ctx = new Context();
             Apply(ctx, ref e);
         }
+
         public void RunXml(string fileName)
         {
             doc = XDocument.Load(fileName);
@@ -201,26 +217,22 @@ namespace akira
 
         public override bool Apply(Context ctx, ref XElement node)
         {
-            if (node.Name != "akira") return false;
+            // if (node.Name != "akira") return false;
+            
+            while (node != null && ApplyRules(ctx, ref node)) ;
+            if (node == null) return false;
 
             var v = node.Elements().ToArray();
             foreach (XElement n in v)
             {
                 XElement m = n;
-                while (m != null && ApplyRules(ctx, ref m)) ;
-
-                if (m != null)
-                {
-                    foreach (XElement u in m.Elements())
-                    {
-                        XElement u1 = u;
-                        Apply(ctx, ref u1);
-                    }
-
-                    while (m != null && ApplyRulesAfter(ctx, ref m)) ;
-                }
+                while (m != null && Apply(ctx, ref m)) ;
             }
-            return true;
+
+            while (node != null && ApplyRulesAfter(ctx, ref node)) ;
+            if (node == null) return false;
+
+            return false;
         }
 
         public bool ApplyRules(Context ctx, ref XElement node)

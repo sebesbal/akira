@@ -1,0 +1,12 @@
+﻿op 1000 yfx :
+op 600 yfx -->
+op 500 yfx =
+op 200 yfx +
+op 100 yfx *
+op 50 yfx /
+
+e
+a
+b -->
+	d f
+	e

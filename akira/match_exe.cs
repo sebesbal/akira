@@ -41,6 +41,12 @@ namespace akira
             {
                 refs.Add(a.Value);
             }
+
+            if (node.Name == "a" || node.Name == "b" || node.Name == "c" || node.Name == "d")
+            {
+                refs.Add(node.Name.ToString());
+            }
+
             if (node.GetAttribute("pre", out a))
             {
                 conds.Add(a.Value);

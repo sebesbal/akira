@@ -59,7 +59,7 @@ namespace test
         public void test_0()
         {
             akira.akira a = new akira.akira();
-            a.Run("test_0.aki");
+            a.Run("test_0.slp");
             a.Save("result.xml");
         }
 

@@ -119,8 +119,11 @@ ID
     :   ('a'..'z'|'A'..'Z'|'0'..'9'|'_')+
     ;
 	
+OPEN_BRACE : '<' {opened++;};
+CLOSE_BRACE : '>' {opened--;};
+	
 OP
-	:   (':'|'+'|'*'|'/'|'='|'-'|'!'|'?'|'|'|'~'|'%'|'&'|'#'|'@')+
+	:   (':'|'+'|'*'|'/'|'='|'-'|'!'|'?'|'|'|'~'|'%'|'&'|'#'|'@'|'<'|'>')+
 	;
 
 NATIVE
@@ -144,8 +147,7 @@ OPEN_PAREN : '(' {opened++;};
 CLOSE_PAREN : ')' {opened--;};
 OPEN_BRACK : '[' {opened++;};
 CLOSE_BRACK : ']' {opened--;};
-OPEN_BRACE : '<' {opened++;};
-CLOSE_BRACE : '>' {opened--;};
+
 
 NEWLINE
  : ( {atStartOfInput()}?   SPACES
@@ -166,11 +168,19 @@ NEWLINE
        int previous = indents.Count == 0 ? 0 : indents.Peek();
        if (indent == previous) {
          // skip indents of the same size as the present indent-size
-         Skip();
+         //Skip();
+		 
+		 while(indents.Count > 0 && indents.Peek() >= indent) {
+           Emit(createDedent());
+           indents.Pop();
+         }
+		 
+		 indents.Push(indent);
+		 Emit(commonToken(slpParser.OPEN_PAREN, spaces));
        }
        else if (indent > previous) {
          indents.Push(indent);
-		 Emit(new CommonToken(slpParser.OP, ":"));
+		 // Emit(new CommonToken(slpParser.OP, ":"));
 		 Emit(commonToken(slpParser.OPEN_PAREN, spaces));
        }
        else {

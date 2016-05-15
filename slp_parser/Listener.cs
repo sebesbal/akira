@@ -276,6 +276,7 @@ namespace slp_parser
                     e.ReplaceWith(f);
                 }
                 e = f;
+                traverse2(ref e);
                 return;
             }
 
