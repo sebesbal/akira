@@ -32,10 +32,10 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 public partial class slpParser : Parser {
 	public const int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, TRUE=13, FALSE=14, NULL=15, STRING=16, INT=17, 
-		FLOAT=18, ID=19, OP=20, NATIVE=21, COMMENT=22, LINE_COMMENT=23, SPACES=24, 
-		OPEN_PAREN=25, CLOSE_PAREN=26, OPEN_BRACK=27, CLOSE_BRACK=28, OPEN_BRACE=29, 
-		CLOSE_BRACE=30, NEWLINE=31, WS=32, INDENT=33, DEDENT=34;
+		T__9=10, T__10=11, TRUE=12, FALSE=13, NULL=14, STRING=15, INT=16, FLOAT=17, 
+		ID=18, OP=19, NATIVE=20, COMMENT=21, LINE_COMMENT=22, SPACES=23, OPEN_PAREN=24, 
+		CLOSE_PAREN=25, OPEN_BRACK=26, CLOSE_BRACK=27, OPEN_BRACE=28, CLOSE_BRACE=29, 
+		NEWLINE=30, WS=31, INDENT=32, DEDENT=33;
 	public const int
 		RULE_program = 0, RULE_assoc = 1, RULE_opdef = 2, RULE_token = 3, RULE_exp = 4, 
 		RULE_block = 5;
@@ -45,13 +45,12 @@ public partial class slpParser : Parser {
 
 	private static readonly string[] _LiteralNames = {
 		null, "'fx'", "'fy'", "'xf'", "'yf'", "'xfx'", "'xfy'", "'yfx'", "'yfy'", 
-		"'op'", "','", "'{'", "'}'", "'true'", "'false'", "'<>'", null, null, 
-		null, null, null, null, null, null, null, "'('", "')'", "'['", "']'", 
-		"'<'", "'>'"
+		"'op'", "'{'", "'}'", "'true'", "'false'", "'<>'", null, null, null, null, 
+		null, null, null, null, null, "'('", "')'", "'['", "']'", "'<'", "'>'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, "TRUE", "FALSE", "NULL", "STRING", "INT", "FLOAT", "ID", "OP", "NATIVE", 
+		"TRUE", "FALSE", "NULL", "STRING", "INT", "FLOAT", "ID", "OP", "NATIVE", 
 		"COMMENT", "LINE_COMMENT", "SPACES", "OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACK", 
 		"CLOSE_BRACK", "OPEN_BRACE", "CLOSE_BRACE", "NEWLINE", "WS", "INDENT", 
 		"DEDENT"
@@ -192,13 +191,9 @@ public partial class slpParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			State = 16; Match(T__8);
-			State = 17; Match(OPEN_PAREN);
-			State = 18; Match(INT);
-			State = 19; Match(T__9);
-			State = 20; assoc();
-			State = 21; Match(T__9);
-			State = 22; Match(OP);
-			State = 23; Match(CLOSE_PAREN);
+			State = 17; Match(INT);
+			State = 18; assoc();
+			State = 19; Match(OP);
 			}
 		}
 		catch (RecognitionException re) {
@@ -245,7 +240,7 @@ public partial class slpParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 25;
+			State = 21;
 			_la = TokenStream.La(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << NEWLINE))) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -312,39 +307,39 @@ public partial class slpParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 31;
+			State = 27;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.La(1);
 			do {
 				{
-				State = 31;
+				State = 27;
 				switch ( Interpreter.AdaptivePredict(TokenStream,0,Context) ) {
 				case 1:
 					{
-					State = 27; block();
+					State = 23; block();
 					}
 					break;
 				case 2:
 					{
-					State = 28; token();
+					State = 24; token();
 					}
 					break;
 				case 3:
 					{
-					State = 29; opdef();
+					State = 25; opdef();
 					}
 					break;
 				case 4:
 					{
-					State = 30; Match(NEWLINE);
+					State = 26; Match(NEWLINE);
 					}
 					break;
 				}
 				}
-				State = 33;
+				State = 29;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.La(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__9) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -382,30 +377,30 @@ public partial class slpParser : Parser {
 		BlockContext _localctx = new BlockContext(Context, State);
 		EnterRule(_localctx, 10, RULE_block);
 		try {
-			State = 47;
+			State = 43;
 			switch (TokenStream.La(1)) {
 			case OPEN_PAREN:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 35; Match(OPEN_PAREN);
-				State = 36; exp();
-				State = 37; Match(CLOSE_PAREN);
+				State = 31; Match(OPEN_PAREN);
+				State = 32; exp();
+				State = 33; Match(CLOSE_PAREN);
 				}
 				break;
-			case T__10:
+			case T__9:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 39; Match(T__10);
-				State = 40; exp();
-				State = 41; Match(T__11);
+				State = 35; Match(T__9);
+				State = 36; exp();
+				State = 37; Match(T__10);
 				}
 				break;
 			case OPEN_BRACK:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 43; Match(OPEN_BRACK);
-				State = 44; exp();
-				State = 45; Match(CLOSE_BRACK);
+				State = 39; Match(OPEN_BRACK);
+				State = 40; exp();
+				State = 41; Match(CLOSE_BRACK);
 				}
 				break;
 			default:
@@ -424,24 +419,23 @@ public partial class slpParser : Parser {
 	}
 
 	public static readonly string _serializedATN =
-		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3$\x34\x4\x2\t\x2"+
+		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3#\x30\x4\x2\t\x2"+
 		"\x4\x3\t\x3\x4\x4\t\x4\x4\x5\t\x5\x4\x6\t\x6\x4\a\t\a\x3\x2\x3\x2\x3\x3"+
-		"\x3\x3\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x5\x3"+
-		"\x5\x3\x6\x3\x6\x3\x6\x3\x6\x6\x6\"\n\x6\r\x6\xE\x6#\x3\a\x3\a\x3\a\x3"+
-		"\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x5\a\x32\n\a\x3\a\x2\x2\b\x2"+
-		"\x4\x6\b\n\f\x2\x4\x3\x2\x3\n\x5\x2\xF\x10\x12\x17!!\x33\x2\xE\x3\x2\x2"+
-		"\x2\x4\x10\x3\x2\x2\x2\x6\x12\x3\x2\x2\x2\b\x1B\x3\x2\x2\x2\n!\x3\x2\x2"+
-		"\x2\f\x31\x3\x2\x2\x2\xE\xF\x5\n\x6\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2"+
-		"\x2\x2\x11\x5\x3\x2\x2\x2\x12\x13\a\v\x2\x2\x13\x14\a\x1B\x2\x2\x14\x15"+
-		"\a\x13\x2\x2\x15\x16\a\f\x2\x2\x16\x17\x5\x4\x3\x2\x17\x18\a\f\x2\x2\x18"+
-		"\x19\a\x16\x2\x2\x19\x1A\a\x1C\x2\x2\x1A\a\x3\x2\x2\x2\x1B\x1C\t\x3\x2"+
-		"\x2\x1C\t\x3\x2\x2\x2\x1D\"\x5\f\a\x2\x1E\"\x5\b\x5\x2\x1F\"\x5\x6\x4"+
-		"\x2 \"\a!\x2\x2!\x1D\x3\x2\x2\x2!\x1E\x3\x2\x2\x2!\x1F\x3\x2\x2\x2! \x3"+
-		"\x2\x2\x2\"#\x3\x2\x2\x2#!\x3\x2\x2\x2#$\x3\x2\x2\x2$\v\x3\x2\x2\x2%&"+
-		"\a\x1B\x2\x2&\'\x5\n\x6\x2\'(\a\x1C\x2\x2(\x32\x3\x2\x2\x2)*\a\r\x2\x2"+
-		"*+\x5\n\x6\x2+,\a\xE\x2\x2,\x32\x3\x2\x2\x2-.\a\x1D\x2\x2./\x5\n\x6\x2"+
-		"/\x30\a\x1E\x2\x2\x30\x32\x3\x2\x2\x2\x31%\x3\x2\x2\x2\x31)\x3\x2\x2\x2"+
-		"\x31-\x3\x2\x2\x2\x32\r\x3\x2\x2\x2\x5!#\x31";
+		"\x3\x3\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x5\x3\x5\x3\x6\x3\x6\x3\x6\x3"+
+		"\x6\x6\x6\x1E\n\x6\r\x6\xE\x6\x1F\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3"+
+		"\a\x3\a\x3\a\x3\a\x3\a\x5\a.\n\a\x3\a\x2\x2\b\x2\x4\x6\b\n\f\x2\x4\x3"+
+		"\x2\x3\n\x5\x2\xE\xF\x11\x16  /\x2\xE\x3\x2\x2\x2\x4\x10\x3\x2\x2\x2\x6"+
+		"\x12\x3\x2\x2\x2\b\x17\x3\x2\x2\x2\n\x1D\x3\x2\x2\x2\f-\x3\x2\x2\x2\xE"+
+		"\xF\x5\n\x6\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2\x2\x2\x11\x5\x3\x2\x2\x2"+
+		"\x12\x13\a\v\x2\x2\x13\x14\a\x12\x2\x2\x14\x15\x5\x4\x3\x2\x15\x16\a\x15"+
+		"\x2\x2\x16\a\x3\x2\x2\x2\x17\x18\t\x3\x2\x2\x18\t\x3\x2\x2\x2\x19\x1E"+
+		"\x5\f\a\x2\x1A\x1E\x5\b\x5\x2\x1B\x1E\x5\x6\x4\x2\x1C\x1E\a \x2\x2\x1D"+
+		"\x19\x3\x2\x2\x2\x1D\x1A\x3\x2\x2\x2\x1D\x1B\x3\x2\x2\x2\x1D\x1C\x3\x2"+
+		"\x2\x2\x1E\x1F\x3\x2\x2\x2\x1F\x1D\x3\x2\x2\x2\x1F \x3\x2\x2\x2 \v\x3"+
+		"\x2\x2\x2!\"\a\x1A\x2\x2\"#\x5\n\x6\x2#$\a\x1B\x2\x2$.\x3\x2\x2\x2%&\a"+
+		"\f\x2\x2&\'\x5\n\x6\x2\'(\a\r\x2\x2(.\x3\x2\x2\x2)*\a\x1C\x2\x2*+\x5\n"+
+		"\x6\x2+,\a\x1D\x2\x2,.\x3\x2\x2\x2-!\x3\x2\x2\x2-%\x3\x2\x2\x2-)\x3\x2"+
+		"\x2\x2.\r\x3\x2\x2\x2\x5\x1D\x1F-";
 	public static readonly ATN _ATN =
 		new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
 }

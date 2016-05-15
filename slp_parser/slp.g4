@@ -195,7 +195,8 @@ assoc
 	;
    
 opdef
-	:	'op' '(' INT ',' assoc ',' OP ')' // NEWLINE
+	// :	'op' '(' INT ',' assoc ',' OP ')' // NEWLINE
+	:	'op' INT assoc OP // NEWLINE
 	;
    
 token

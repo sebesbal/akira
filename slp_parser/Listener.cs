@@ -28,6 +28,10 @@ namespace slp_parser
             nullop.Name = "nullop";
             nullop.Precedence = 1100;
             nullop.Associativity = Associativity.f;
+            
+            listop.Name = "list";
+            listop.Precedence = 10000;
+            listop.Associativity = Associativity.yfy;
         }
 
         public string Name;
@@ -91,9 +95,68 @@ namespace slp_parser
             }
         }
         public static Operator nullop = new Operator();
+        public static Operator listop = new Operator();
         public AssociativitySide left { get; protected set; }
         public AssociativitySide right { get; protected set; }
         public int Count { get; protected set; }
+
+        /// <summary>
+        /// a alá berakható b
+        /// </summary>
+        public static bool operator <(Operator a, Operator b)
+        {
+            if (a.Precedence > b.Precedence)
+            {
+                if (a.right != AssociativitySide.n)
+                {
+                    return true;
+                }
+            }
+            else if (a.Precedence == b.Precedence)
+            {
+                if (a.right == AssociativitySide.x)
+                {
+                    return true;
+                }
+            }
+            else // (a.Precedence < b.Precedence)
+            {
+                if (a.right != AssociativitySide.n && b.left == AssociativitySide.n)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// b alá berakható a
+        /// </summary>
+        public static bool operator >(Operator a, Operator b)
+        {
+            if (a.Precedence < b.Precedence)
+            {
+                if (b.left != AssociativitySide.n)
+                {
+                    return true;
+                }
+            }
+            else if (a.Precedence == b.Precedence)
+            {
+                if (b.left == AssociativitySide.x)
+                {
+                    return true;
+                }
+            }
+            else // (a.Precedence > b.Precedence)
+            {
+                if (a.right == AssociativitySide.n && b.left != AssociativitySide.n)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     class Listener: slpBaseListener
@@ -104,10 +167,7 @@ namespace slp_parser
 
         public Listener()
         {
-            Operator op = new Operator();
-            op.Name = "list";
-            op.Precedence = Operator.nullop.Precedence;
-            op.Associativity = Associativity.yfy;
+            Operator op = Operator.listop;
             operators.Add(op.Name, op);
         }
 
@@ -206,6 +266,19 @@ namespace slp_parser
 
         void traverse2(ref XElement e)
         {
+            // remove lists with one element
+            if (e.Name == "list" && e.Elements().Count() == 1)
+            {
+                var f = e.Elements().ElementAt(0);
+                f.Remove();
+                if (e.Parent != null)
+                {
+                    e.ReplaceWith(f);
+                }
+                e = f;
+                return;
+            }
+
             var h = e.FirstNode;
             while (h != null)
             {
@@ -224,7 +297,10 @@ namespace slp_parser
                 if (f.Elements().Count() == 0)
                 {
                     f.Remove();
-                    e.ReplaceWith(f);
+                    if (e.Parent != null)
+                    {
+                        e.ReplaceWith(f);
+                    }
                     foreach (var g in e.Elements())
                     {
                         f.Add(g);
@@ -236,66 +312,63 @@ namespace slp_parser
 
         protected XElement ParseOperators(List<Tuple<Operator, XElement>> list)
         {
-            Stack<Tuple<Operator, XElement>> open = new Stack<Tuple<Operator, XElement>>();
-            Stack<XElement> closed = new Stack<XElement>();
+            var open = new Stack<Tuple<Operator, XElement>>();
+            var root = new Tuple<Operator, XElement>(Operator.listop, new XElement("list"));
+            open.Push(root);
 
-            foreach (var x in list)
+            foreach (var b in list)
             {
-                Operator op = x.Item1;
+                Operator opb = b.Item1;
+                Tuple<Operator, XElement> c = null;
 
-                if (op == Operator.nullop || x.Item2 != null && x.Item2.Elements().Count() > 0)
+                while (open.Count > 0)
                 {
-                    closed.Push(x.Item2);
-                }
-                else
-                {
-                    open.Push(x);
-                }
+                    var a = open.Peek();
+                    Operator opa = a.Item1;
 
-                while (true)
-                {
-                    if (open.Count == 0) break;
-                    var top = open.Peek();
-                    var o = top.Item1;
-                    if ((o.Precedence > op.Precedence
-                        || o.Precedence == op.Precedence
-                            && o.right == AssociativitySide.y))
+                    if (opa < opb) // can push b under a
                     {
-                        break;
-                    }
-                    else
-                    {
-                        open.Pop();
-                        var l = new List<XElement>();
-                        for (int i = 0; i < o.Count; ++i)
+                        if (c != null)
                         {
-                            l.Add(closed.Pop());
+                            Operator opc = c.Item1;
+                            if (opc > opb) // can pus c under b
+                            {
+                                // check a's size
+                                if (!(opa == Operator.listop || opa.Count >= a.Item2.Elements().Count())) goto move_up;
+
+                                // remove c from a
+                                c.Item2.Remove();
+
+                                // add c to b
+                                b.Item2.Add(c.Item2);
+                            }
+                            else
+                            {
+                                // Skip c
+                                // check a's size
+                                if (!(opa == Operator.listop || opa.Count > a.Item2.Elements().Count())) goto move_up;
+                            }
                         }
-                        l.Reverse();
-                        foreach (var item in l)
-                        {
-                            top.Item2.Add(item);
-                        }
-                        closed.Push(top.Item2);
+
+                        a.Item2.Add(b.Item2); // push b under a
+                        open.Push(b);
+                        break; // take the next b
                     }
+
+                    move_up:
+                    c = a;
+                    open.Pop();
                 }
             }
 
-            XElement e = null;
-            if (closed.Count == 1)
-            {
-                e = closed.Peek();
-            }
-            else
-            {
-                e = new XElement("op");
-                e.SetAttributeValue("id", "list");
-                foreach (var x in closed)
-                {
-                    e.AddFirst(x);
-                }
-            }
-            return e;
+            //XElement e = root.Item2;
+            //if (e.Elements().Count() == 1)
+            //{
+            //    e = e.Elements().ElementAt(0);
+            //    e.Remove();
+            //}
+
+            return root.Item2;
         }
 
         public override void ExitExp([NotNull] slpParser.ExpContext context)
@@ -312,6 +385,10 @@ namespace slp_parser
                     if (operators.ContainsKey(txt))
                     {
                         var op = operators[txt];
+                        //if (op == Operator.listop)
+                        //{
+                        //    op = Operator.nullop;
+                        //}
                         list.Add(new Tuple<Operator, XElement>(op, n));
                     }
                     else

@@ -1,19 +1,11 @@
-﻿op(1000, yfy, :)
-op(200, yfy, +)
-op(100, yfy, *)
-op(50, yfy, /)
+﻿op 1000 yfx :
+op 200 yfx +
+op 100 yfx *
+op 50 yfx /
 
 a
-
+	2*(3+4)*c
 	b
-	c
-(d h j)
-	e
-		f
+		e f
 	g
-		h
-		i
-			j
-	k
-l
-	m n
+h i j
