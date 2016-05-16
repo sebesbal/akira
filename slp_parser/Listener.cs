@@ -13,7 +13,7 @@ namespace slp_parser
 {
     public enum Associativity
     {
-        f, fx, fy, xf, yf, xfx, xfy, yfx, yfy
+        f, fx, fy, xf, yf, xfx, xfy, yfx, yfy, yfxx
     }
 
     public enum AssociativitySide
@@ -88,6 +88,11 @@ namespace slp_parser
                         left = AssociativitySide.y;
                         right = AssociativitySide.y;
                         Count = 2;
+                        break;
+                    case Associativity.yfxx:
+                        left = AssociativitySide.y;
+                        right = AssociativitySide.x;
+                        Count = int.MaxValue;
                         break;
                     default:
                         break;

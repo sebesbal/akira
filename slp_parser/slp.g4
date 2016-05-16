@@ -201,7 +201,7 @@ program
 	;
    
 assoc
-	:	'fx' | 'fy' | 'xf' | 'yf' | 'xfx' | 'xfy' | 'yfx' | 'yfy'
+	:	'fx' | 'fy' | 'xf' | 'yf' | 'xfx' | 'xfy' | 'yfx' | 'yfy' | 'yfxx'
 	;
    
 opdef
