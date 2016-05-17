@@ -24,7 +24,7 @@ namespace test2
 
         static void Main(string[] args)
         {
-            test_1();
+            test_0();
         }
     }
 }

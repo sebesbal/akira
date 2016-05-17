@@ -28,7 +28,7 @@ tokens { INDENT, DEDENT }
       }
     }
 
-    return count;
+    return count / 8;
   }
   
   private CommonToken commonToken(int type, String text) {
@@ -163,33 +163,14 @@ NEWLINE
        Skip();
      }
      else {
-       // Emit(commonToken(NEWLINE, newLine));
        int indent = getIndentationCount(spaces);
-       int previous = indents.Count == 0 ? 0 : indents.Peek();
-       if (indent == previous) {
-         // skip indents of the same size as the present indent-size
-         //Skip();
-		 
-		 while(indents.Count > 0 && indents.Peek() >= indent) {
+
+	   while(indents.Count > 0 && indents.Peek() >= indent) {
            Emit(createDedent());
            indents.Pop();
-         }
-		 
-		 indents.Push(indent);
-		 Emit(commonToken(slpParser.OPEN_PAREN, spaces));
-       }
-       else if (indent > previous) {
-         indents.Push(indent);
-		 // Emit(new CommonToken(slpParser.OP, ":"));
-		 Emit(commonToken(slpParser.OPEN_PAREN, spaces));
-       }
-       else {
-         // Possibly emit more than 1 DEDENT token.
-         while(indents.Count > 0 && indents.Peek() > indent) {
-           Emit(createDedent());
-           indents.Pop();
-         }
-       }
+		}
+		Emit(commonToken(slpParser.OPEN_PAREN, spaces));
+		indents.Push(indent);
      }
    };
 
