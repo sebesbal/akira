@@ -429,7 +429,7 @@ namespace slp_parser
             else if (context.INT() != null)
             {
                 name = "int";
-            } 
+            }
             else if (context.OP() != null)
             {
                 name = "op";
@@ -444,17 +444,16 @@ namespace slp_parser
             }
             else if (context.NEWLINE() != null)
             {
-                //XElement n = new XElement("op");
-                //n.SetAttributeValue("id", "list");
-                //m.Put(context, n);
                 return;
             }
             else if (context.NATIVE() != null)
             {
-                XElement n = new XElement("run");
-                n.SetAttributeValue("type", "cs");
                 string code = context.NATIVE().GetText();
-                n.SetAttributeValue("code", code.Substring(1, code.Length - 2));
+                if (code.Length >= 2)
+                {
+                    code = code.Substring(1, code.Length - 2); // remove surrounding { }
+                }
+                var n = new Code(code);
                 m.Put(context, n);
                 return;
             }

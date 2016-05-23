@@ -48,6 +48,20 @@ namespace akira
         public Stack<Rule> ActiveRules = new Stack<Rule>();
     }
 
+    public class Code: XElement
+    {
+        public Code(string code) : base("code")
+        {
+            Add(code);
+            // parse(code);
+        }
+
+        void parse(string code)
+        {
+
+        }
+    }
+
     public class Context
     {
         //public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();

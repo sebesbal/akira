@@ -2,12 +2,5 @@
 op 200 yfx +
 op 100 yfx *
 op 50 yfx /
-b e f
-	d
-a c
-	d 2*(3+4)*c
-	b e f
-	g
-b e f
-	d
-f
+
+{ alma }
