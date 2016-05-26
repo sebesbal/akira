@@ -1,4 +1,5 @@
-﻿using System;
+﻿using akira;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,9 +27,9 @@ namespace GUI
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             attributes.Items.Clear();
-            var element = (XElement)DataContext;
+            var element = (Node)DataContext;
             codeView.DataContext = null;
-            foreach (var attribute in element.Attributes())
+            foreach (var attribute in element.Attributes)
             {
                 if (attribute.Name == "code")
                 {

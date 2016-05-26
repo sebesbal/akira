@@ -41,7 +41,7 @@ namespace GUI
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             akira.akira a = new akira.akira();
-            a.RunXml(fileName);
+            a.Run(fileName);
             a.Save("result.xml");
             treeView2.Load("result.xml");
         }

@@ -167,8 +167,8 @@ namespace slp_parser
     class Listener: slpBaseListener
     {
         public Dictionary<string, Operator> operators = new Dictionary<string, Operator>();
-        Antlr4.Runtime.Tree.ParseTreeProperty<XElement> m = new Antlr4.Runtime.Tree.ParseTreeProperty<XElement>();
-        public XElement program;
+        Antlr4.Runtime.Tree.ParseTreeProperty<Node> m = new Antlr4.Runtime.Tree.ParseTreeProperty<Node>();
+        public Node program;
 
         public Listener()
         {
@@ -197,13 +197,13 @@ namespace slp_parser
         //}
 
 
-        protected void add(ParserRuleContext context, XElement node)
+        protected void add(ParserRuleContext context, Node node)
         {
             m.Put(context, node);
             addChildrens(context, node);
         }
 
-        protected void addChildrens(ParserRuleContext context, XElement node)
+        protected void addChildrens(ParserRuleContext context, Node node)
         {
             foreach (var item in context.children)
             {
@@ -225,17 +225,17 @@ namespace slp_parser
             base.EnterOpdef(context);
         }
         
-        void traverse0(XElement e)
+        void traverse0(Node e)
         {
             if (e.Name == "id")
             {
-                e.Name = e.Value;
-                e.RemoveNodes();
+                e.Name = e.Children.First.Value.Name;
+                e.Clear();
             }
-            else if (e.Name == "op" && e.MatchAttribute("id", "list"))
+            else if (e.Name == "op" && e.Match("id", "list"))
             {
                 e.Name = "list";
-                e.Attribute("id").Remove();
+                e.Remove("id");
             }
 
             foreach (var f in e.Elements())
@@ -244,13 +244,13 @@ namespace slp_parser
             }
         }
 
-        void traverse1(XElement e)
+        void traverse1(Node e)
         {
-            if (e.Name == "op" && e.MatchAttribute("id", ":"))
+            if (e.Name == "op" && e.Match("id", ":"))
             {
                 var f = e.Elements().ElementAt(1);
                 
-                e.Attribute("id").Remove();
+                e.Remove("id");
                 e.Name = "list";
 
                 if (f.Name == "list")
@@ -269,7 +269,7 @@ namespace slp_parser
             }
         }
 
-        void traverse2(ref XElement e)
+        void traverse2(ref Node e)
         {
             // remove lists with one element
             if (e.Name == "list" && e.Elements().Count() == 1)
@@ -285,16 +285,17 @@ namespace slp_parser
                 return;
             }
 
-            var h = e.FirstNode;
+            var h = e.Children.First;
             while (h != null)
             {
-                if (h is XElement)
+                Node i = (Node)h.Value;
+                Node old_i = i;
+                traverse2(ref i);
+                if (old_i != i)
                 {
-                    XElement i = (XElement)h;
-                    traverse2(ref i);
-                    h = i;
+                    h = e.Children.Find(i);
                 }
-                h = h.NextNode;
+                h = h.Next;
             }
             
             if (e.Name == "list")
@@ -316,16 +317,16 @@ namespace slp_parser
             }
         }
 
-        protected XElement ParseOperators(List<Tuple<Operator, XElement>> list)
+        protected Node ParseOperators(List<Tuple<Operator, Node>> list)
         {
-            var open = new Stack<Tuple<Operator, XElement>>();
-            var root = new Tuple<Operator, XElement>(Operator.listop, new XElement("list"));
+            var open = new Stack<Tuple<Operator, Node>>();
+            var root = new Tuple<Operator, Node>(Operator.listop, new Node("list"));
             open.Push(root);
 
             foreach (var b in list)
             {
                 Operator opb = b.Item1;
-                Tuple<Operator, XElement> c = null;
+                Tuple<Operator, Node> c = null;
 
                 while (open.Count > 0)
                 {
@@ -367,7 +368,7 @@ namespace slp_parser
                 }
             }
 
-            //XElement e = root.Item2;
+            //Node e = root.Item2;
             //if (e.Elements().Count() == 1)
             //{
             //    e = e.Elements().ElementAt(0);
@@ -379,7 +380,7 @@ namespace slp_parser
 
         public override void ExitExp([NotNull] slpParser.ExpContext context)
         {
-            var list = new List<Tuple<Operator, XElement>>();
+            var list = new List<Tuple<Operator, Node>>();
             foreach (var item in context.children)
             {
                 var n = m.Get(item);
@@ -387,7 +388,7 @@ namespace slp_parser
 
                 if (n.Name == "op")
                 {
-                    var txt = n.Attribute("id").Value;
+                    var txt = n["id"].Name;
                     if (operators.ContainsKey(txt))
                     {
                         var op = operators[txt];
@@ -395,7 +396,7 @@ namespace slp_parser
                         //{
                         //    op = Operator.nullop;
                         //}
-                        list.Add(new Tuple<Operator, XElement>(op, n));
+                        list.Add(new Tuple<Operator, Node>(op, n));
                     }
                     else
                     {
@@ -404,7 +405,7 @@ namespace slp_parser
                 }
                 else
                 {
-                    list.Add(new Tuple<Operator, XElement>(Operator.nullop, n));
+                    list.Add(new Tuple<Operator, Node>(Operator.nullop, n));
                 }
             }
 
@@ -458,16 +459,16 @@ namespace slp_parser
                 return;
             }
 
-            XElement node = new XElement(name);
-            
-            if (context.OP() == null)
+            Node node = new Node(name);
+            if (context.OP() != null)
             {
-                node.Value = context.GetText();
+                node["id"] = new Node(context.GetText());
             }
             else
             {
-                node.SetAttributeValue("id", context.GetText());
+                node.Add(context.GetText());
             }
+            
             m.Put(context, node);
         }
 
@@ -479,7 +480,7 @@ namespace slp_parser
             }
             else
             {
-                XElement node = new XElement("block");
+                Node node = new Node("block");
                 add(context, node);
             }
         }
@@ -495,7 +496,7 @@ namespace slp_parser
 
         //public override void ExitLList([NotNull] slpParser.LListContext context)
         //{
-        //    XElement n = m.Get(context.GetChild(0));
+        //    Node n = m.Get(context.GetChild(0));
         //    XAttribute id;
         //    if (n.GetAttribute("id", out id) && id.Value == "list")
         //    {
@@ -504,7 +505,7 @@ namespace slp_parser
         //    }
         //    else
         //    {
-        //        XElement list = new XElement("op");
+        //        Node list = new Node("op");
         //        list.SetAttributeValue("id", "list");
         //        add(context, list);
         //    }

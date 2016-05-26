@@ -14,7 +14,7 @@ namespace akira
     /// </summary>
     public class match_exe : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule" && node.MatchAttribute("type", "match"))) return false;
             // Instance result = new Instance(node.Elements().ElementAt(0), node.Elements().ElementAt(1));
@@ -27,14 +27,14 @@ namespace akira
             node.Remove();
             node = null;
 
-            //XElement m = new XElement("txt", GenerateClass(ctx, node));
+            //Node m = new Node("txt", GenerateClass(ctx, node));
             //node.ReplaceWith(m);
             //node = m;
 
             return true;
         }
 
-        void FindRefs(XElement node, List<string> refs, List<string> conds)
+        void FindRefs(Node node, List<string> refs, List<string> conds)
         {
             XAttribute a;
             if (node.GetAttribute("ref", out a))
@@ -68,7 +68,7 @@ namespace akira
 
         delegate bool check();
 
-        protected string GenerateCode(Context ctx, XElement node)
+        protected string GenerateCode(Context ctx, Node node)
         {
             List<string> refs = new List<string>();
             List<string> conds = new List<string>();
@@ -76,7 +76,7 @@ namespace akira
             string refDefs = "";
             foreach (var item in refs)
             {
-                refDefs += "[IsVar()] public XElement " + item + "; \n";
+                refDefs += "[IsVar()] public Node " + item + "; \n";
             }
 
             string condDefs = "";
@@ -97,7 +97,7 @@ namespace akira
             return code;
         }
 
-        protected Rule GenerateInstance(Context ctx, XElement node)
+        protected Rule GenerateInstance(Context ctx, Node node)
         {
             string name = node.Attribute("src").Value;
             Assembly a = null;

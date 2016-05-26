@@ -17,19 +17,19 @@ namespace akira
 
     public class match : Rule
     {
-        public XElement left;
-        public XElement right;
+        public Node left;
+        public Node right;
 
         //[IsVar()]
-        //public XElement a;
+        //public Node a;
         //[IsVar()]
-        //public XElement b;
+        //public Node b;
 
         protected List<Condition> conds = new List<Condition>();
 
         int condIndex = 0;
 
-        //public Instance(XElement left, XElement right)
+        //public Instance(Node left, Node right)
         //{
         //    this.left = left;
         //    this.right = right;
@@ -39,7 +39,7 @@ namespace akira
         //    //    return a.Name == "num";
         //    //});
         //}
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             clearVars();
 
@@ -54,7 +54,7 @@ namespace akira
             return false;
         }
 
-        bool unify(XElement a, XElement b)
+        bool unify(Node a, Node b)
         {
             if (a.Name == "any")
             {
@@ -107,14 +107,14 @@ namespace akira
             return false;
         }
 
-        void setVar(string name, XElement node)
+        void setVar(string name, Node node)
         {
             GetType().GetField(name).SetValue(this, node);
         }
 
-        XElement getVar(string name)
+        Node getVar(string name)
         {
-            return (XElement)GetType().GetField(name).GetValue(this);
+            return (Node)GetType().GetField(name).GetValue(this);
         }
 
         bool varDefined(string name)
@@ -139,14 +139,14 @@ namespace akira
             }
         }
 
-        XElement construct(XElement template)
+        Node construct(Node template)
         {
             template = template.DeepCopy();
             ReplaceRefs(template);
             return template;
         }
 
-        void ReplaceRefs(XElement elem)
+        void ReplaceRefs(Node elem)
         {
             if (elem.Name == "any")
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using akira;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,9 +23,22 @@ namespace test2
             a.Save("result.xml");
         }
 
+        static public void test_3()
+        {
+            var n = Node.ParseFile("base.slp");
+            n.SaveToXml("result.xml");
+        }
+
+        static public void test_4()
+        {
+            akira.akira a = new akira.akira();
+            a.Run("base.slp");
+            a.Save("result.xml");
+        }
+
         static void Main(string[] args)
         {
-            test_0();
+            test_4();
         }
     }
 }

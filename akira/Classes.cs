@@ -11,55 +11,11 @@ using System.Xml.Linq;
 
 namespace akira
 {
-    public static class Extensions
-    {
-        public static bool GetAttribute(this XElement node, string name, out XAttribute attribute)
-        {
-            attribute = node.Attribute(name);
-            return attribute != null;
-        }
-
-        public static bool MatchAttribute(this XElement node, string name, string value)
-        {
-            var attribute = node.Attribute(name);
-            return attribute != null && attribute.Value == value;
-        }
-
-        public static XElement DeepCopy(this XElement node)
-        {
-            return new XElement(node);
-        }
-
-        public static XElement ShallowCopy(this XElement node)
-        {
-            XElement result = new XElement(node.Name);
-            foreach (var item in node.Attributes())
-            {
-                result.SetAttributeValue(item.Name, item.Value);
-            }
-            return result;
-        }
-    }
-
     class Block
     {
         // public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
         public Stack<Rule> DefinedRules = new Stack<Rule>();
         public Stack<Rule> ActiveRules = new Stack<Rule>();
-    }
-
-    public class Code: XElement
-    {
-        public Code(string code) : base("code")
-        {
-            Add(code);
-            // parse(code);
-        }
-
-        void parse(string code)
-        {
-
-        }
     }
 
     public class Context
@@ -132,9 +88,35 @@ namespace akira
 
         public void GetType(string name, string code, ref Type type, ref System.Reflection.Assembly assembly)
         {
-            assembly = akira.AssemblyFromCode(code);
+            assembly = AssemblyFromCode(code);
             type = assembly.GetTypes()[0];
             File.WriteAllText("../akira/gen/" + name + ".cs", code);
+        }
+
+        public static Assembly AssemblyFromCode(string code)
+        {
+            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, "gen0.dll", true);
+            parameters.GenerateExecutable = false;
+
+            CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
+            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+            var assembly = results.CompiledAssembly;
+            // results.
+            return assembly;
+        }
+
+        public static object InstanceFromCode(string code)
+        {
+            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll" });
+            parameters.GenerateExecutable = false;
+            CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
+            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+            var assembly = results.CompiledAssembly;
+
+            var t = assembly.GetTypes()[0];
+            return assembly.CreateInstance(t.FullName);
         }
     }
 
@@ -167,8 +149,8 @@ namespace akira
     public class Rule : exe
     {
         public string ID;
-        public virtual bool Apply(Context ctx, ref XElement node) { return false; }
-        public virtual bool ApplyAfter(Context ctx, ref XElement node) { return false; }
+        public virtual bool Apply(Context ctx, ref Node node) { return false; }
+        public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
     }
 
     public class akira : Rule
@@ -176,80 +158,62 @@ namespace akira
         // List<Rule> Rules = new List<Rule>();
         Context ctx = new Context();
         public XDocument doc { get; protected set; }
+        Node root;
         public akira()
         {
-            ctx.ActivateRule(new misc_atttribute());
-            ctx.ActivateRule(new cs_rule());
-            ctx.ActivateRule(new cs_exe());
-            ctx.ActivateRule(new match_exe());
-            ctx.ActivateRule(new cs_cs());
-            ctx.ActivateRule(new if_cs());
-            ctx.ActivateRule(new cs_run());
-            ctx.ActivateRule(new apply());
+            ctx.ActivateRule(new replace());
+            //ctx.ActivateRule(new misc_atttribute());
+            //ctx.ActivateRule(new cs_rule());
+            //ctx.ActivateRule(new cs_exe());
+            //ctx.ActivateRule(new match_exe());
+            //ctx.ActivateRule(new cs_cs());
+            //ctx.ActivateRule(new if_cs());
+            //ctx.ActivateRule(new cs_run());
+            //ctx.ActivateRule(new apply());
             //ctx.ActivateRule(new misc_variables());
         }
+
         public void Run(string fileName)
         {
-            string ext = Path.GetExtension(fileName);
-            if (ext == ".slp")
-            {
-                RunSlp(fileName);
-            }
-            else if (ext == ".aki")
-            {
-                RunXml(fileName);
-            }
-        }
-
-        public void RunSlp(string fileName)
-        {
-            doc = new XDocument();
-            doc.Add(new XElement("akira"));
-            XElement e = doc.Root;
-            XElement apply = new XElement("apply");
-            apply.SetAttributeValue("src", "slp_ast");
-            e.Add(apply);
-            XElement slp = new XElement("slp");
-            slp.Value = File.ReadAllText(fileName);
-            e.Add(slp);
-            // Context ctx = new Context();
-            Apply(ctx, ref e);
-        }
-
-        public void RunXml(string fileName)
-        {
-            doc = XDocument.Load(fileName);
-            XElement e = doc.Root;
-            // Context ctx = new Context();
-            Apply(ctx, ref e);
+            root = Node.ParseFile(fileName);
+            Apply(ctx, ref root);
         }
 
         public void Save(string fileName)
         {
-            doc.Save(fileName);
+            // doc.Save(fileName);
+            root.SaveToXml(fileName);
         }
 
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
-            // if (node.Name != "akira") return false;
-            
-            while (node != null && ApplyRules(ctx, ref node)) ;
+            begin:
             if (node == null) return false;
 
-            var v = node.Elements().ToArray();
-            foreach (XElement n in v)
+            if (ApplyRules(ctx, ref node))
             {
-                XElement m = n;
-                while (m != null && Apply(ctx, ref m)) ;
+                goto begin;
             }
 
-            while (node != null && ApplyRulesAfter(ctx, ref node)) ;
-            if (node == null) return false;
+            // while (node != null && ApplyRules(ctx, ref node)) ;
+            //if (node == null) return false;
 
+            var v = node.Elements().ToArray();
+            foreach (Node n in v)
+            {
+                Node m = n;
+                Apply(ctx, ref m);
+            }
+
+            if (ApplyRulesAfter(ctx, ref node))
+            {
+                goto begin;
+            }
+            
             return false;
         }
 
-        public bool ApplyRules(Context ctx, ref XElement node)
+        public bool ApplyRules(Context ctx, ref Node node)
         {
             foreach (Rule r in ctx.ActiveRules().ToArray())
             {
@@ -261,7 +225,7 @@ namespace akira
             return false;
         }
 
-        public bool ApplyRulesAfter(Context ctx, ref XElement node)
+        public bool ApplyRulesAfter(Context ctx, ref Node node)
         {
             foreach (Rule r in ctx.ActiveRules().ToArray())
             {
@@ -271,32 +235,6 @@ namespace akira
                 }
             }
             return false;
-        }
-
-        public static Assembly AssemblyFromCode(string code)
-        {
-            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll"}, "gen0.dll", true);
-            parameters.GenerateExecutable = false;
-            
-            CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
-            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
-            var assembly = results.CompiledAssembly;
-            // results.
-            return assembly;
-        }
-
-        public static object InstanceFromCode(string code)
-        {
-            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll" });
-            parameters.GenerateExecutable = false;
-            CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
-            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
-            var assembly = results.CompiledAssembly;
-
-            var t = assembly.GetTypes()[0];
-            return assembly.CreateInstance(t.FullName);
         }
     }
 }

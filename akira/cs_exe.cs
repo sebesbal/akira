@@ -17,7 +17,7 @@ namespace akira
     /// </summary>
     class cs_exe : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule" && node.MatchAttribute("type", "cs"))) return false;
             // string code = node.Value;
@@ -41,7 +41,7 @@ namespace akira
     /// </summary>
     class cs_rule : Rule
     {
-        public override bool ApplyAfter(Context ctx, ref XElement node)
+        public override bool ApplyAfter(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule" && node.Attribute("type") == null)) return false;
             ruleName = node.Attribute("src").Value;
@@ -55,15 +55,15 @@ namespace akira
         bool after = false;
         string ruleName;
 
-        protected string GenerateCode(Context ctx, XElement node)
+        protected string GenerateCode(Context ctx, Node node)
         {
             string code = "using System; using akira; using System.Xml.Linq;"
             + "namespace akira {"
             + "public class " + ruleName + " : Rule"
             + "{ "
             + "public " + ruleName + "(){" + "" + "}"
-            + (after ? "public override bool ApplyAfter(Context ctx, ref XElement that)"
-                     : "public override bool Apply(Context ctx, ref XElement that)")
+            + (after ? "public override bool ApplyAfter(Context ctx, ref Node that)"
+                     : "public override bool Apply(Context ctx, ref Node that)")
             + "{"
             + GetRuleBody(ctx, node)
             + "}"
@@ -71,7 +71,7 @@ namespace akira
             return code;
         }
 
-        protected string GetRuleBody(Context ctx, XElement node)
+        protected string GetRuleBody(Context ctx, Node node)
         {
             string code = "";
 
@@ -89,7 +89,7 @@ namespace akira
             return code;
         }
 
-        protected Rule GenerateInstance(Context ctx, XElement node)
+        protected Rule GenerateInstance(Context ctx, Node node)
         {
             Assembly a = null;
             Type t = null;

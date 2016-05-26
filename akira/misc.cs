@@ -10,7 +10,7 @@ namespace akira
 {
     class misc_atttribute : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             if (!(node.Name == "op" && node.MatchAttribute("id", "=") && node.Nodes().Count() == 2)) return false;
 
@@ -19,7 +19,7 @@ namespace akira
 
             var key = node.Elements().ElementAt(0).Name.ToString();
             var value = node.Nodes().ElementAt(1);
-            string val = value is XElement ? ((XElement)value).Name.ToString() : value.ToString();
+            string val = value is Node ? ((Node)value).Name.ToString() : value.ToString();
 
             p.SetAttributeValue(key, val);
 
@@ -32,11 +32,11 @@ namespace akira
 
     class misc_variables : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             if (node.Name.ToString().Length != 1) return false;
 
-            var e = new XElement("any");
+            var e = new Node("any");
             e.SetAttributeValue("ref", node.Name);
             node.ReplaceWith(e);
             node = e;
@@ -47,7 +47,7 @@ namespace akira
 
     class misc_rule : Rule
     {
-        public override bool ApplyAfter(Context ctx, ref XElement node)
+        public override bool ApplyAfter(Context ctx, ref Node node)
         {
             if (node.Name != "rule") return false;
             ruleName = node.Attribute("src").Value;
@@ -61,15 +61,15 @@ namespace akira
         bool after = false;
         string ruleName;
 
-        protected string GenerateCode(Context ctx, XElement node)
+        protected string GenerateCode(Context ctx, Node node)
         {
             string code = "using System; using akira; using System.Xml.Linq;"
             + "namespace akira {"
             + "public class " + ruleName + " : Rule"
             + "{ "
             + "public " + ruleName + "(){" + "" + "}"
-            + (after ? "public override bool ApplyAfter(Context ctx, ref XElement that)"
-                     : "public override bool Apply(Context ctx, ref XElement that)")
+            + (after ? "public override bool ApplyAfter(Context ctx, ref Node that)"
+                     : "public override bool Apply(Context ctx, ref Node that)")
             + "{"
             + GetRuleBody(ctx, node)
             + "}"
@@ -77,7 +77,7 @@ namespace akira
             return code;
         }
 
-        protected string GetRuleBody(Context ctx, XElement node)
+        protected string GetRuleBody(Context ctx, Node node)
         {
             string code = "";
 
@@ -95,7 +95,7 @@ namespace akira
             return code;
         }
 
-        protected Rule GenerateInstance(Context ctx, XElement node)
+        protected Rule GenerateInstance(Context ctx, Node node)
         {
             Assembly a = null;
             Type t = null;
@@ -110,11 +110,11 @@ namespace akira
 
     //class misc_op_replace : Rule
     //{
-    //    public override bool Apply(Context ctx, ref XElement node)
+    //    public override bool Apply(Context ctx, ref Node node)
     //    {
     //        if (!(node.Name == "op" && node.MatchAttribute("id", "-->")) return false;
 
-    //        var e = new XElement("any");
+    //        var e = new Node("any");
     //        e.SetAttributeValue("ref", node.Name);
     //        node.ReplaceWith(e);
     //        node = e;
@@ -125,7 +125,7 @@ namespace akira
 
     //class misc_bool : Rule
     //{
-    //    public override bool Apply(Context ctx, ref XElement node)
+    //    public override bool Apply(Context ctx, ref Node node)
     //    {
     //        if (!(node.Name == "bool")) return false;
 
@@ -139,7 +139,7 @@ namespace akira
     ///// </summary>
     //class misc_rule : Rule
     //{
-    //    public override bool ApplyAfter(Context ctx, ref XElement node)
+    //    public override bool ApplyAfter(Context ctx, ref Node node)
     //    {
     //        if (node.Name != "rule") return false;
     //        ruleName = node.Attribute("src").Value;
@@ -153,15 +153,15 @@ namespace akira
     //    bool after = false;
     //    string ruleName;
 
-    //    protected string GenerateCode(Context ctx, XElement node)
+    //    protected string GenerateCode(Context ctx, Node node)
     //    {
     //        string code = "using System; using akira; using System.Xml.Linq;"
     //        + "namespace akira {"
     //        + "public class " + ruleName + " : Rule"
     //        + "{ "
     //        + "public " + ruleName + "(){" + "" + "}"
-    //        + (after ? "public override bool ApplyAfter(Context ctx, ref XElement that)"
-    //                 : "public override bool Apply(Context ctx, ref XElement that)")
+    //        + (after ? "public override bool ApplyAfter(Context ctx, ref Node that)"
+    //                 : "public override bool Apply(Context ctx, ref Node that)")
     //        + "{"
     //        + GetRuleBody(ctx, node)
     //        + "}"
@@ -169,7 +169,7 @@ namespace akira
     //        return code;
     //    }
 
-    //    protected string GetRuleBody(Context ctx, XElement node)
+    //    protected string GetRuleBody(Context ctx, Node node)
     //    {
     //        string code = "";
 
@@ -187,7 +187,7 @@ namespace akira
     //        return code;
     //    }
 
-    //    protected Rule GenerateInstance(Context ctx, XElement node)
+    //    protected Rule GenerateInstance(Context ctx, Node node)
     //    {
     //        Assembly a = null;
     //        Type t = null;

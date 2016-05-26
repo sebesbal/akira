@@ -43,18 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Listener.cs" />
+    <Compile Include="Node.cs" />
     <Compile Include="slp_ast.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="slpBaseListener.cs" />
     <Compile Include="slpLexer.cs" />
     <Compile Include="slpListener.cs" />
     <Compile Include="slpParser.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\akira\akira.csproj">
-      <Project>{a143ba8d-c92a-4f82-b55b-d78f4f43c48b}</Project>
-      <Name>akira</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

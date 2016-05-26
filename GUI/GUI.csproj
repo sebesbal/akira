@@ -119,6 +119,10 @@
       <Project>{a143ba8d-c92a-4f82-b55b-d78f4f43c48b}</Project>
       <Name>akira</Name>
     </ProjectReference>
+    <ProjectReference Include="..\slp_parser\slp_ast.csproj">
+      <Project>{507598c9-ac33-499d-8c41-2eab3c79f905}</Project>
+      <Name>slp_ast</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

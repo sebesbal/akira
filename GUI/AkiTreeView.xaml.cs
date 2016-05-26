@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using akira;
+using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
 
@@ -18,20 +19,14 @@ namespace GUI
         XDocument doc;
         public void Load(string file_xml)
         {
-            this.file_xml = file_xml;
-            doc = XDocument.Load(file_xml);
-            var item = CreateItem(doc.Root);
-            treeView.Items.Clear();
-            treeView.Items.Add(item);
-
-            //foreach (var child_element in doc.Root.Elements())
-            //{
-            //    var child_item = CreateItem(child_element);
-            //    treeView.Items.Add(child_item);
-            //}
+            //this.file_xml = file_xml;
+            //doc = XDocument.Load(file_xml);
+            //var item = CreateItem(doc.Root);
+            //treeView.Items.Clear();
+            //treeView.Items.Add(item);
         }
 
-        public TreeViewItem CreateItem(XElement e)
+        public TreeViewItem CreateItem(Node e)
         {
             var item = new TreeViewItem();
             item.DataContext = e;
@@ -60,8 +55,8 @@ namespace GUI
         public void Add()
         {
             var item = (TreeViewItem)treeView.SelectedItem;
-            var element = (XElement)item.DataContext;
-            var new_element = new XElement("fos");
+            var element = (Node)item.DataContext;
+            var new_element = new Node("fos");
             element.Add(new_element);
             var new_item = CreateItem(new_element);
             item.Items.Add(new_item);
@@ -76,7 +71,7 @@ namespace GUI
             if (p == null) return;
             p.Items.Remove(item);
 
-            var element = (XElement)item.DataContext;
+            var element = (Node)item.DataContext;
             element.Remove();
         }
     }

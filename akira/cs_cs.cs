@@ -14,7 +14,7 @@ namespace akira
     /// </summary>
     class cs_cs : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             var p = node.Parent;
             if (!(node.Name == "cs" && node.Elements().Count() > 0)) return false;
@@ -41,7 +41,7 @@ namespace akira
 
     class if_cs : Rule
     {
-        public override bool ApplyAfter(Context ctx, ref XElement node)
+        public override bool ApplyAfter(Context ctx, ref Node node)
         {
             if (!(node.Name == "if")) return false;
             node.Name = "cs";
@@ -52,7 +52,7 @@ namespace akira
             return true;
         }
 
-        public static string GetBody(Context ctx, XElement node)
+        public static string GetBody(Context ctx, Node node)
         {
             string code = "";
 

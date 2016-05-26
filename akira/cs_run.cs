@@ -12,7 +12,7 @@ namespace akira
 {
     class cs_run : Rule
     {
-        public override bool Apply(Context ctx, ref XElement node)
+        public override bool Apply(Context ctx, ref Node node)
         {
             if (!(node.Name == "run" && node.MatchAttribute("type", "cs"))) return false;
             string code = node.Attribute("code").Value;

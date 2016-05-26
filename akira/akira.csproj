@@ -39,22 +39,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="apply.cs" />
     <Compile Include="Classes.cs" />
-    <Compile Include="cs_cs.cs" />
-    <Compile Include="cs_exe.cs" />
-    <Compile Include="cs_run.cs" />
-    <Compile Include="gen\lofusz.cs" />
-    <Compile Include="gen\rule_1.cs" />
-    <Compile Include="match.cs" />
-    <Compile Include="match_exe.cs" />
-    <Compile Include="misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="rules\replace.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="base.slp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="gen\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\slp_parser\slp_ast.csproj">
+      <Project>{507598c9-ac33-499d-8c41-2eab3c79f905}</Project>
+      <Name>slp_ast</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
