@@ -285,6 +285,7 @@ namespace slp_parser
                 return;
             }
 
+            // traverse children
             var h = e.Children.First;
             while (h != null)
             {
@@ -298,6 +299,7 @@ namespace slp_parser
                 h = h.Next;
             }
             
+            // if the first item is a leaf, replace the list with it.
             if (e.Name == "list")
             {
                 var f = e.Elements().ElementAt(0);
@@ -314,6 +316,11 @@ namespace slp_parser
                     }
                     e = f;
                 }
+            }
+
+            if (e.Name == "op")
+            {
+                e.Name = e["id"].Name;
             }
         }
 

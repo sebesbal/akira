@@ -53,8 +53,18 @@ namespace akira
             }
             else
             {
+                int count = 0;
+                foreach (var item in node.Children)
+                {
+                    if (item.Name != "code")
+                    {
+                        ++count;
+                    }
+                }
+
                 string name = node.Name;
-                sb.AppendLine("if (\"" + node.Name + "\" != cur.Name" + ") return false;");
+                sb.AppendLine("if (\"" + node.Name + "\" != cur.Name || "
+                    + count + " != cur.Children.Count) return false;");
 
                 if (node.Children.Count > 0)
                 {
@@ -63,13 +73,16 @@ namespace akira
                     foreach (var item in node.Children)
                     {
                         GenCodeRec(sb, ctx, item);
+
+                        if (item != node.Children.Last.Value)
+                        {
+                            sb.AppendLine("cur = cur.Next;");
+                        }
                     }
 
                     sb.AppendLine("cur = cur.Parent;");
                 }
             }
-
-            
         }
 
         protected string GenerateCode(Context ctx, Node node)
@@ -80,12 +93,12 @@ namespace akira
             sb.AppendLine("namespace akira {");
             sb.AppendLine("public class " + className + ": Rule");
             sb.AppendLine("{");
-            sb.AppendLine(after ? "public override bool ApplyAfter(Context ctx, ref Node node)"
-                                : "public override bool Apply(Context ctx, ref Node node)");
+            sb.AppendLine(after ? "public override bool ApplyAfter(Context ctx, ref Node that)"
+                                : "public override bool Apply(Context ctx, ref Node that)");
 
             sb.AppendLine("{");
             sb.AppendLine("begin:");
-            sb.AppendLine("Node cur = node;");
+            sb.AppendLine("Node cur = that;");
             foreach (var item in node.Children)
             {
                 GenCodeRec(sb, ctx, item);

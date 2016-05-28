@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeBuilder.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="slp_ast.cs" />

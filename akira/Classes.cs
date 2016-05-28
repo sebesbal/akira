@@ -93,10 +93,12 @@ namespace akira
             File.WriteAllText("../akira/gen/" + name + ".cs", code);
         }
 
+        static int dllCount = 0;
+
         public static Assembly AssemblyFromCode(string code)
         {
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, "gen0.dll", true);
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, "gen" + dllCount++ + ".dll", true);
             parameters.GenerateExecutable = false;
 
             CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
@@ -109,7 +111,7 @@ namespace akira
         public static object InstanceFromCode(string code)
         {
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll" });
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" });
             parameters.GenerateExecutable = false;
             CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
             results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));

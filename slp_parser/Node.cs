@@ -40,6 +40,22 @@ namespace akira
             get { return Children.First.Value; }
         }
 
+        public Node Next
+        {
+            get
+            {
+                var n = Parent.Children.Find(this).Next;
+                if (n == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return n.Value;
+                }
+            }
+        }
+
         public Node this[string name]
         {
             get
@@ -134,10 +150,17 @@ namespace akira
 
         public Node Clone()
         {
+            var node = CloneRec();
+            node.Parent = null;
+            return node;
+        }
+
+        Node CloneRec()
+        {
             Node result = new Node(Name);
             foreach (var item in Children)
             {
-                result.Add(item.Clone());
+                result.Add(item.CloneRec());
             }
             return result;
         }
@@ -181,7 +204,7 @@ namespace akira
             }
             else if (n.Parent != null)
             {
-                throw new Exception("n.Parent != null!");
+                throw new Exception("n.Parent must be null!");
             }
             else
             {
@@ -252,11 +275,81 @@ namespace akira
             doc.Save(file);
         }
 
+        public void SaveTo(string file)
+        {
+            File.WriteAllText(file, ToString());
+        }
+
         public static Node ParseFile(string file)
         {
             string code = File.ReadAllText(file);
             Node n = AkiraParser.Parse(code);
             return n;
+        }
+
+        protected int Size = 1;
+
+        void Measure()
+        {
+            Size = 1;
+            foreach (var item in Attributes)
+            {
+                item.Measure();
+                Size += item.Size;
+            }
+            foreach (var item in Children)
+            {
+                item.Measure();
+                Size += item.Size;
+            }
+        }
+
+        public override string ToString()
+        {
+            Measure();
+            var cb = new CodeBuilder();
+            ToStringRec(cb, false, false);
+            return cb.ToString();
+        }
+        
+        virtual public void ToStringRec(CodeBuilder cb, bool inline, bool isAttribute)
+        {
+            cb.PushInline(Size == 2);
+
+            bool code = Name == "code";
+            
+            if (!code)
+            {
+                cb.AddLine(Name);
+            }
+
+            cb.Begin();
+
+            foreach (var item in Attributes)
+            {
+                item.ToStringRec(cb, inline, true);
+            }
+
+            if (code)
+            {
+                cb.BeginCurly();
+                foreach (var item in Children)
+                {
+                    item.ToStringRec(cb, inline, false);
+                }
+                cb.End();
+            }
+            else
+            {
+                foreach (var item in Children)
+                {
+                    item.ToStringRec(cb, inline, false);
+                }
+            }
+
+            cb.End();
+
+            cb.PopInline();
         }
     }
     

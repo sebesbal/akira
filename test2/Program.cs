@@ -36,9 +36,15 @@ namespace test2
             a.Save("result.xml");
         }
 
+        static public void test_5()
+        {
+            var n = Node.ParseFile("base.slp");
+            n.SaveTo("result.xml");
+        }
+
         static void Main(string[] args)
         {
-            test_4();
+            test_5();
         }
     }
 }

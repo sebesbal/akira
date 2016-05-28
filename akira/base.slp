@@ -5,9 +5,11 @@ op 200 yfx +
 op 100 yfx *
 op 50 yfx /
 
-rule
-	alma a b
-	{ node.Name = "korte"; }
+root
+	rule
+		alma a b
+		{ that.Name = a.Name; }
 
-alma
-	citrom
+	alma
+		citrom
+		banan
