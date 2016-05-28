@@ -227,7 +227,7 @@ namespace slp_parser
         
         void traverse0(Node e)
         {
-            if (e.Name == "id")
+            if (e.Name == "id") // (id a) --> a
             {
                 e.Name = e.Children.First.Value.Name;
                 e.Clear();
@@ -238,7 +238,8 @@ namespace slp_parser
                 e.Remove("id");
             }
 
-            foreach (var f in e.Elements())
+            var v = e.Children.ToArray();
+            foreach (var f in v)
             {
                 traverse0(f);
             }
@@ -248,22 +249,12 @@ namespace slp_parser
         {
             if (e.Name == "op" && e.Match("id", ":"))
             {
-                var f = e.Elements().ElementAt(1);
-                
-                e.Remove("id");
-                e.Name = "list";
-
-                if (f.Name == "list")
-                {
-                    f.Remove();
-                    foreach (var h in f.Elements())
-                    {
-                        e.Add(h);
-                    }
-                }
+                e.Parent[e.Children.First.Value.Name] = e.Children.ElementAt(1);
+                e.Remove();
             }
-            
-            foreach (var f in e.Elements())
+
+            var v = e.Items.ToArray();
+            foreach (var f in v)
             {
                 traverse1(f);
             }
@@ -271,8 +262,19 @@ namespace slp_parser
 
         void traverse2(ref Node e)
         {
+            // remove lists with zero element
+            if (e.Name == "list" && e.Children.Count() == 0)
+            {
+                if (e.Parent != null)
+                {
+                    e.Parent.InheritAttributesFrom(e);
+                }
+                e.Remove();
+                return;
+            }
+
             // remove lists with one element
-            if (e.Name == "list" && e.Elements().Count() == 1)
+            if (e.Name == "list" && e.Children.Count() == 1)
             {
                 var f = e.Elements().ElementAt(0);
                 f.Remove();
@@ -285,20 +287,27 @@ namespace slp_parser
                 return;
             }
 
-            // traverse children
-            var h = e.Children.First;
-            while (h != null)
+            //// traverse children
+            //var h = e.Children.First;
+            //while (h != null)
+            //{
+            //    Node i = (Node)h.Value;
+            //    Node old_i = i;
+            //    traverse2(ref i);
+            //    if (old_i != i)
+            //    {
+            //        h = e.Children.Find(i);
+            //    }
+            //    h = h.Next;
+            //}
+
+            var v = e.Items.ToArray();
+            foreach (var item in v)
             {
-                Node i = (Node)h.Value;
-                Node old_i = i;
-                traverse2(ref i);
-                if (old_i != i)
-                {
-                    h = e.Children.Find(i);
-                }
-                h = h.Next;
+                Node n = item;
+                traverse2(ref n);
             }
-            
+
             // if the first item is a leaf, replace the list with it.
             if (e.Name == "list")
             {
@@ -315,6 +324,7 @@ namespace slp_parser
                         f.Add(g);
                     }
                     e = f;
+                    traverse2(ref e);
                 }
             }
 
@@ -497,6 +507,7 @@ namespace slp_parser
             program = m.Get(context.exp());
             traverse0(program);
             traverse1(program);
+            // traverse0(program);
             traverse2(ref program);
             m.Put(context, program);
         }

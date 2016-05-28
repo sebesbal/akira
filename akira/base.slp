@@ -1,4 +1,4 @@
-﻿op 1000 yfx :
+﻿op 500 yfx :
 op 600 yfxx -->
 op 500 yfx =
 op 200 yfx +
@@ -6,8 +6,22 @@ op 100 yfx *
 op 50 yfx /
 
 root
+	alma
+		a c
+		b
+
 	rule
-		alma a b
+		src:debug
+		print a
+		{
+			Node b = a.Clone();
+			that.ReplaceWith(b);
+		}
+
+	rule
+		alma
+			a c
+			b
 		{ that.Name = a.Name; }
 
 	alma

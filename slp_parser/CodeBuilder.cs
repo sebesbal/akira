@@ -10,7 +10,7 @@ namespace akira
     {
         public CodeBuilder()
         {
-
+            inlines.Push(false);
         }
 
         public CodeBuilder(string begin, string end)
@@ -43,7 +43,8 @@ namespace akira
 
         public bool PopInline()
         {
-            bool newInline = inlines.Pop();
+            inlines.Pop();
+            bool newInline = inlines.Peek();
             if (!newInline && Inline)
             {
                 LineEnd();

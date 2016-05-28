@@ -25,9 +25,46 @@ namespace akira
         {
         }
 
-        public Node(string name)
+        public IEnumerable<Node> Items
+        {
+            get
+            {
+                foreach (var item in Attributes)
+                {
+                    yield return item;
+                }
+                foreach (var item in Children)
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        public Node(string name, params Node[] children)
         {
             Name = name;
+            foreach (var item in children)
+            {
+                if (item is Attribute)
+                {
+                    Attributes.AddLast(item);
+                    item.Parent = this;
+                }
+                else
+                {
+                    Add(item);
+                }
+            }
+        }
+
+        public static Node __(string name, params Node[] children)
+        {
+            return new Node(name, children);
+        }
+
+        public static Node _a(string name, params Node[] children)
+        {
+            return new Attribute(name, children);
         }
 
         public string Value
@@ -119,7 +156,7 @@ namespace akira
 
         protected Node SetAttribute(string key, Node value)
         {
-            Node n = new Node(key);
+            Attribute n = new Attribute(key);
             n.Add(value);
             n.Parent = this;
             var m = FindAtttribute(key);
@@ -196,6 +233,14 @@ namespace akira
             }
         }
 
+        public void InheritAttributesFrom(Node n)
+        {
+            foreach (var a in n.Attributes)
+            {
+                this[a.Name] = a.First;
+            }
+        }
+
         public void ReplaceWith(Node n)
         {
             if (Parent == null)
@@ -212,6 +257,7 @@ namespace akira
                 m.Value = n;
                 n.Parent = Parent;
                 Parent = null;
+                n.InheritAttributesFrom(this);
             }
         }
 
@@ -275,9 +321,10 @@ namespace akira
             doc.Save(file);
         }
 
-        public void SaveTo(string file)
+        public void Save(string file)
         {
             File.WriteAllText(file, ToString());
+            // File.WriteAllText(file, ToCs());
         }
 
         public static Node ParseFile(string file)
@@ -314,13 +361,13 @@ namespace akira
         
         virtual public void ToStringRec(CodeBuilder cb, bool inline, bool isAttribute)
         {
-            cb.PushInline(Size == 2);
+            cb.PushInline(Size <= 2);
 
             bool code = Name == "code";
             
             if (!code)
             {
-                cb.AddLine(Name);
+                cb.AddLine(Name + (this is Attribute ? ":" : ""));
             }
 
             cb.Begin();
@@ -351,8 +398,43 @@ namespace akira
 
             cb.PopInline();
         }
+
+        void ToCsRec(StringBuilder sb)
+        {
+            if (this is Attribute)
+            {
+                sb.Append("_a(");
+            }
+            else
+            {
+                sb.Append("__(");
+            }
+            
+            sb.Append("\"" + Name + "\"");
+            foreach (var item in Items)
+            {
+                sb.Append(", ");
+                item.ToCsRec(sb);
+            }
+            sb.Append(")");
+        }
+
+        public string ToCs()
+        {
+            var sb = new StringBuilder();
+            ToCsRec(sb);
+            return sb.ToString();
+        }
     }
     
+    public class Attribute: Node
+    {
+        public Attribute(string name, params Node[] children): base(name, children)
+        {
+            
+        }
+    }
+
 
     public class Code : Node
     {
