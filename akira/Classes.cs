@@ -163,7 +163,7 @@ namespace akira
         Node root;
         public akira()
         {
-            ctx.ActivateRule(new replace());
+            ctx.ActivateRule(new rule());
             //ctx.ActivateRule(new misc_atttribute());
             //ctx.ActivateRule(new cs_rule());
             //ctx.ActivateRule(new cs_exe());

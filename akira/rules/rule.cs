@@ -4,7 +4,7 @@ using System.Text;
 
 namespace akira
 {
-    public class replace : Rule
+    public class rule : Rule
     {
         bool after = false;
         string className;
@@ -22,10 +22,11 @@ namespace akira
 
         bool IsReference(Node n)
         {
-            return n.Name == "a"
-                || n.Name == "b"
-                || n.Name == "c"
-                || n.Name == "d";
+            return n.Name == "$";
+            //return n.Name == "a"
+            //    || n.Name == "b"
+            //    || n.Name == "c"
+            //    || n.Name == "d";
         }
 
         //void FindRefs(Node node, List<string> refs, List<string> conds)
@@ -49,7 +50,7 @@ namespace akira
             }
             else if (IsReference(node))
             {
-                sb.AppendLine("Node " + node.Name + " = cur;");
+                sb.AppendLine("Node " + node.Value + " = cur;");
             }
             else
             {
@@ -111,7 +112,16 @@ namespace akira
 
         protected Rule GenerateInstance(Context ctx, Node node)
         {
-            className = ctx.GenName();
+            Node src = node["src"];
+            if (src == null)
+            {
+                className = ctx.GenName();
+            }
+            else
+            {
+                className = src.Name;
+            }
+            
             Assembly a = null;
             Type t = null;
             if (!ctx.GetType(className, ref t, ref a))

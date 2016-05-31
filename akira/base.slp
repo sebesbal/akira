@@ -4,26 +4,16 @@ op 500 yfx =
 op 200 yfx +
 op 100 yfx *
 op 50 yfx /
+op 20 fx $
 
 root
-	alma
-		a c
-		b
+	{ alma }
+		{ korte }
 
 	rule
 		src:debug
-		print a
+		print $a
 		{
 			Node b = a.Clone();
 			that.ReplaceWith(b);
 		}
-
-	rule
-		alma
-			a c
-			b
-		{ that.Name = a.Name; }
-
-	alma
-		citrom
-		banan
