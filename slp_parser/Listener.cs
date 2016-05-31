@@ -471,7 +471,8 @@ namespace slp_parser
                 {
                     code = code.Substring(1, code.Length - 2); // remove surrounding { }
                 }
-                var n = new Code(code);
+                var n = new Node(code);
+                n["type"] = new Node("code");
                 m.Put(context, n);
                 return;
             }

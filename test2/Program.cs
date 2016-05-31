@@ -39,7 +39,10 @@ namespace test2
         static public void test_5()
         {
             var n = Node.ParseFile("base.slp");
-            n.Save("result.xml");
+            n.Save("pretty.slp");
+            akira.akira a = new akira.akira();
+            a.Run(n);
+            a.Save("result.slp");
         }
 
         static void Main(string[] args)

@@ -44,9 +44,9 @@ namespace akira
 
         protected void GenCodeRec(StringBuilder sb, Context ctx, Node node)
         {
-            if (node.Name == "code")
+            if (node.IsCode)
             {
-                sb.AppendLine(node.Value);
+                sb.AppendLine(node.Name);
             }
             else if (IsReference(node))
             {
@@ -57,7 +57,7 @@ namespace akira
                 int count = 0;
                 foreach (var item in node.Children)
                 {
-                    if (item.Name != "code")
+                    if (!item.IsCode)
                     {
                         ++count;
                     }

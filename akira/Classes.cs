@@ -177,13 +177,22 @@ namespace akira
 
         public void Run(string fileName)
         {
-            root = Node.ParseFile(fileName);
+            Run(Node.ParseFile(fileName));
+        }
+
+        public void Run(Node node)
+        {
+            root = node;
             Apply(ctx, ref root);
         }
 
         public void Save(string fileName)
         {
-            // doc.Save(fileName);
+            root.Save(fileName);
+        }
+
+        public void SaveToXml(string fileName)
+        {
             root.SaveToXml(fileName);
         }
 

@@ -274,6 +274,11 @@ namespace akira
             }
         }
 
+        public bool IsCode
+        {
+            get { return Match("type", "code"); }
+        }
+
         public bool IsLeaf()
         {
             return Children.Count == 0;
@@ -361,13 +366,32 @@ namespace akira
         
         virtual public void ToStringRec(CodeBuilder cb, bool inline, bool isAttribute)
         {
+            if (this is Attribute && Name == "type")
+            {
+                return;
+            }
+
+            bool code = IsCode;
             cb.PushInline(Size <= 2);
 
-            bool code = Name == "code";
-            
-            if (!code)
+            if (code)
             {
-                cb.AddLine(Name + (this is Attribute ? ":" : ""));
+                cb.PushInline(true);
+                cb.BeginCurly();
+                cb.AddLine(Name);
+                cb.End();
+                cb.PopInline();
+            }
+            else
+            {
+                if (this is Attribute)
+                {
+                    cb.AddLine(Name + ":");
+                }
+                else
+                {
+                    cb.AddLine(Name);
+                }
             }
 
             cb.Begin();
@@ -376,26 +400,15 @@ namespace akira
             {
                 item.ToStringRec(cb, inline, true);
             }
-
-            if (code)
+            
+            foreach (var item in Children)
             {
-                cb.BeginCurly();
-                foreach (var item in Children)
-                {
-                    item.ToStringRec(cb, inline, false);
-                }
-                cb.End();
-            }
-            else
-            {
-                foreach (var item in Children)
-                {
-                    item.ToStringRec(cb, inline, false);
-                }
+                item.ToStringRec(cb, inline, false);
             }
 
             cb.End();
 
+        end:
             cb.PopInline();
         }
 
@@ -436,17 +449,17 @@ namespace akira
     }
 
 
-    public class Code : Node
-    {
-        public Code(string code) : base("code")
-        {
-            Add(code);
-            // parse(code);
-        }
+    //public class Code : Node
+    //{
+    //    public Code(string code) : base("code")
+    //    {
+    //        Add(code);
+    //        // parse(code);
+    //    }
 
-        void parse(string code)
-        {
+    //    void parse(string code)
+    //    {
 
-        }
-    }
+    //    }
+    //}
 }
