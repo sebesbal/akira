@@ -9,7 +9,7 @@ namespace akira
         bool after = false;
         string className;
 
-        public override bool Apply(Context ctx, ref Node node)
+        public override bool ApplyAfter(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule")) return false;
             Rule result = GenerateInstance(ctx, node);
@@ -20,14 +20,14 @@ namespace akira
             return true;
         }
 
-        bool IsReference(Node n)
-        {
-            return n.Name == "$";
-            //return n.Name == "a"
-            //    || n.Name == "b"
-            //    || n.Name == "c"
-            //    || n.Name == "d";
-        }
+        //bool IsReference(Node n)
+        //{
+        //    return n.Name == "$";
+        //    //return n.Name == "a"
+        //    //    || n.Name == "b"
+        //    //    || n.Name == "c"
+        //    //    || n.Name == "d";
+        //}
 
         //void FindRefs(Node node, List<string> refs, List<string> conds)
         //{
@@ -48,7 +48,7 @@ namespace akira
             {
                 sb.AppendLine(node.Name);
             }
-            else if (IsReference(node))
+            else if (node.IsRef)
             {
                 sb.AppendLine("Node " + node.Value + " = cur;");
             }
@@ -98,7 +98,7 @@ namespace akira
                                 : "public override bool Apply(Context ctx, ref Node that)");
 
             sb.AppendLine("{");
-            sb.AppendLine("begin:");
+            //sb.AppendLine("begin:");
             sb.AppendLine("Node cur = that;");
             foreach (var item in node.Children)
             {

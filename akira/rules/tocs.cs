@@ -4,26 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace akira.rules
+namespace akira
 {
-    class tocs: Rule
+    public class tocs: Rule
     {
-        public override bool Apply(Context ctx, ref Node node)
+        public override bool ApplyAfter(Context ctx, ref Node node)
         {
-            //if (node.Name != "code") return false;
-
-            //string s = node.Value;
-
-            //var v = node.Elements().ToArray();
-            //string s = node.Attribute("code").Value;
-
-            //for (int i = 0; i < v.Count(); ++i)
-            //{
-            //    var c = v[i];
-            //    s = Regex.Replace(s, "\\$" + (i + 1).ToString(), c.Attribute("code").Value);
-            //}
-            
-            return false;
+            if (node.Match("type", "code") && node.Children.Count > 0)
+            {
+                node.InsertChildren();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
     }

@@ -1,19 +1,24 @@
-﻿op 500 yfx :
-op 600 yfxx -->
-op 500 yfx =
-op 200 yfx +
-op 100 yfx *
-op 50 yfx /
-op 20 fx $
+﻿op 200 yfx :
+op 100 fx $
 
 root
-	{ alma }
-		{ korte }
+	// The program 
+
+	// define a transition rule:
+	// it searches for "write a" patterns (where a is an arbitrary expression)
+	// 
+	rule
+		src:write
+		write $a
+		{ that.ReplaceWith($1); }
+			{ that.ReplaceWith($1); }
+				$a
 
 	rule
-		src:debug
-		print $a
-		{
-			Node b = a.Clone();
-			that.ReplaceWith(b);
-		}
+		alma
+		write lofusz
+
+	alma
+
+	// The result of the run:
+	// lofusz

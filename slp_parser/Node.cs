@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -12,13 +13,10 @@ namespace akira
     {
         public string Name;
         public Node Parent;
+        public bool IsAttribute;
         public LinkedList<Node> Attributes = new LinkedList<Node>();
         public LinkedList<Node> Children = new LinkedList<Node>();
-        //public Node Value
-        //{
-        //    get { return Children.First.Value; }
-        //    set { Children.First.Value = value; value.Parent = this; }
-        //}
+
         public LinkedList<Node> Elements() { return Children; }
 
         public Node()
@@ -45,7 +43,7 @@ namespace akira
             Name = name;
             foreach (var item in children)
             {
-                if (item is Attribute)
+                if (item.IsAttribute)
                 {
                     Attributes.AddLast(item);
                     item.Parent = this;
@@ -55,16 +53,6 @@ namespace akira
                     Add(item);
                 }
             }
-        }
-
-        public static Node __(string name, params Node[] children)
-        {
-            return new Node(name, children);
-        }
-
-        public static Node _a(string name, params Node[] children)
-        {
-            return new Attribute(name, children);
         }
 
         public string Value
@@ -112,21 +100,7 @@ namespace akira
                 SetAttribute(name, value);
             }
         }
-
-        //protected LinkedListNode<Node> Find(string name)
-        //{
-        //    var n = Children.First;
-        //    while (n != null)
-        //    {
-        //        if (n.Value.Name == name)
-        //        {
-        //            return n;
-        //        }
-        //        n = n.Next;
-        //    }
-        //    return null;
-        //}
-
+        
         protected LinkedListNode<Node> FindAtttribute(string name)
         {
             var n = Attributes.First;
@@ -156,7 +130,8 @@ namespace akira
 
         protected Node SetAttribute(string key, Node value)
         {
-            Attribute n = new Attribute(key);
+            Node n = new Node(key);
+            n.IsAttribute = true;
             n.Add(value);
             n.Parent = this;
             var m = FindAtttribute(key);
@@ -170,21 +145,7 @@ namespace akira
             }
             return n;
         }
-
-        //void AddAttribute(Node n)
-        //{
-        //    var m = FindAtttribute(n.Name);
-        //    if (m == null)
-        //    {
-        //        Attributes.AddLast(n);
-        //        n.Parent = this;
-        //    }
-        //    else
-        //    {
-        //        m.Value = n;
-        //    }
-        //}
-
+        
         public Node Clone()
         {
             var node = CloneRec();
@@ -195,6 +156,7 @@ namespace akira
         Node CloneRec()
         {
             Node result = new Node(Name);
+            result.IsAttribute = IsAttribute;
             foreach (var item in Children)
             {
                 result.Add(item.CloneRec());
@@ -277,6 +239,11 @@ namespace akira
         public bool IsCode
         {
             get { return Match("type", "code"); }
+        }
+
+        public bool IsRef
+        {
+            get { return Name == "$"; }
         }
 
         public bool IsLeaf()
@@ -366,8 +333,14 @@ namespace akira
         
         virtual public void ToStringRec(CodeBuilder cb, bool inline, bool isAttribute)
         {
-            if (this is Attribute && Name == "type")
+            if (IsAttribute && Name == "type")
             {
+                return;
+            }
+
+            if (IsRef)
+            {
+                cb.AddLine("$" + Value);
                 return;
             }
 
@@ -384,7 +357,7 @@ namespace akira
             }
             else
             {
-                if (this is Attribute)
+                if (IsAttribute)
                 {
                     cb.AddLine(Name + ":");
                 }
@@ -412,11 +385,31 @@ namespace akira
             cb.PopInline();
         }
 
+        public void InsertChildren()
+        {
+            int i = 0;
+            foreach (var item in Children)
+            {
+                Name = Regex.Replace(Name, "\\$" + ++i, item.ToCs());
+            }
+            Clear();
+        }
+
         void ToCsRec(StringBuilder sb)
         {
-            if (this is Attribute)
+            if (IsAttribute)
             {
                 sb.Append("_a(");
+            }
+            else if (IsCode)
+            {
+                sb.Append("_c(");
+            }
+            else if (IsRef)
+            {
+                //sb.Append("__(" + Value + ")");
+                sb.Append("\" + " + Value + ".ToCs() + \"");
+                return;
             }
             else
             {
@@ -426,6 +419,7 @@ namespace akira
             sb.Append("\"" + Name + "\"");
             foreach (var item in Items)
             {
+                if (item.IsAttribute && item.Name == "type" && item.Value == "code") continue;
                 sb.Append(", ");
                 item.ToCsRec(sb);
             }
@@ -439,27 +433,4 @@ namespace akira
             return sb.ToString();
         }
     }
-    
-    public class Attribute: Node
-    {
-        public Attribute(string name, params Node[] children): base(name, children)
-        {
-            
-        }
-    }
-
-
-    //public class Code : Node
-    //{
-    //    public Code(string code) : base("code")
-    //    {
-    //        Add(code);
-    //        // parse(code);
-    //    }
-
-    //    void parse(string code)
-    //    {
-
-    //    }
-    //}
 }

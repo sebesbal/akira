@@ -1,6 +1,6 @@
 using System; using akira;
 namespace akira {
-public class debug: Rule
+public class write: Rule
 {
 public override bool Apply(Context ctx, ref Node that)
 {

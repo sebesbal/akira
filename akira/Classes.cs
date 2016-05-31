@@ -153,6 +153,30 @@ namespace akira
         public string ID;
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
+        
+        public static Node __(string name, params Node[] children)
+        {
+            return new Node(name, children);
+        }
+
+        public static Node __(Node n)
+        {
+            return n.Clone();
+        }
+
+        public static Node _a(string name, params Node[] children)
+        {
+            Node n = new Node(name, children);
+            n.IsAttribute = true;
+            return n;
+        }
+
+        public static Node _c(string name, params Node[] children)
+        {
+            Node n = new Node(name, children);
+            n["type"] = new Node("code");
+            return n;
+        }
     }
 
     public class akira : Rule
@@ -163,6 +187,7 @@ namespace akira
         Node root;
         public akira()
         {
+            ctx.ActivateRule(new tocs());
             ctx.ActivateRule(new rule());
             //ctx.ActivateRule(new misc_atttribute());
             //ctx.ActivateRule(new cs_rule());
