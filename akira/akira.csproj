@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Classes.cs" />
     <Compile Include="gen\debug.cs" />
+    <Compile Include="gen\question.cs" />
     <Compile Include="gen\replace.cs" />
     <Compile Include="gen\write.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

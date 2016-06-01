@@ -1,5 +1,6 @@
 ﻿op 300 yfxx -->
 op 200 yfx :
+op 150 xf ?
 op 100 fx $
 
 rule
@@ -17,6 +18,8 @@ rule
 			$a
 			write $b
 
-alma --> korte
+$a? -->
+	src:question
+	citrom
 
-alma
+alma ?

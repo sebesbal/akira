@@ -232,7 +232,7 @@ namespace slp_parser
                 e.Name = e.Children.First.Value.Name;
                 e.Clear();
             }
-            else if (e.Name == "op" && e.Match("id", "list"))
+            else if (e.Name == "op" && e.Match("__id", "list"))
             {
                 e.Name = "list";
                 e.Remove("id");
@@ -247,7 +247,7 @@ namespace slp_parser
 
         void traverse1(Node e)
         {
-            if (e.Name == "op" && e.Match("id", ":"))
+            if (e.Name == "op" && e.Match("__id", ":"))
             {
                 e.Parent[e.Children.First.Value.Name] = e.Children.ElementAt(1);
                 e.Remove();
@@ -337,7 +337,8 @@ namespace slp_parser
 
             if (e.Name == "op")
             {
-                e.Name = e["id"].Name;
+                e.Name = e["__id"].Name;
+                e.Remove("__id");
             }
         }
 
@@ -412,7 +413,7 @@ namespace slp_parser
 
                 if (n.Name == "op")
                 {
-                    var txt = n["id"].Name;
+                    var txt = n["__id"].Name;
                     if (operators.ContainsKey(txt))
                     {
                         var op = operators[txt];
@@ -487,7 +488,7 @@ namespace slp_parser
             Node node = new Node(name);
             if (context.OP() != null)
             {
-                node["id"] = new Node(context.GetText());
+                node["__id"] = new Node(context.GetText());
             }
             else
             {
