@@ -12,6 +12,6 @@ cur = cur.Next;
 Node b = cur;
 cur = cur.Parent;
  Node.Replace(ref that, __("rule", __(a), __("write", __(b)))); 
-return false;
+return true;
 }
 }}

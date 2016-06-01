@@ -121,7 +121,7 @@ namespace akira
             {
                 GenCodeRec(sb, ctx, item);
             }
-            sb.AppendLine("return false;");
+            sb.AppendLine("return true;");
             sb.AppendLine("}");
             sb.AppendLine("}}");
             return sb.ToString();

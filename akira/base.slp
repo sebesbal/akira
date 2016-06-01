@@ -5,7 +5,7 @@ op 100 fx $
 rule
 	src:write
 	write $a
-	{ Node.Replace(ref that, $1); return true; }
+	{ Node.Replace(ref that, $1); }
 		{ Node.Replace(ref that, $1); }
 			$a
 
@@ -17,12 +17,6 @@ rule
 			$a
 			write $b
 
-rule
-	alma
-	write lofusz
-
-korte --> citrom
-
-korte
+alma --> korte
 
 alma
