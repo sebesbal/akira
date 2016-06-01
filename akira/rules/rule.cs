@@ -9,10 +9,27 @@ namespace akira
         bool after = false;
         string className;
 
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!(node.Name == "rule")) return false;
+            Rule result = GenerateInstanceFromCS(ctx, node);
+            if (result == null)
+            {
+                return false;
+            }
+            else
+            {
+                ctx.ActivateRule(result);
+                node.Remove();
+                node = null;
+                return true;
+            }
+        }
+
         public override bool ApplyAfter(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule")) return false;
-            Rule result = GenerateInstance(ctx, node);
+            Rule result = GenerateInstanceFromCode(ctx, node);
             ctx.ActivateRule(result);
 
             node.Remove();
@@ -110,7 +127,29 @@ namespace akira
             return sb.ToString();
         }
 
-        protected Rule GenerateInstance(Context ctx, Node node)
+        //protected Rule GenerateInstance(Context ctx, Node node)
+        //{
+        //    Node src = node["src"];
+        //    if (src == null)
+        //    {
+        //        className = ctx.GenName();
+        //    }
+        //    else
+        //    {
+        //        className = src.Name;
+        //    }
+
+        //    Assembly a = null;
+        //    Type t = null;
+        //    if (!ctx.GetType(className, ref t, ref a))
+        //    {
+        //        ctx.GetType(className, GenerateCode(ctx, node), ref t, ref a);
+        //    }
+        //    var o = a.CreateInstance(t.FullName);
+        //    return (Rule)o;
+        //}
+
+        protected Rule GenerateInstanceFromCode(Context ctx, Node node)
         {
             Node src = node["src"];
             if (src == null)
@@ -121,15 +160,37 @@ namespace akira
             {
                 className = src.Name;
             }
-            
+
             Assembly a = null;
             Type t = null;
-            if (!ctx.GetType(className, ref t, ref a))
-            {
-                ctx.GetType(className, GenerateCode(ctx, node), ref t, ref a);
-            }
+            ctx.GetType(className, GenerateCode(ctx, node), ref t, ref a);
             var o = a.CreateInstance(t.FullName);
             return (Rule)o;
+        }
+
+        protected Rule GenerateInstanceFromCS(Context ctx, Node node)
+        {
+            Node src = node["src"];
+            if (src == null)
+            {
+                return null;
+            }
+            else
+            {
+                className = src.Name;
+            }
+
+            Assembly a = null;
+            Type t = null;
+            if (ctx.GetType(className, ref t, ref a))
+            {
+                var o = a.CreateInstance(t.FullName);
+                return (Rule)o;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

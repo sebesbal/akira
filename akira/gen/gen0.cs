@@ -6,7 +6,7 @@ public override bool Apply(Context ctx, ref Node that)
 {
 Node cur = that;
 if ("alma" != cur.Name || 0 != cur.Children.Count) return false;
- that.ReplaceWith(__("lofusz")); 
+ Node.Replace(ref that, __("lofusz")); 
 return false;
 }
 }}

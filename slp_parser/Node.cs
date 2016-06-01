@@ -186,7 +186,7 @@ namespace akira
         {
             if (Parent == null)
             {
-                throw new Exception("Parent == null!");
+                // throw new Exception("Parent == null!");
             }
             else
             {
@@ -203,7 +203,7 @@ namespace akira
             }
         }
 
-        public void ReplaceWith(Node n)
+        private void ReplaceWith(Node n)
         {
             if (Parent == null)
             {
@@ -221,6 +221,15 @@ namespace akira
                 Parent = null;
                 n.InheritAttributesFrom(this);
             }
+        }
+
+        public static void Replace(ref Node old, Node neu)
+        {
+            if (old.Parent != null)
+            {
+                old.ReplaceWith(neu);
+            }
+            old = neu;
         }
 
         public bool Match(string key, string value)
@@ -395,7 +404,23 @@ namespace akira
             Clear();
         }
 
-        void ToCsRec(StringBuilder sb)
+        public string Fos
+        {
+            get
+            {
+                // if (IsRef)
+                if (Children.Count == 0 && !IsCode)
+                {
+                    return Name;
+                }
+                else
+                {
+                    return ToCs();
+                }
+            }
+        }
+
+        void ToCsRec(StringBuilder sb, int depth = 0)
         {
             if (IsAttribute)
             {
@@ -407,8 +432,12 @@ namespace akira
             }
             else if (IsRef)
             {
-                //sb.Append("__(" + Value + ")");
-                sb.Append("\" + " + Value + ".ToCs() + \"");
+                //sb.Append("__(" + Value + ".Name)");
+                //sb.Append("__(\" + " + Value + ".ToCs() + \")");
+                //sb.Append(Value);
+                //sb.Append("__(" + Value + ".Fos)");
+                sb.Append("__(" + Value + ")");
+                //sb.Append(Value + ".Clone()");
                 return;
             }
             else
@@ -426,10 +455,10 @@ namespace akira
             sb.Append(")");
         }
 
-        public string ToCs()
+        public string ToCs(int depth = 0)
         {
             var sb = new StringBuilder();
-            ToCsRec(sb);
+            ToCsRec(sb, depth);
             return sb.ToString();
         }
     }

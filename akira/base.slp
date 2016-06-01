@@ -1,24 +1,28 @@
-﻿op 200 yfx :
+﻿op 300 yfxx -->
+op 200 yfx :
 op 100 fx $
 
-root
-	// The program 
+rule
+	src:write
+	write $a
+	{ Node.Replace(ref that, $1); return true; }
+		{ Node.Replace(ref that, $1); }
+			$a
 
-	// define a transition rule:
-	// it searches for "write a" patterns (where a is an arbitrary expression)
-	// 
-	rule
-		src:write
-		write $a
-		{ that.ReplaceWith($1); }
-			{ that.ReplaceWith($1); }
-				$a
+rule
+	src:replace
+	$a --> $b
+	write
+		rule
+			$a
+			write $b
 
-	rule
-		alma
-		write lofusz
-
+rule
 	alma
+	write lofusz
 
-	// The result of the run:
-	// lofusz
+korte --> citrom
+
+korte
+
+alma

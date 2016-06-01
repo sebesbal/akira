@@ -278,11 +278,12 @@ namespace slp_parser
             {
                 var f = e.Elements().ElementAt(0);
                 f.Remove();
-                if (e.Parent != null)
-                {
-                    e.ReplaceWith(f);
-                }
-                e = f;
+                Node.Replace(ref e, f);
+                //if (e.Parent != null)
+                //{
+                //    e.ReplaceWith(f);
+                //}
+                //e = f;
                 traverse2(ref e);
                 return;
             }
@@ -315,15 +316,21 @@ namespace slp_parser
                 if (f.Elements().Count() == 0)
                 {
                     f.Remove();
-                    if (e.Parent != null)
-                    {
-                        e.ReplaceWith(f);
-                    }
                     foreach (var g in e.Elements())
                     {
                         f.Add(g);
                     }
-                    e = f;
+                    Node.Replace(ref e, f);
+
+                    //if (e.Parent != null)
+                    //{
+                    //    e.ReplaceWith(f);
+                    //}
+                    //foreach (var g in e.Elements())
+                    //{
+                    //    f.Add(g);
+                    //}
+                    //e = f;
                     traverse2(ref e);
                 }
             }

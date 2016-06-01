@@ -88,17 +88,22 @@ namespace akira
 
         public void GetType(string name, string code, ref Type type, ref System.Reflection.Assembly assembly)
         {
+            File.WriteAllText("../akira/gen/" + name + ".cs", code);
             assembly = AssemblyFromCode(code);
             type = assembly.GetTypes()[0];
-            File.WriteAllText("../akira/gen/" + name + ".cs", code);
         }
 
         static int dllCount = 0;
 
         public static Assembly AssemblyFromCode(string code)
         {
+            string dllName = "gen" + dllCount++ + ".dll";
+            if (File.Exists(dllName))
+            {
+                File.Delete(dllName);
+            }
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, "gen" + dllCount++ + ".dll", true);
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, dllName, true);
             parameters.GenerateExecutable = false;
 
             CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
@@ -207,18 +212,34 @@ namespace akira
 
         public void Run(Node node)
         {
+            //root = new Node("root");
+            //root.Add(node);
             root = node;
             Apply(ctx, ref root);
         }
 
         public void Save(string fileName)
         {
-            root.Save(fileName);
+            if (root == null)
+            {
+                File.WriteAllText(fileName, "");
+            }
+            else
+            {
+                root.Save(fileName);
+            }
         }
 
         public void SaveToXml(string fileName)
         {
-            root.SaveToXml(fileName);
+            if (root == null)
+            {
+                File.WriteAllText(fileName, "");
+            }
+            else
+            {
+                root.SaveToXml(fileName);
+            }
         }
 
         public override bool Apply(Context ctx, ref Node node)
