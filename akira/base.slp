@@ -1,14 +1,17 @@
-﻿op 1000 yfxx -->
+﻿op 15000 fx #
+op 1000 yfxx -->
 op 500 yf ->
 op 200 yf :
 op 150 xf ?
 op 100 fx $
+op 100 yfx + 
+op 50 yfx *
 
 rule
-	write $a
+	# write $a
 	src: write
-	{ Node.Replace(ref that, $1); }
-		{ Node.Replace(ref that, $1); }
+	{ Node.Replace(ref that, $1); return true; }
+		{ Node.Replace(ref that, $1); return true; }
 			$a
 
 rule
@@ -20,6 +23,29 @@ rule
 			write $b
 
 rule
+	src: read
+	after:
+	# $a
+	{
+            var list = __("list");
+            list.Add(_c("if (!Match(cur, \"" + a.Name + "\", " + a.Children.Count + ")) return false;"));
+            list.Add(_c("cur = cur.First;"));
+            foreach (var item in a.Children)
+            {
+                list.Add(__("#", __(item)));
+            }
+            list.Add(_c("cur = cur.Parent;"));
+            Node.Replace(ref that, list);
+	}
+
+rule
+	src: debug
+	# a $b c
+	{ Console.WriteLine(b); }
+
+/*
+
+rule
 	test $a $b
 	src: test
 	after:
@@ -27,16 +53,4 @@ rule
 	{ if (! a.Eq(b)) Console.WriteLine("Test failed!"); }
 	{ return false; }
 
-korte --> citrom
-
-test
-	block
-		korte
-	block
-		citrom
-
-$a? -->
-	src: question
-	citrom
-
-alma ?
+*/

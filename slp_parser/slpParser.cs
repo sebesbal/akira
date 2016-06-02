@@ -32,10 +32,10 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 public partial class slpParser : Parser {
 	public const int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, TRUE=13, FALSE=14, NULL=15, STRING=16, INT=17, 
-		FLOAT=18, ID=19, OPEN_BRACE=20, CLOSE_BRACE=21, OP=22, NATIVE=23, COMMENT=24, 
-		LINE_COMMENT=25, SPACES=26, OPEN_PAREN=27, CLOSE_PAREN=28, OPEN_BRACK=29, 
-		CLOSE_BRACK=30, NEWLINE=31, WS=32, INDENT=33, DEDENT=34;
+		T__9=10, T__10=11, T__11=12, T__12=13, TRUE=14, FALSE=15, NULL=16, STRING=17, 
+		INT=18, FLOAT=19, ID=20, OPEN_BRACE=21, CLOSE_BRACE=22, OP=23, NATIVE=24, 
+		COMMENT=25, LINE_COMMENT=26, SPACES=27, OPEN_PAREN=28, CLOSE_PAREN=29, 
+		OPEN_BRACK=30, CLOSE_BRACK=31, NEWLINE=32, WS=33, INDENT=34, DEDENT=35;
 	public const int
 		RULE_program = 0, RULE_assoc = 1, RULE_opdef = 2, RULE_token = 3, RULE_exp = 4, 
 		RULE_block = 5;
@@ -45,13 +45,13 @@ public partial class slpParser : Parser {
 
 	private static readonly string[] _LiteralNames = {
 		null, "'fx'", "'fy'", "'xf'", "'yf'", "'xfx'", "'xfy'", "'yfx'", "'yfy'", 
-		"'yfxx'", "'op'", "'{'", "'}'", "'true'", "'false'", "'<>'", null, null, 
-		null, null, "'<'", "'>'", null, null, null, null, null, "'('", "')'", 
-		"'['", "']'"
+		"'yfxx'", "'fxx'", "'op'", "'{'", "'}'", "'true'", "'false'", "'<>'", 
+		null, null, null, null, "'<'", "'>'", null, null, null, null, null, "'('", 
+		"')'", "'['", "']'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, "TRUE", "FALSE", "NULL", "STRING", "INT", "FLOAT", "ID", "OPEN_BRACE", 
+		null, null, "TRUE", "FALSE", "NULL", "STRING", "INT", "FLOAT", "ID", "OPEN_BRACE", 
 		"CLOSE_BRACE", "OP", "NATIVE", "COMMENT", "LINE_COMMENT", "SPACES", "OPEN_PAREN", 
 		"CLOSE_PAREN", "OPEN_BRACK", "CLOSE_BRACK", "NEWLINE", "WS", "INDENT", 
 		"DEDENT"
@@ -144,7 +144,7 @@ public partial class slpParser : Parser {
 			{
 			State = 14;
 			_la = TokenStream.La(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9))) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -191,7 +191,7 @@ public partial class slpParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 16; Match(T__9);
+			State = 16; Match(T__10);
 			State = 17; Match(INT);
 			State = 18; assoc();
 			State = 19; Match(OP);
@@ -340,7 +340,7 @@ public partial class slpParser : Parser {
 				State = 29;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.La(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__9) | (1L << T__10) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__11) | (1L << TRUE) | (1L << FALSE) | (1L << STRING) | (1L << INT) | (1L << FLOAT) | (1L << ID) | (1L << OP) | (1L << NATIVE) | (1L << OPEN_PAREN) | (1L << OPEN_BRACK) | (1L << NEWLINE))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -388,12 +388,12 @@ public partial class slpParser : Parser {
 				State = 33; Match(CLOSE_PAREN);
 				}
 				break;
-			case T__10:
+			case T__11:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 35; Match(T__10);
+				State = 35; Match(T__11);
 				State = 36; exp();
-				State = 37; Match(T__11);
+				State = 37; Match(T__12);
 				}
 				break;
 			case OPEN_BRACK:
@@ -420,23 +420,23 @@ public partial class slpParser : Parser {
 	}
 
 	public static readonly string _serializedATN =
-		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3$\x30\x4\x2\t\x2"+
+		"\x3\x430\xD6D1\x8206\xAD2D\x4417\xAEF1\x8D80\xAADD\x3%\x30\x4\x2\t\x2"+
 		"\x4\x3\t\x3\x4\x4\t\x4\x4\x5\t\x5\x4\x6\t\x6\x4\a\t\a\x3\x2\x3\x2\x3\x3"+
 		"\x3\x3\x3\x4\x3\x4\x3\x4\x3\x4\x3\x4\x3\x5\x3\x5\x3\x6\x3\x6\x3\x6\x3"+
 		"\x6\x6\x6\x1E\n\x6\r\x6\xE\x6\x1F\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3\a\x3"+
 		"\a\x3\a\x3\a\x3\a\x3\a\x5\a.\n\a\x3\a\x2\x2\b\x2\x4\x6\b\n\f\x2\x4\x3"+
-		"\x2\x3\v\x6\x2\xF\x10\x12\x15\x18\x19!!/\x2\xE\x3\x2\x2\x2\x4\x10\x3\x2"+
-		"\x2\x2\x6\x12\x3\x2\x2\x2\b\x17\x3\x2\x2\x2\n\x1D\x3\x2\x2\x2\f-\x3\x2"+
-		"\x2\x2\xE\xF\x5\n\x6\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2\x2\x2\x11\x5\x3"+
-		"\x2\x2\x2\x12\x13\a\f\x2\x2\x13\x14\a\x13\x2\x2\x14\x15\x5\x4\x3\x2\x15"+
-		"\x16\a\x18\x2\x2\x16\a\x3\x2\x2\x2\x17\x18\t\x3\x2\x2\x18\t\x3\x2\x2\x2"+
-		"\x19\x1E\x5\f\a\x2\x1A\x1E\x5\b\x5\x2\x1B\x1E\x5\x6\x4\x2\x1C\x1E\a!\x2"+
-		"\x2\x1D\x19\x3\x2\x2\x2\x1D\x1A\x3\x2\x2\x2\x1D\x1B\x3\x2\x2\x2\x1D\x1C"+
-		"\x3\x2\x2\x2\x1E\x1F\x3\x2\x2\x2\x1F\x1D\x3\x2\x2\x2\x1F \x3\x2\x2\x2"+
-		" \v\x3\x2\x2\x2!\"\a\x1D\x2\x2\"#\x5\n\x6\x2#$\a\x1E\x2\x2$.\x3\x2\x2"+
-		"\x2%&\a\r\x2\x2&\'\x5\n\x6\x2\'(\a\xE\x2\x2(.\x3\x2\x2\x2)*\a\x1F\x2\x2"+
-		"*+\x5\n\x6\x2+,\a \x2\x2,.\x3\x2\x2\x2-!\x3\x2\x2\x2-%\x3\x2\x2\x2-)\x3"+
-		"\x2\x2\x2.\r\x3\x2\x2\x2\x5\x1D\x1F-";
+		"\x2\x3\f\x6\x2\x10\x11\x13\x16\x19\x1A\"\"/\x2\xE\x3\x2\x2\x2\x4\x10\x3"+
+		"\x2\x2\x2\x6\x12\x3\x2\x2\x2\b\x17\x3\x2\x2\x2\n\x1D\x3\x2\x2\x2\f-\x3"+
+		"\x2\x2\x2\xE\xF\x5\n\x6\x2\xF\x3\x3\x2\x2\x2\x10\x11\t\x2\x2\x2\x11\x5"+
+		"\x3\x2\x2\x2\x12\x13\a\r\x2\x2\x13\x14\a\x14\x2\x2\x14\x15\x5\x4\x3\x2"+
+		"\x15\x16\a\x19\x2\x2\x16\a\x3\x2\x2\x2\x17\x18\t\x3\x2\x2\x18\t\x3\x2"+
+		"\x2\x2\x19\x1E\x5\f\a\x2\x1A\x1E\x5\b\x5\x2\x1B\x1E\x5\x6\x4\x2\x1C\x1E"+
+		"\a\"\x2\x2\x1D\x19\x3\x2\x2\x2\x1D\x1A\x3\x2\x2\x2\x1D\x1B\x3\x2\x2\x2"+
+		"\x1D\x1C\x3\x2\x2\x2\x1E\x1F\x3\x2\x2\x2\x1F\x1D\x3\x2\x2\x2\x1F \x3\x2"+
+		"\x2\x2 \v\x3\x2\x2\x2!\"\a\x1E\x2\x2\"#\x5\n\x6\x2#$\a\x1F\x2\x2$.\x3"+
+		"\x2\x2\x2%&\a\xE\x2\x2&\'\x5\n\x6\x2\'(\a\xF\x2\x2(.\x3\x2\x2\x2)*\a "+
+		"\x2\x2*+\x5\n\x6\x2+,\a!\x2\x2,.\x3\x2\x2\x2-!\x3\x2\x2\x2-%\x3\x2\x2"+
+		"\x2-)\x3\x2\x2\x2.\r\x3\x2\x2\x2\x5\x1D\x1F-";
 	public static readonly ATN _ATN =
 		new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
 }

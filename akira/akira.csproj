@@ -40,11 +40,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes.cs" />
-    <Compile Include="gen\arrow.cs" />
-    <Compile Include="gen\debug.cs" />
-    <Compile Include="gen\question.cs" />
+    <None Include="gen\arrow.cs" />
+    <None Include="gen\debug.cs" />
+    <None Include="gen\question.cs" />
+    <Compile Include="gen\read.cs" />
     <Compile Include="gen\replace.cs" />
-    <Compile Include="gen\test.cs" />
+    <None Include="gen\test.cs" />
     <Compile Include="gen\write.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="rules\eval.cs" />

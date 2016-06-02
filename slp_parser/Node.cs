@@ -264,7 +264,7 @@ namespace akira
             }
         }
 
-        private void ReplaceWith(Node n)
+        public void ReplaceWith(Node n)
         {
             if (Parent == null)
             {
@@ -291,6 +291,12 @@ namespace akira
                 old.ReplaceWith(neu);
             }
             old = neu;
+        }
+
+        public void Insert(ref LinkedListNode<Node> after, Node n)
+        {
+            after = Children.AddAfter(after, n);
+            n.Parent = this;
         }
 
         public bool Match(string key, string value)

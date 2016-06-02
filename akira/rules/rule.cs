@@ -59,48 +59,99 @@ namespace akira
         //    }
         //}
 
+        //protected void GenCodeRec(StringBuilder sb, Context ctx, Node node)
+        //{
+        //    if (node.IsCode)
+        //    {
+        //        sb.AppendLine(node.Name);
+        //    }
+        //    else if (node.IsRef)
+        //    {
+        //        sb.AppendLine("Node " + node.Value + " = cur;");
+        //    }
+        //    else
+        //    {
+        //        int count = 0;
+        //        foreach (var item in node.Children)
+        //        {
+        //            if (!item.IsCode)
+        //            {
+        //                ++count;
+        //            }
+        //        }
+
+        //        string name = node.Name;
+        //        sb.AppendLine("if (\"" + node.Name + "\" != cur.Name || "
+        //            + count + " != cur.Children.Count) return false;");
+
+        //        if (node.Children.Count > 0)
+        //        {
+        //            sb.AppendLine("cur = cur.First;");
+
+        //            foreach (var item in node.Children)
+        //            {
+        //                GenCodeRec(sb, ctx, item);
+
+        //                if (item != node.Children.Last.Value)
+        //                {
+        //                    sb.AppendLine("cur = cur.Next;");
+        //                }
+        //            }
+
+        //            sb.AppendLine("cur = cur.Parent;");
+        //        }
+        //    }
+        //}
+
+
         protected void GenCodeRec(StringBuilder sb, Context ctx, Node node)
         {
             if (node.IsCode)
             {
                 sb.AppendLine(node.Name);
             }
-            else if (node.IsRef)
+
+            foreach (var item in node.Children)
             {
-                sb.AppendLine("Node " + node.Value + " = cur;");
+                GenCodeRec(sb, ctx, item);
             }
-            else
-            {
-                int count = 0;
-                foreach (var item in node.Children)
-                {
-                    if (!item.IsCode)
-                    {
-                        ++count;
-                    }
-                }
 
-                string name = node.Name;
-                sb.AppendLine("if (\"" + node.Name + "\" != cur.Name || "
-                    + count + " != cur.Children.Count) return false;");
+            //else if (node.IsRef)
+            //{
+            //    sb.AppendLine("Node " + node.Value + " = cur;");
+            //}
+            //else
+            //{
+            //    int count = 0;
+            //    foreach (var item in node.Children)
+            //    {
+            //        if (!item.IsCode)
+            //        {
+            //            ++count;
+            //        }
+            //    }
 
-                if (node.Children.Count > 0)
-                {
-                    sb.AppendLine("cur = cur.First;");
+            //    string name = node.Name;
+            //    sb.AppendLine("if (\"" + node.Name + "\" != cur.Name || "
+            //        + count + " != cur.Children.Count) return false;");
 
-                    foreach (var item in node.Children)
-                    {
-                        GenCodeRec(sb, ctx, item);
+            //    if (node.Children.Count > 0)
+            //    {
+            //        sb.AppendLine("cur = cur.First;");
 
-                        if (item != node.Children.Last.Value)
-                        {
-                            sb.AppendLine("cur = cur.Next;");
-                        }
-                    }
+            //        foreach (var item in node.Children)
+            //        {
+            //            GenCodeRec(sb, ctx, item);
 
-                    sb.AppendLine("cur = cur.Parent;");
-                }
-            }
+            //            if (item != node.Children.Last.Value)
+            //            {
+            //                sb.AppendLine("cur = cur.Next;");
+            //            }
+            //        }
+
+            //        sb.AppendLine("cur = cur.Parent;");
+            //    }
+            //}
         }
 
         protected string GenerateCode(Context ctx, Node node, string className)
@@ -122,7 +173,7 @@ namespace akira
             {
                 GenCodeRec(sb, ctx, item);
             }
-            sb.AppendLine("return true;");
+            sb.AppendLine("return false;");
             sb.AppendLine("}");
             sb.AppendLine("}}");
             return sb.ToString();

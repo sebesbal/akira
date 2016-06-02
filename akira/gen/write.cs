@@ -9,7 +9,7 @@ if ("write" != cur.Name || 1 != cur.Children.Count) return false;
 cur = cur.First;
 Node a = cur;
 cur = cur.Parent;
- Node.Replace(ref that, _c(" Node.Replace(ref that, $1); ", __(a))); 
+ Node.Replace(ref that, _c(" Node.Replace(ref that, $1); return true;", __(a))); 
 return true;
 }
 }}

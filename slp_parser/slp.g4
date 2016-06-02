@@ -157,7 +157,8 @@ NEWLINE
      string newLine = Regex.Replace(Text, "[^\r\n]", "");
      string spaces = Regex.Replace(Text, "[\r\n]", "");
      int next = InputStream.La(1);
-     if (opened > 0 || next == '\r' || next == '\n' ||next == '#') {
+     // if (opened > 0 || next == '\r' || next == '\n' ||next == '#') {
+	 if (opened > 0 || next == '\r' || next == '\n') {
        // If we're inside a list or on a blank line, ignore all indents, 
        // dedents and line breaks.
        Skip();
@@ -182,7 +183,7 @@ program
 	;
    
 assoc
-	:	'fx' | 'fy' | 'xf' | 'yf' | 'xfx' | 'xfy' | 'yfx' | 'yfy' | 'yfxx'
+	:	'fx' | 'fy' | 'xf' | 'yf' | 'xfx' | 'xfy' | 'yfx' | 'yfy' | 'yfxx' | 'fxx'
 	;
    
 opdef

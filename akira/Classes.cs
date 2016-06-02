@@ -182,6 +182,11 @@ namespace akira
             n["type"] = new Node("code");
             return n;
         }
+
+        public bool Match(Node n, string name, int childCount)
+        {
+            return n.Name.Equals(name) && n.Children.Count == childCount;
+        }
     }
 
     public class akira : Rule
@@ -251,10 +256,7 @@ namespace akira
             {
                 goto begin;
             }
-
-            // while (node != null && ApplyRules(ctx, ref node)) ;
-            //if (node == null) return false;
-
+            
             var v = node.Elements().ToArray();
             foreach (Node n in v)
             {

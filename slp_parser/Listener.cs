@@ -13,9 +13,11 @@ namespace slp_parser
 {
     public enum Associativity
     {
-        f, fx, fy, xf, yf, xfx, xfy, yfx, yfy, yfxx
+        f, fx, fy, xf, yf, xfx, xfy, yfx, yfy, yfxx, fxx
     }
 
+    // x: less or equal precedence
+    // y: less precedence
     public enum AssociativitySide
     {
         n, x, y
@@ -26,7 +28,7 @@ namespace slp_parser
         static Operator()
         {
             nullop.Name = "nullop";
-            nullop.Precedence = 1100;
+            nullop.Precedence = 1000;
             nullop.Associativity = Associativity.f;
             
             listop.Name = "list";
@@ -91,6 +93,11 @@ namespace slp_parser
                         break;
                     case Associativity.yfxx:
                         left = AssociativitySide.y;
+                        right = AssociativitySide.x;
+                        Count = int.MaxValue;
+                        break;
+                    case Associativity.fxx:
+                        left = AssociativitySide.n;
                         right = AssociativitySide.x;
                         Count = int.MaxValue;
                         break;
@@ -332,12 +339,45 @@ namespace slp_parser
             }
         }
 
-        protected Node ParseOperators(List<Tuple<Operator, Node>> list)
+        protected Tuple<Operator, Node> ParseOperators2(List<Tuple<Operator, Node>> list)
+        {
+            var a = new List<Tuple<Operator, Node>>();
+            var b = new List<Tuple<Operator, Node>>();
+            bool bb = false;
+
+            foreach (var item in list)
+            {
+                if (bb)
+                {
+                    b.Add(item);
+                }
+                else
+                {
+                    a.Add(item);
+                }
+                bb |= item.Item1.Precedence > Operator.listop.Precedence;
+            }
+
+            if (b.Count > 0)
+            {
+                var n = ParseOperators2(b);
+                a.Add(n);
+                
+            }
+            return ParseOperators(a);
+        }
+
+        protected Tuple<Operator, Node> ParseOperators(List<Tuple<Operator, Node>> list)
         {
             var open = new Stack<Tuple<Operator, Node>>();
             var root = new Tuple<Operator, Node>(Operator.listop, new Node("list"));
             open.Push(root);
 
+            //      a
+            //     / \
+            //    *   b
+            //   /   /
+            //  *   c
             foreach (var b in list)
             {
                 Operator opb = b.Item1;
@@ -382,15 +422,8 @@ namespace slp_parser
                     open.Pop();
                 }
             }
-
-            //Node e = root.Item2;
-            //if (e.Elements().Count() == 1)
-            //{
-            //    e = e.Elements().ElementAt(0);
-            //    e.Remove();
-            //}
-
-            return root.Item2;
+            
+            return root;
         }
 
         public override void ExitExp([NotNull] slpParser.ExpContext context)
@@ -407,10 +440,6 @@ namespace slp_parser
                     if (operators.ContainsKey(txt))
                     {
                         var op = operators[txt];
-                        //if (op == Operator.listop)
-                        //{
-                        //    op = Operator.nullop;
-                        //}
                         list.Add(new Tuple<Operator, Node>(op, n));
                     }
                     else
@@ -430,7 +459,7 @@ namespace slp_parser
             }
             else if (list.Count > 0)
             {
-                m.Put(context, ParseOperators(list));
+                m.Put(context, ParseOperators2(list).Item2);
             }
         }
 
