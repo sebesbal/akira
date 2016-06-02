@@ -6,13 +6,10 @@ namespace akira
 {
     public class rule : Rule
     {
-        bool after = false;
-        string className;
-
         public override bool Apply(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule")) return false;
-            after = node.Match("after");
+            
             Rule result = GenerateInstanceFromCS(ctx, node);
             if (result == null)
             {
@@ -106,8 +103,9 @@ namespace akira
             }
         }
 
-        protected string GenerateCode(Context ctx, Node node)
+        protected string GenerateCode(Context ctx, Node node, string className)
         {
+            bool after = node.Match("after");
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("using System; using akira;");
@@ -154,6 +152,7 @@ namespace akira
 
         protected Rule GenerateInstanceFromCode(Context ctx, Node node)
         {
+            string className;
             Node src = node["src"];
             if (src == null)
             {
@@ -166,13 +165,14 @@ namespace akira
 
             Assembly a = null;
             Type t = null;
-            ctx.GetType(className, GenerateCode(ctx, node), ref t, ref a);
+            ctx.GetType(className, GenerateCode(ctx, node, className), ref t, ref a);
             var o = a.CreateInstance(t.FullName);
             return (Rule)o;
         }
 
         protected Rule GenerateInstanceFromCS(Context ctx, Node node)
         {
+            string className;
             Node src = node["src"];
             if (src == null)
             {
