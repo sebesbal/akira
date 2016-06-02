@@ -92,7 +92,14 @@ namespace akira
                 }
                 else
                 {
-                    return n.Value.Children.First.Value;
+                    if (n.Value.Children.First == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return n.Value.Children.First.Value;
+                    }
                 }
             }
             set
@@ -121,6 +128,13 @@ namespace akira
             n.Parent = this;
         }
 
+        public void AddAttribute(Node n)
+        {
+            Attributes.AddLast(n);
+            n.Parent = this;
+            n.IsAttribute = true;
+        }
+
         public Node Add(string name)
         {
             Node n = new Node(name);
@@ -128,11 +142,14 @@ namespace akira
             return n;
         }
 
-        protected Node SetAttribute(string key, Node value)
+        public Node SetAttribute(string key, Node value)
         {
             Node n = new Node(key);
             n.IsAttribute = true;
-            n.Add(value);
+            if (value != null)
+            {
+                n.Add(value);
+            }
             n.Parent = this;
             var m = FindAtttribute(key);
             if (m == null)
@@ -161,7 +178,50 @@ namespace akira
             {
                 result.Add(item.CloneRec());
             }
+            foreach (var item in Attributes)
+            {
+                result.AddAttribute(item.CloneRec());
+            }
             return result;
+        }
+
+        public bool Eq(object obj)
+        {
+            Node n = (Node)obj;
+            if (Children.Count != n.Children.Count
+                || Attributes.Count != n.Attributes.Count
+                || ! Name.Equals(n.Name))
+            {
+                return false;
+            }
+
+            var c = Children.First;
+            var nc = n.Children.First;
+            while (c != null)
+            {
+                if (!c.Value.Eq(nc.Value)) return false;
+                c = c.Next;
+                nc = nc.Next;
+            }
+
+            c = Attributes.First;
+            while (c != null)
+            {
+                nc = n.Attributes.First;
+                while (nc != null)
+                {
+                    if (c.Value.Eq(nc.Value))
+                    {
+                        // c is OK
+                        goto nextc;
+                    }
+                }
+                // there is no nc matching c
+                return false;
+
+                nextc: c = c.Next;
+            }
+            return true;
         }
 
         public void Clear()
@@ -199,7 +259,8 @@ namespace akira
         {
             foreach (var a in n.Attributes)
             {
-                this[a.Name] = a.First;
+                AddAttribute(a.Clone());
+                // this[a.Name] = a.First;
             }
         }
 
@@ -243,6 +304,12 @@ namespace akira
             {
                 return n.Name == value;
             }
+        }
+
+        public bool Match(string key)
+        {
+            var n = FindAtttribute(key);
+            return n != null;
         }
 
         public bool IsCode

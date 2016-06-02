@@ -1,25 +1,42 @@
-﻿op 300 yfxx -->
-op 200 yfx :
+﻿op 1000 yfxx -->
+op 500 yf ->
+op 200 yf :
 op 150 xf ?
 op 100 fx $
 
 rule
-	src:write
 	write $a
+	src: write
 	{ Node.Replace(ref that, $1); }
 		{ Node.Replace(ref that, $1); }
 			$a
 
 rule
-	src:replace
 	$a --> $b
+	src: replace
 	write
 		rule
 			$a
 			write $b
 
+rule
+	test $a $b
+	src: test
+	after:
+	{ Console.WriteLine("a:" + a.ToString() + "b:" + b.ToString()); }
+	{ if (! a.Eq(b)) Console.WriteLine("Test failed!"); }
+	{ return false; }
+
+korte --> citrom
+
+test
+	block
+		korte
+	block
+		citrom
+
 $a? -->
-	src:question
+	src: question
 	citrom
 
 alma ?

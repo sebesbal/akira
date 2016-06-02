@@ -235,7 +235,7 @@ namespace slp_parser
             else if (e.Name == "op" && e.Match("__id", "list"))
             {
                 e.Name = "list";
-                e.Remove("id");
+                e.Remove("__id");
             }
 
             var v = e.Children.ToArray();
@@ -249,8 +249,11 @@ namespace slp_parser
         {
             if (e.Name == "op" && e.Match("__id", ":"))
             {
-                e.Parent[e.Children.First.Value.Name] = e.Children.ElementAt(1);
-                e.Remove();
+                e.Remove("__id");
+                Node n = e.First;
+                n.Remove();
+                n.IsAttribute = true;
+                Node.Replace(ref e, n);
             }
 
             var v = e.Items.ToArray();
@@ -279,29 +282,10 @@ namespace slp_parser
                 var f = e.Elements().ElementAt(0);
                 f.Remove();
                 Node.Replace(ref e, f);
-                //if (e.Parent != null)
-                //{
-                //    e.ReplaceWith(f);
-                //}
-                //e = f;
                 traverse2(ref e);
                 return;
             }
-
-            //// traverse children
-            //var h = e.Children.First;
-            //while (h != null)
-            //{
-            //    Node i = (Node)h.Value;
-            //    Node old_i = i;
-            //    traverse2(ref i);
-            //    if (old_i != i)
-            //    {
-            //        h = e.Children.Find(i);
-            //    }
-            //    h = h.Next;
-            //}
-
+            
             var v = e.Items.ToArray();
             foreach (var item in v)
             {
@@ -321,16 +305,6 @@ namespace slp_parser
                         f.Add(g);
                     }
                     Node.Replace(ref e, f);
-
-                    //if (e.Parent != null)
-                    //{
-                    //    e.ReplaceWith(f);
-                    //}
-                    //foreach (var g in e.Elements())
-                    //{
-                    //    f.Add(g);
-                    //}
-                    //e = f;
                     traverse2(ref e);
                 }
             }
@@ -339,6 +313,22 @@ namespace slp_parser
             {
                 e.Name = e["__id"].Name;
                 e.Remove("__id");
+            }
+        }
+
+        void traverse3(Node e)
+        {
+            var v = e.Items.ToArray();
+            foreach (var item in v)
+            {
+                traverse3(item);
+            }
+
+            if (e.IsAttribute && e.Parent.Children.Find(e) != null)
+            {
+                Node p = e.Parent;
+                e.Remove();
+                p.AddAttribute(e);
             }
         }
 
@@ -363,7 +353,7 @@ namespace slp_parser
                         if (c != null)
                         {
                             Operator opc = c.Item1;
-                            if (opc > opb) // can pus c under b
+                            if (opc > opb) // can push c under b
                             {
                                 // check a's size
                                 if (!(opa == Operator.listop || opa.Count >= a.Item2.Elements().Count())) goto move_up;
@@ -518,6 +508,7 @@ namespace slp_parser
             traverse1(program);
             // traverse0(program);
             traverse2(ref program);
+            traverse3(program);
             m.Put(context, program);
         }
 

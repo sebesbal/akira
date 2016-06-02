@@ -12,9 +12,11 @@ namespace akira
         public override bool Apply(Context ctx, ref Node node)
         {
             if (!(node.Name == "rule")) return false;
+            after = node.Match("after");
             Rule result = GenerateInstanceFromCS(ctx, node);
             if (result == null)
             {
+                ctx.PushBlock();
                 return false;
             }
             else
@@ -30,6 +32,7 @@ namespace akira
         {
             if (!(node.Name == "rule")) return false;
             Rule result = GenerateInstanceFromCode(ctx, node);
+            ctx.PopBlock();
             ctx.ActivateRule(result);
 
             node.Remove();
