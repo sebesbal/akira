@@ -159,34 +159,19 @@ namespace akira
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
         
-        public static Node __(string name, params Node[] children)
+        public static NList _l(params Node[] items)
         {
-            return new Node(name, children);
+            return new NList(items);
         }
 
         public static Node __(Node n)
         {
             return n.Clone();
         }
+        
 
-        public static Node _a(string name, params Node[] children)
-        {
-            Node n = new Node(name, children);
-            n.IsAttribute = true;
-            return n;
-        }
-
-        public static Node _c(string name, params Node[] children)
-        {
-            Node n = new Node(name, children);
-            n["type"] = new Node("code");
-            return n;
-        }
-
-        public bool Match(Node n, string name, int childCount)
-        {
-            return n.Name.Equals(name) && n.Children.Count == childCount;
-        }
+        public static NString _s(string str) { return new NString(str); }
+        public static NCode _c(string str) { return new NCode(str); }
     }
 
     public class akira : Rule
@@ -198,7 +183,7 @@ namespace akira
         public akira()
         {
             ctx.ActivateRule(new tocs());
-            ctx.ActivateRule(new rule());
+            //ctx.ActivateRule(new rule());
             //ctx.ActivateRule(new misc_atttribute());
             //ctx.ActivateRule(new cs_rule());
             //ctx.ActivateRule(new cs_exe());
@@ -257,11 +242,15 @@ namespace akira
                 goto begin;
             }
             
-            var v = node.Elements().ToArray();
-            foreach (Node n in v)
+            var list = node as NList;
+            if (list != null)
             {
-                Node m = n;
-                Apply(ctx, ref m);
+                var v = list.Items.ToArray();
+                foreach (Node n in v)
+                {
+                    Node m = n;
+                    Apply(ctx, ref m);
+                }
             }
 
             if (ApplyRulesAfter(ctx, ref node))

@@ -171,9 +171,15 @@ namespace slp_parser
         }
     }
 
+    class NodeData
+    {
+        public Operator Operator;
+    }
+
     class Listener: slpBaseListener
     {
         public Dictionary<string, Operator> operators = new Dictionary<string, Operator>();
+        public Dictionary<Node, NodeData> nodeData = new Dictionary<Node, NodeData>();
         Antlr4.Runtime.Tree.ParseTreeProperty<Node> m = new Antlr4.Runtime.Tree.ParseTreeProperty<Node>();
         public Node program;
 
@@ -202,26 +208,7 @@ namespace slp_parser
         //{
         //    throw new NotImplementedException();
         //}
-
-
-        protected void add(ParserRuleContext context, Node node)
-        {
-            m.Put(context, node);
-            addChildrens(context, node);
-        }
-
-        protected void addChildrens(ParserRuleContext context, Node node)
-        {
-            foreach (var item in context.children)
-            {
-                var n = m.Get(item);
-                if (n != null)
-                {
-                    node.Add(n);
-                }
-            }
-        }
-
+        
         public override void EnterOpdef(slpParser.OpdefContext context)
         {
             Operator op = new Operator();
@@ -232,112 +219,74 @@ namespace slp_parser
             base.EnterOpdef(context);
         }
         
-        void traverse0(Node e)
-        {
-            if (e.Name == "id") // (id a) --> a
-            {
-                e.Name = e.Children.First.Value.Name;
-                e.Clear();
-            }
-            else if (e.Name == "op" && e.Match("__id", "list"))
-            {
-                e.Name = "list";
-                e.Remove("__id");
-            }
+        //void traverse2(ref Node e)
+        //{
+        //    // remove lists with zero element
+        //    if (e.Name == "list" && e.Children.Count() == 0)
+        //    {
+        //        if (e.Parent != null)
+        //        {
+        //            e.Parent.InheritAttributesFrom(e);
+        //        }
+        //        e.Remove();
+        //        return;
+        //    }
 
-            var v = e.Children.ToArray();
-            foreach (var f in v)
-            {
-                traverse0(f);
-            }
-        }
-
-        void traverse1(Node e)
-        {
-            if (e.Name == "op" && e.Match("__id", ":"))
-            {
-                e.Remove("__id");
-                Node n = e.First;
-                n.Remove();
-                n.IsAttribute = true;
-                Node.Replace(ref e, n);
-            }
-
-            var v = e.Items.ToArray();
-            foreach (var f in v)
-            {
-                traverse1(f);
-            }
-        }
-
-        void traverse2(ref Node e)
-        {
-            // remove lists with zero element
-            if (e.Name == "list" && e.Children.Count() == 0)
-            {
-                if (e.Parent != null)
-                {
-                    e.Parent.InheritAttributesFrom(e);
-                }
-                e.Remove();
-                return;
-            }
-
-            // remove lists with one element
-            if (e.Name == "list" && e.Children.Count() == 1)
-            {
-                var f = e.Elements().ElementAt(0);
-                f.Remove();
-                Node.Replace(ref e, f);
-                traverse2(ref e);
-                return;
-            }
+        //    // remove lists with one element
+        //    if (e.Name == "list" && e.Children.Count() == 1)
+        //    {
+        //        var f = e.Elements().ElementAt(0);
+        //        f.Remove();
+        //        Node.Replace(ref e, f);
+        //        traverse2(ref e);
+        //        return;
+        //    }
             
-            var v = e.Items.ToArray();
-            foreach (var item in v)
-            {
-                Node n = item;
-                traverse2(ref n);
-            }
+        //    var v = e.Items.ToArray();
+        //    foreach (var item in v)
+        //    {
+        //        Node n = item;
+        //        traverse2(ref n);
+        //    }
 
-            // if the first item is a leaf, replace the list with it.
-            if (e.Name == "list")
-            {
-                var f = e.Elements().ElementAt(0);
-                if (f.Elements().Count() == 0)
-                {
-                    f.Remove();
-                    foreach (var g in e.Elements())
-                    {
-                        f.Add(g);
-                    }
-                    Node.Replace(ref e, f);
-                    traverse2(ref e);
-                }
-            }
+        //    // if the first item is a leaf, replace the list with it.
+        //    if (e.Name == "list")
+        //    {
+        //        var f = e.Elements().ElementAt(0);
+        //        if (f.Elements().Count() == 0)
+        //        {
+        //            f.Remove();
+        //            foreach (var g in e.Elements())
+        //            {
+        //                f.Add(g);
+        //            }
+        //            Node.Replace(ref e, f);
+        //            traverse2(ref e);
+        //        }
+        //    }
 
-            if (e.Name == "op")
-            {
-                e.Name = e["__id"].Name;
-                e.Remove("__id");
-            }
-        }
+        //    if (e.Name == "op")
+        //    {
+        //        e.Name = e["__id"].Name;
+        //        e.Remove("__id");
+        //    }
+        //}
 
-        void traverse3(Node e)
-        {
-            var v = e.Items.ToArray();
-            foreach (var item in v)
-            {
-                traverse3(item);
-            }
+        //void traverse3(Node e)
+        //{
+        //    var v = e.Items.ToArray();
+        //    foreach (var item in v)
+        //    {
+        //        traverse3(item);
+        //    }
 
-            if (e.IsAttribute && e.Parent.Children.Find(e) != null)
-            {
-                Node p = e.Parent;
-                e.Remove();
-                p.AddAttribute(e);
-            }
-        }
+        //    if (e.IsAttribute && e.Parent.Children.Find(e) != null)
+        //    {
+        //        Node p = e.Parent;
+        //        e.Remove();
+        //        p.AddAttribute(e);
+        //    }
+        //}
 
         protected Tuple<Operator, Node> ParseOperators2(List<Tuple<Operator, Node>> list)
         {
@@ -370,7 +319,7 @@ namespace slp_parser
         protected Tuple<Operator, Node> ParseOperators(List<Tuple<Operator, Node>> list)
         {
             var open = new Stack<Tuple<Operator, Node>>();
-            var root = new Tuple<Operator, Node>(Operator.listop, new Node("list"));
+            var root = new Tuple<Operator, Node>(Operator.listop, new NList());
             open.Push(root);
 
             //      a
@@ -386,6 +335,8 @@ namespace slp_parser
                 while (open.Count > 0)
                 {
                     var a = open.Peek();
+                    NList alist = a.Item2 as NList;
+                    
                     Operator opa = a.Item1;
 
                     if (opa < opb) // can push b under a
@@ -396,23 +347,23 @@ namespace slp_parser
                             if (opc > opb) // can push c under b
                             {
                                 // check a's size
-                                if (!(opa == Operator.listop || opa.Count >= a.Item2.Elements().Count())) goto move_up;
+                                if (!(opa == Operator.listop || opa.Count >= alist.Items.Count())) goto move_up;
 
                                 // remove c from a
                                 c.Item2.Remove();
 
                                 // add c to b
-                                b.Item2.Add(c.Item2);
+                                (b.Item2 as NList).Add(c.Item2);
                             }
                             else
                             {
                                 // Skip c
                                 // check a's size
-                                if (!(opa == Operator.listop || opa.Count > a.Item2.Elements().Count())) goto move_up;
+                                if (!(opa == Operator.listop || opa.Count > alist.Items.Count())) goto move_up;
                             }
                         }
 
-                        a.Item2.Add(b.Item2); // push b under a
+                        alist.Add(b.Item2); // push b under a
                         open.Push(b);
                         break; // take the next b
                     }
@@ -434,18 +385,9 @@ namespace slp_parser
                 var n = m.Get(item);
                 if (n == null) continue;
 
-                if (n.Name == "op")
+                if (n is NOperator)
                 {
-                    var txt = n["__id"].Name;
-                    if (operators.ContainsKey(txt))
-                    {
-                        var op = operators[txt];
-                        list.Add(new Tuple<Operator, Node>(op, n));
-                    }
-                    else
-                    {
-                        throw new Exception("Unknown operator: " + txt);
-                    }
+                     list.Add(new Tuple<Operator, Node>(((NOperator)n).Operator, n));
                 }
                 else
                 {
@@ -465,81 +407,84 @@ namespace slp_parser
 
         public override void ExitToken(slpParser.TokenContext context)
         {
-            string name = "token";
+            string txt = context.GetText();
             string value = context.GetText();
+            Node n = null;
             if (context.FLOAT() != null)
             {
-                name = "flo";
+                n = new NString(txt);
             }
             else if (context.INT() != null)
             {
-                name = "int";
-            }
-            else if (context.OP() != null)
-            {
-                name = "op";
+                n = new NString(txt);
             }
             else if (context.STRING() != null)
             {
-                name = "str";
+                n = new NString(txt);
             }
             else if (context.ID() != null)
             {
-                name = "id";
+                n = new NString(txt);
             }
             else if (context.NEWLINE() != null)
             {
                 return;
             }
+            else if (context.OP() != null)
+            {
+                if (operators.ContainsKey(txt))
+                {
+                    Operator op = operators[txt];
+                    n = new NOperator(op);
+                }
+                else
+                {
+                    throw new Exception("Unknown operator: " + txt);
+                }
+            }
             else if (context.NATIVE() != null)
             {
-                string code = context.NATIVE().GetText();
-                if (code.Length >= 2)
+                if (txt.Length >= 2)
                 {
-                    code = code.Substring(1, code.Length - 2); // remove surrounding { }
+                    txt = txt.Substring(1, txt.Length - 2); // remove surrounding { }
                 }
-                var n = new Node(code);
-                n["type"] = new Node("code");
-                m.Put(context, n);
-                return;
+                n = new NCode(txt);
             }
 
-            Node node = new Node(name);
-            if (context.OP() != null)
-            {
-                node["__id"] = new Node(context.GetText());
-            }
-            else
-            {
-                node.Add(context.GetText());
-            }
-            
-            m.Put(context, node);
+            m.Put(context, n);
         }
 
         public override void ExitBlock(slpParser.BlockContext context)
         {
-            if (context.ChildCount == 3)
-            {
-                m.Put(context, m.Get(context.GetChild(1)));
-            }
-            else
-            {
-                Node node = new Node("block");
-                add(context, node);
-            }
+            m.Put(context, m.Get(context.GetChild(1)));
         }
 
         public override void ExitProgram(slpParser.ProgramContext context)
         {
             program = m.Get(context.exp());
-            traverse0(program);
-            traverse1(program);
-            // traverse0(program);
-            traverse2(ref program);
-            traverse3(program);
+            //traverse0(program);
+            //traverse1(program);
+            //// traverse0(program);
+            //traverse2(ref program);
+            //traverse3(program);
             m.Put(context, program);
         }
+
+        //void traverse0(Node n)
+        //{
+        //    var list = n as NList;
+        //    if (list != null)
+        //    {
+        //        foreach (var item in list.Items)
+        //        {
+        //            traverse0(item);
+        //        }
+
+        //        var first = list.First;
+        //        list.Items.RemoveFirst();
+        //        list.Head = first;
+        //    }
+        //}
 
         //public override void ExitLList([NotNull] slpParser.LListContext context)
         //{

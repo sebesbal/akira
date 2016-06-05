@@ -26,20 +26,20 @@ namespace GUI
 
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            attributes.Items.Clear();
-            var element = (Node)DataContext;
-            codeView.DataContext = null;
-            foreach (var attribute in element.Attributes)
-            {
-                if (attribute.Name == "code")
-                {
-                    codeView.DataContext = attribute;
-                }
-                else
-                {
-                    attributes.Items.Add(attribute);
-                }
-            }
+            //attributes.Items.Clear();
+            //var element = (Node)DataContext;
+            //codeView.DataContext = null;
+            //foreach (var attribute in element.Attributes)
+            //{
+            //    if (attribute.Name == "code")
+            //    {
+            //        codeView.DataContext = attribute;
+            //    }
+            //    else
+            //    {
+            //        attributes.Items.Add(attribute);
+            //    }
+            //}
         }
     }
 }

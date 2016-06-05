@@ -11,236 +11,17 @@ namespace akira
 {
     public class Node
     {
-        public string Name;
-        public Node Parent;
-        public bool IsAttribute;
-        public LinkedList<Node> Attributes = new LinkedList<Node>();
-        public LinkedList<Node> Children = new LinkedList<Node>();
+        public NList Parent;
 
-        public LinkedList<Node> Elements() { return Children; }
-
-        public Node()
+        virtual public Node Clone()
         {
-        }
-
-        public IEnumerable<Node> Items
-        {
-            get
-            {
-                foreach (var item in Attributes)
-                {
-                    yield return item;
-                }
-                foreach (var item in Children)
-                {
-                    yield return item;
-                }
-            }
-        }
-
-        public Node(string name, params Node[] children)
-        {
-            Name = name;
-            foreach (var item in children)
-            {
-                if (item.IsAttribute)
-                {
-                    Attributes.AddLast(item);
-                    item.Parent = this;
-                }
-                else
-                {
-                    Add(item);
-                }
-            }
-        }
-
-        public string Value
-        {
-            get { return First.Name; }
-        }
-
-        public Node First
-        {
-            get { return Children.First.Value; }
-        }
-
-        public Node Next
-        {
-            get
-            {
-                var n = Parent.Children.Find(this).Next;
-                if (n == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    return n.Value;
-                }
-            }
-        }
-
-        public Node this[string name]
-        {
-            get
-            {
-                var n = FindAtttribute(name);
-                if (n == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    if (n.Value.Children.First == null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        return n.Value.Children.First.Value;
-                    }
-                }
-            }
-            set
-            {
-                SetAttribute(name, value);
-            }
-        }
-        
-        protected LinkedListNode<Node> FindAtttribute(string name)
-        {
-            var n = Attributes.First;
-            while (n != null)
-            {
-                if (n.Value.Name == name)
-                {
-                    return n;
-                }
-                n = n.Next;
-            }
             return null;
         }
 
-        public void Add(Node n)
-        {
-            Children.AddLast(n);
-            n.Parent = this;
-        }
-
-        public void AddAttribute(Node n)
-        {
-            Attributes.AddLast(n);
-            n.Parent = this;
-            n.IsAttribute = true;
-        }
-
-        public Node Add(string name)
-        {
-            Node n = new Node(name);
-            Add(n);
-            return n;
-        }
-
-        public Node SetAttribute(string key, Node value)
-        {
-            Node n = new Node(key);
-            n.IsAttribute = true;
-            if (value != null)
-            {
-                n.Add(value);
-            }
-            n.Parent = this;
-            var m = FindAtttribute(key);
-            if (m == null)
-            {
-                Attributes.AddLast(n);
-            }
-            else
-            {
-                m.Value = n;
-            }
-            return n;
-        }
-        
-        public Node Clone()
-        {
-            var node = CloneRec();
-            node.Parent = null;
-            return node;
-        }
-
-        Node CloneRec()
-        {
-            Node result = new Node(Name);
-            result.IsAttribute = IsAttribute;
-            foreach (var item in Children)
-            {
-                result.Add(item.CloneRec());
-            }
-            foreach (var item in Attributes)
-            {
-                result.AddAttribute(item.CloneRec());
-            }
-            return result;
-        }
-
-        public bool Eq(object obj)
-        {
-            Node n = (Node)obj;
-            if (Children.Count != n.Children.Count
-                || Attributes.Count != n.Attributes.Count
-                || ! Name.Equals(n.Name))
-            {
-                return false;
-            }
-
-            var c = Children.First;
-            var nc = n.Children.First;
-            while (c != null)
-            {
-                if (!c.Value.Eq(nc.Value)) return false;
-                c = c.Next;
-                nc = nc.Next;
-            }
-
-            c = Attributes.First;
-            while (c != null)
-            {
-                nc = n.Attributes.First;
-                while (nc != null)
-                {
-                    if (c.Value.Eq(nc.Value))
-                    {
-                        // c is OK
-                        goto nextc;
-                    }
-                }
-                // there is no nc matching c
-                return false;
-
-                nextc: c = c.Next;
-            }
-            return true;
-        }
-
-        public void Clear()
-        {
-            foreach (var item in Children)
-            {
-                item.Parent = null;
-            }
-            Children.Clear();
-        }
-
-        public void Remove(string key)
-        {
-            var n = FindAtttribute(key);
-            if (n != null)
-            {
-                Attributes.Remove(n.Value);
-            }
-        }
+        virtual public bool Match(string s) { return false; }
+        virtual public bool Match(string key, string value) { return false; }
+        virtual public bool Match(string name, int itemCount) { return false; }
+        virtual public bool MatchItemCount(int itemCount) { return false; }
 
         public void Remove()
         {
@@ -250,17 +31,8 @@ namespace akira
             }
             else
             {
-                Parent.Children.Remove(this);
+                Parent.Items.Remove(this);
                 Parent = null;
-            }
-        }
-
-        public void InheritAttributesFrom(Node n)
-        {
-            foreach (var a in n.Attributes)
-            {
-                AddAttribute(a.Clone());
-                // this[a.Name] = a.First;
             }
         }
 
@@ -276,11 +48,10 @@ namespace akira
             }
             else
             {
-                var m = Parent.Children.Find(this);
+                var m = Parent.Items.Find(this);
                 m.Value = n;
                 n.Parent = Parent;
                 Parent = null;
-                n.InheritAttributesFrom(this);
             }
         }
 
@@ -292,93 +63,15 @@ namespace akira
             }
             old = neu;
         }
-
-        public void Insert(ref LinkedListNode<Node> after, Node n)
+        
+        public void Save(string file)
         {
-            after = Children.AddAfter(after, n);
-            n.Parent = this;
-        }
-
-        public bool Match(string key, string value)
-        {
-            var n = this[key];
-            if (n == null)
-            {
-                return false;
-            }
-            else
-            {
-                return n.Name == value;
-            }
-        }
-
-        public bool Match(string key)
-        {
-            var n = FindAtttribute(key);
-            return n != null;
-        }
-
-        public bool IsCode
-        {
-            get { return Match("type", "code"); }
-        }
-
-        public bool IsRef
-        {
-            get { return Name == "$"; }
-        }
-
-        public bool IsLeaf()
-        {
-            return Children.Count == 0;
-        }
-
-        public virtual XElement ToXml()
-        {
-            XElement n;
-            try
-            {
-                n = new XElement(Name);
-            }
-            catch (Exception e)
-            {
-                n = new XElement("node");
-                n.SetAttributeValue("name", Name);
-            }
-
-            foreach (var item in Attributes)
-            {
-                if (item.First.IsLeaf())
-                {
-                    n.SetAttributeValue(item.Name, item.First.Name);
-                }
-                else
-                {
-                    var m = item.ToXml();
-                    m.SetAttributeValue("att", "true");
-                    n.Add(m);
-                }
-            }
-
-            foreach (var item in Children)
-            {
-                n.Add(item.ToXml());
-            }
-
-            return n;
+            File.WriteAllText(file, ToString());
         }
 
         public void SaveToXml(string file)
         {
-            XDocument doc = new XDocument();
-            doc.Add(this.ToXml());
-            doc.Save(file);
-        }
-
-        public void Save(string file)
-        {
-            File.WriteAllText(file, ToString());
-            // File.WriteAllText(file, ToCs());
+            // Skip
         }
 
         public static Node ParseFile(string file)
@@ -388,151 +81,240 @@ namespace akira
             return n;
         }
 
-        protected int Size = 1;
+        public int Size = 1;
 
-        void Measure()
+        public virtual void Measure()
         {
-            Size = 1;
-            foreach (var item in Attributes)
-            {
-                item.Measure();
-                Size += item.Size;
-            }
-            foreach (var item in Children)
-            {
-                item.Measure();
-                Size += item.Size;
-            }
         }
 
         public override string ToString()
         {
             Measure();
             var cb = new CodeBuilder();
-            ToStringRec(cb, false, false);
+            ToStringRec(cb);
             return cb.ToString();
         }
         
-        virtual public void ToStringRec(CodeBuilder cb, bool inline, bool isAttribute)
+        public virtual void ToStringRec(CodeBuilder cb)
         {
-            if (IsAttribute && Name == "type")
-            {
-                return;
-            }
 
-            if (IsRef)
-            {
-                cb.AddLine("$" + Value);
-                return;
-            }
-
-            bool code = IsCode;
-            cb.PushInline(Size <= 2);
-
-            if (code)
-            {
-                cb.PushInline(true);
-                cb.BeginCurly();
-                cb.AddLine(Name);
-                cb.End();
-                cb.PopInline();
-            }
-            else
-            {
-                if (IsAttribute)
-                {
-                    cb.AddLine(Name + ":");
-                }
-                else
-                {
-                    cb.AddLine(Name);
-                }
-            }
-
-            cb.Begin();
-
-            foreach (var item in Attributes)
-            {
-                item.ToStringRec(cb, inline, true);
-            }
-            
-            foreach (var item in Children)
-            {
-                item.ToStringRec(cb, inline, false);
-            }
-
-            cb.End();
-
-        end:
-            cb.PopInline();
         }
 
-        public void InsertChildren()
+        public virtual bool Eq(Node obj)
         {
-            int i = 0;
-            foreach (var item in Children)
-            {
-                Name = Regex.Replace(Name, "\\$" + ++i, item.ToCs());
-            }
-            Clear();
+            return false;
         }
 
-        public string Fos
+        virtual public void ToCsRec(StringBuilder sb)
+        {
+        }
+        
+        public string ToCs()
+        {
+            var sb = new StringBuilder();
+            ToCsRec(sb);
+            return sb.ToString();
+        }
+    }
+
+    public class NList: Node
+    {
+        public LinkedList<Node> Items = new LinkedList<Node>();
+        public Node Head { get { return Items.First.Value; } }
+        public Node Second { get { return Items.First.Next.Value; } }
+        
+        public NList() { }
+        public NList(params Node[] items)
+        {
+            foreach (var item in items)
+            {
+                Add(item);
+            }
+        }
+
+        public IEnumerable<Node> NonHeadItems
         {
             get
             {
-                // if (IsRef)
-                if (Children.Count == 0 && !IsCode)
+                var n = Items.First;
+                n = n.Next;
+                while (n != null)
                 {
-                    return Name;
-                }
-                else
-                {
-                    return ToCs();
+                    yield return n.Value;
+                    n = n.Next;
                 }
             }
         }
 
-        void ToCsRec(StringBuilder sb, int depth = 0)
+        public void Add(Node n)
         {
-            if (IsAttribute)
-            {
-                sb.Append("_a(");
-            }
-            else if (IsCode)
-            {
-                sb.Append("_c(");
-            }
-            else if (IsRef)
-            {
-                //sb.Append("__(" + Value + ".Name)");
-                //sb.Append("__(\" + " + Value + ".ToCs() + \")");
-                //sb.Append(Value);
-                //sb.Append("__(" + Value + ".Fos)");
-                sb.Append("__(" + Value + ")");
-                //sb.Append(Value + ".Clone()");
-                return;
-            }
-            else
-            {
-                sb.Append("__(");
-            }
-            
-            sb.Append("\"" + Name + "\"");
+            Items.AddLast(n);
+            n.Parent = this;
+        }
+
+        override public Node Clone()
+        {
+            NList result = new NList();
             foreach (var item in Items)
             {
-                if (item.IsAttribute && item.Name == "type" && item.Value == "code") continue;
+                result.Add(item.Clone());
+            }
+            return result;
+        }
+
+        override public bool Match(string name, int childCount)
+        {
+            return Head.Match(name) && Items.Count == childCount;
+        }
+
+        override public bool MatchItemCount(int itemCount)
+        {
+            return Items.Count == itemCount;
+        }
+
+        virtual public bool Eq(Node obj)
+        {
+            NList n = (NList)obj;
+            if (Items.Count != n.Items.Count)
+            {
+                return false;
+            }
+
+            var c = Items.First;
+            var nc = n.Items.First;
+            while (c != null)
+            {
+                if (!c.Value.Eq(nc.Value)) return false;
+                c = c.Next;
+                nc = nc.Next;
+            }
+            return true;
+        }
+        
+        public void Insert(ref LinkedListNode<Node> after, Node n)
+        {
+            after = Items.AddAfter(after, n);
+            n.Parent = this;
+        }
+
+        override public bool Match(string key, string value)
+        {
+            foreach (var item in Items)
+            {
+                var p = item as NList;
+                if (p != null
+                    && p.Head.Match(key)
+                    && p.Items.Count == 1
+                    && p.Second.Match(value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool HasString(string str)
+        {
+            foreach (var item in Items)
+            {
+                var s = item as NString;
+                if (s != null && s.Value == str)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        override public void Measure()
+        {
+            Size = 1;
+            foreach (var item in Items)
+            {
+                item.Measure();
+                Size += item.Size;
+            }
+        }
+
+        override public void ToStringRec(CodeBuilder cb)
+        {
+            var item = Items.First;
+            item.Value.ToStringRec(cb);
+            item = item.Next;
+            cb.PushInline(Size <= 2);
+            cb.Begin();
+            while (item != null)
+            {
+                item.Value.ToStringRec(cb);
+                item = item.Next;
+            }
+            cb.End();
+            cb.PopInline();
+        }
+
+        override public void ToCsRec(StringBuilder sb)
+        {
+            sb.Append("_l(");
+            Head.ToCsRec(sb);
+            foreach (var item in NonHeadItems)
+            {
                 sb.Append(", ");
                 item.ToCsRec(sb);
             }
             sb.Append(")");
         }
+    }
 
-        public string ToCs(int depth = 0)
+    public interface IString
+    {
+        string Value { get; set; }
+    }
+
+    public class NString : Node
+    {
+        public NString(string value) { Value = value; }
+        virtual public string Value { get; set; }
+        override public Node Clone() { return new NString(Value); }
+        override public void ToStringRec(CodeBuilder cb) { cb.AddLine(Value); }
+        override public void ToCsRec(StringBuilder cb) { cb.Append("_s(\"" + Value +"\""); }
+        override public bool Match(string s) { return Value == s; }
+    }
+    
+    public class NOperator : NList
+    {
+        public NOperator(slp_parser.Operator op): base(new NString(op.Name)) { Operator = op; }
+        public slp_parser.Operator Operator;
+        // override public Node Clone() { return new NOperator(Operator); }
+    }
+
+    public class NCode : NString
+    {
+        public NCode(string value): base(value) { }
+        override public Node Clone() { return new NCode(Value); }
+        override public void ToStringRec(CodeBuilder cb)
         {
-            var sb = new StringBuilder();
-            ToCsRec(sb, depth);
-            return sb.ToString();
+            cb.PushInline(true);
+            cb.BeginCurly();
+            cb.AddLine(Value);
+            cb.End();
+            cb.PopInline();
         }
+        override public void ToCsRec(StringBuilder cb) { cb.Append("_c(\"" + Value + "\""); }
+        public void InsertChildren()
+        {
+            int i = 0;
+            foreach (var item in Parent.NonHeadItems)
+            {
+                Value = Regex.Replace(Value, "\\$" + ++i, item.ToCs());
+            }
+        }
+    }
+
+    public class NRef : NString
+    {
+        public NRef(string value): base(value) { }
+        override public Node Clone() { return new NRef(Value); }
+        override public void ToStringRec(CodeBuilder cb) { cb.AddLine("$" + Value); }
+        override public void ToCsRec(StringBuilder cb) { cb.Append("__(\"" + Value + "\""); }
     }
 }

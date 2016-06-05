@@ -8,18 +8,24 @@ namespace akira
 {
     public class tocs: Rule
     {
-        public override bool Apply(Context ctx, ref Node node)
+        public override bool Apply(Context ctx, ref Node that)
         {
-            if (node.Match("type", "code") && node.Children.Count > 0)
+            NList list = that as NList;
+            if (list != null)
             {
-                node.InsertChildren();
-                return true;
+                NCode code = list.Head as NCode;
+                if (code != null)
+                {
+                    code.InsertChildren();
+                    code.Remove();
+                    Node.Replace(ref that, code);
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
-
     }
+
+
+
 }
