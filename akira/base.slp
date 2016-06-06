@@ -7,50 +7,10 @@ op 100 fx $
 op 100 yfx + 
 op 50 yfx *
 
-rule
-	# write $a
-	src: write
-	{ Node.Replace(ref that, $1); return true; }
+module basic
+
+	rule
+		# write $a
 		{ Node.Replace(ref that, $1); return true; }
-			$a
-
-rule
-	$a --> $b
-	src: replace
-	write
-		rule
-			$a
-			write $b
-
-rule
-	src: read
-	after:
-	# $a
-	{
-            var list = __("list");
-            list.Add(_c("if (!Match(cur, \"" + a.Name + "\", " + a.Children.Count + ")) return false;"));
-            list.Add(_c("cur = cur.First;"));
-            foreach (var item in a.Children)
-            {
-                list.Add(__("#", __(item)));
-            }
-            list.Add(_c("cur = cur.Parent;"));
-            Node.Replace(ref that, list);
-	}
-
-rule
-	src: debug
-	# a $b c
-	{ Console.WriteLine(b); }
-
-/*
-
-rule
-	test $a $b
-	src: test
-	after:
-	{ Console.WriteLine("a:" + a.ToString() + "b:" + b.ToString()); }
-	{ if (! a.Eq(b)) Console.WriteLine("Test failed!"); }
-	{ return false; }
-
-*/
+			{ Node.Replace(ref that, $1); return true; }
+				$a

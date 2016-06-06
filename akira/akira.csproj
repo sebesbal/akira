@@ -43,13 +43,14 @@
     <None Include="gen\arrow.cs" />
     <None Include="gen\debug.cs" />
     <None Include="gen\question.cs" />
+    <None Include="gen\basic.cs" />
     <Compile Include="gen\read.cs" />
     <None Include="gen\replace.cs" />
     <None Include="gen\test.cs" />
     <None Include="gen\write.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="rules\eval.cs" />
-    <None Include="rules\rule.cs" />
+    <Compile Include="rules\rule.cs" />
     <Compile Include="rules\tocs.cs" />
   </ItemGroup>
   <ItemGroup>

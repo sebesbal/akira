@@ -13,9 +13,16 @@ namespace akira
 {
     class Block
     {
+        public Block()
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                ActiveRules[i] = new Stack<Rule>();
+            }
+        }
         // public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
         public Stack<Rule> DefinedRules = new Stack<Rule>();
-        public Stack<Rule> ActiveRules = new Stack<Rule>();
+        public Stack<Rule>[] ActiveRules = new Stack<Rule>[3];
     }
 
     public class Context
@@ -49,7 +56,7 @@ namespace akira
         }
         public void ActivateRule(Rule r)
         {
-            currentBlock.ActiveRules.Push(r);
+            currentBlock.ActiveRules[r.level].Push(r);
         }
         public System.Collections.Generic.IEnumerable<Rule> DefinedRules()
         {
@@ -61,11 +68,11 @@ namespace akira
                 }
             }
         }
-        public System.Collections.Generic.IEnumerable<Rule> ActiveRules()
+        public System.Collections.Generic.IEnumerable<Rule> ActiveRules(int level)
         {
             foreach (var block in blocks)
             {
-                foreach (var Rule in block.ActiveRules)
+                foreach (var Rule in block.ActiveRules[level])
                 {
                     yield return Rule;
                 }
@@ -86,16 +93,44 @@ namespace akira
             return type != null;
         }
 
-        public void GetType(string name, string code, ref Type type, ref System.Reflection.Assembly assembly)
+        public void SaveCs(string fileName, string code)
         {
-            File.WriteAllText("../akira/gen/" + name + ".cs", code);
+            File.WriteAllText(PathCs(fileName), code);
+        }
+
+        public string LoadCs(string fileName)
+        {
+            return File.ReadAllText(PathCs(fileName));
+        }
+
+        public string PathCs(string fileName)
+        {
+            return "../akira/gen/" + fileName + ".cs";
+        }
+
+        public void LoadRulesFromCs(string fileName)
+        {
+            var ass = AssemblyFromCode(LoadCs(fileName));
+            foreach (var item in ass.GetTypes())
+            {
+                if (item.IsSubclassOf(typeof(Rule)))
+                {
+                    Rule r = (Rule)ass.CreateInstance(item.FullName);
+                    ActivateRule(r);
+                }
+            }
+        }
+
+        public void GetType(string fileName, string code, ref Type type, ref System.Reflection.Assembly assembly)
+        {
+            SaveCs(fileName, code);
             assembly = AssemblyFromCode(code);
             type = assembly.GetTypes()[0];
         }
 
         static int dllCount = 0;
 
-        public static Assembly AssemblyFromCode(string code)
+        public Assembly AssemblyFromCode(string code)
         {
             string dllName = "gen" + dllCount++ + ".dll";
             if (File.Exists(dllName))
@@ -113,7 +148,7 @@ namespace akira
             return assembly;
         }
 
-        public static object InstanceFromCode(string code)
+        public object InstanceFromCode(string code)
         {
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
             var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" });
@@ -155,6 +190,7 @@ namespace akira
 
     public class Rule : exe
     {
+        public int level = 2;
         public string ID;
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
@@ -183,7 +219,13 @@ namespace akira
         public akira()
         {
             ctx.ActivateRule(new tocs());
-            //ctx.ActivateRule(new rule());
+
+            ctx.ActivateRule(new read());
+
+            ctx.ActivateRule(new rule());
+            ctx.ActivateRule(new module());
+            ctx.ActivateRule(new parse());
+
             //ctx.ActivateRule(new misc_atttribute());
             //ctx.ActivateRule(new cs_rule());
             //ctx.ActivateRule(new cs_exe());
@@ -234,36 +276,52 @@ namespace akira
 
         public override bool Apply(Context ctx, ref Node node)
         {
-            begin:
-            if (node == null) return false;
-
-            if (ApplyRules(ctx, ref node))
+            for (int level = 0; level < 3; level++)
             {
-                goto begin;
+                Apply(ctx, ref node, level);
             }
-            
-            var list = node as NList;
-            if (list != null)
-            {
-                var v = list.Items.ToArray();
-                foreach (Node n in v)
-                {
-                    Node m = n;
-                    Apply(ctx, ref m);
-                }
-            }
-
-            if (ApplyRulesAfter(ctx, ref node))
-            {
-                goto begin;
-            }
-            
             return false;
         }
 
-        public bool ApplyRules(Context ctx, ref Node node)
+        public void Apply(Context ctx, ref Node node, int Level)
         {
-            foreach (Rule r in ctx.ActiveRules().ToArray())
+            int level = Level;
+
+            begin:
+            while (level <= Level)
+            // for (int level = 0; level < 3; ++level)
+            {
+                if (node == null) return;
+
+                if (ApplyRules(ctx, ref node, level))
+                {
+                    level = 0;
+                    goto begin;
+                }
+
+                var list = node as NList;
+                if (list != null)
+                {
+                    var v = list.Items.ToArray();
+                    foreach (Node n in v)
+                    {
+                        Node m = n;
+                        Apply(ctx, ref m, level);
+                    }
+                }
+
+                if (ApplyRulesAfter(ctx, ref node, level))
+                {
+                    level = 0;
+                    goto begin;
+                }
+                ++level;
+            }
+        }
+
+        public bool ApplyRules(Context ctx, ref Node node, int level)
+        {
+            foreach (Rule r in ctx.ActiveRules(level).ToArray())
             {
                 if (r.Apply(ctx, ref node))
                 {
@@ -273,9 +331,9 @@ namespace akira
             return false;
         }
 
-        public bool ApplyRulesAfter(Context ctx, ref Node node)
+        public bool ApplyRulesAfter(Context ctx, ref Node node, int level)
         {
-            foreach (Rule r in ctx.ActiveRules().ToArray())
+            foreach (Rule r in ctx.ActiveRules(level).ToArray())
             {
                 if (r.ApplyAfter(ctx, ref node))
                 {

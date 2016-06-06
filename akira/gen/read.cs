@@ -4,6 +4,7 @@ namespace akira
 {
     public class read : Rule
     {
+        public read() { level = 1; }
         public override bool ApplyAfter(Context ctx, ref Node that)
         {
             if (!that.Match("#", 2)) return false;
@@ -14,7 +15,9 @@ namespace akira
 
             if (a is NRef)
             {
-                list.Add(_c("Node " + ((NRef)a).Value + " = cur;"));
+                //list.Add(_c("Node " + ((NRef)a).Value + " = cur;"));
+                Node.Replace(ref that, _c("Node " + ((NRef)a).Value + " = cur;"));
+                return true;
             }
             else if (a is NString)
             {
@@ -33,6 +36,7 @@ namespace akira
                     {
                         list.Add(_c("cur = cur.Next;"));
                     }
+                    item = item.Next;
                 }
                 list.Add(_c("cur = cur.Parent;"));
             }

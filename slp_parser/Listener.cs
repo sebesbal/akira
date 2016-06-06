@@ -462,7 +462,7 @@ namespace slp_parser
         public override void ExitProgram(slpParser.ProgramContext context)
         {
             program = m.Get(context.exp());
-            //traverse0(program);
+            traverse0(program);
             //traverse1(program);
             //// traverse0(program);
             //traverse2(ref program);
@@ -470,21 +470,24 @@ namespace slp_parser
             m.Put(context, program);
         }
 
-        //void traverse0(Node n)
-        //{
-        //    var list = n as NList;
-        //    if (list != null)
-        //    {
-        //        foreach (var item in list.Items)
-        //        {
-        //            traverse0(item);
-        //        }
+        void traverse0(Node n)
+        {
+            var list = n as NList;
+            if (list != null)
+            {
+                foreach (var item in list.Items)
+                {
+                    traverse0(item);
+                }
 
-        //        var first = list.First;
-        //        list.Items.RemoveFirst();
-        //        list.Head = first;
-        //    }
-        //}
+                if (list.Items.Count == 1)
+                {
+                    var h = list.Head;
+                    list.Head.Remove();
+                    list.ReplaceWith(h);
+                }
+            }
+        }
 
         //public override void ExitLList([NotNull] slpParser.LListContext context)
         //{
