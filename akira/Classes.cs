@@ -78,6 +78,18 @@ namespace akira
                 }
             }
         }
+
+        public System.Collections.Generic.IEnumerable<Rule> ActiveRules()
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                foreach (var item in ActiveRules(i))
+                {
+                    yield return item;
+                }
+            }
+        }
+
         public Rule DefinedRule(string id)
         {
             foreach (var rule in DefinedRules())
@@ -239,6 +251,8 @@ namespace akira
             ctx.ActivateRule(new module());
             ctx.ActivateRule(new parse());
 
+            AutoLoadRules();
+
             //ctx.ActivateRule(new misc_atttribute());
             //ctx.ActivateRule(new cs_rule());
             //ctx.ActivateRule(new cs_exe());
@@ -248,6 +262,29 @@ namespace akira
             //ctx.ActivateRule(new cs_run());
             //ctx.ActivateRule(new apply());
             //ctx.ActivateRule(new misc_variables());
+        }
+
+        void AutoLoadRules()
+        {
+            var ass = Assembly.GetCallingAssembly();
+            var activeRules = ctx.ActiveRules().ToList();
+            foreach (var type in ass.GetTypes())
+            {
+                if (type.IsSubclassOf(typeof(Rule)) 
+                    && type.Name != "akira"
+                    && type.Name != "Rule")
+                {
+                    foreach (var item in activeRules)
+                    {
+                        if (item.GetType() == type) goto next_type;
+                    }
+
+                    var rule = (Rule)ass.CreateInstance(type.FullName);
+                    ctx.ActivateRule(rule);
+                    activeRules.Add(rule);
+                }
+                next_type:;
+            }
         }
 
         public void Run(string fileName)

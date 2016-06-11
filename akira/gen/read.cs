@@ -4,8 +4,8 @@ namespace akira
 {
     public class read : Rule
     {
-        public read() { level = 1; }
-        public override bool ApplyAfter(Context ctx, ref Node that)
+        //public read() { level = 2; }
+        public override bool Apply(Context ctx, ref Node that)
         {
             if (!that.Match("read", 2)) return false;
             Node a = ((NList)that).Second;

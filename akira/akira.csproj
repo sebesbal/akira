@@ -40,19 +40,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes.cs" />
-    <None Include="gen\arrow.cs" />
-    <None Include="gen\debug.cs" />
-    <None Include="gen\question.cs" />
     <Compile Include="gen\basic.cs" />
     <Compile Include="gen\read.cs" />
-    <None Include="gen\replace.cs" />
     <None Include="gen\test.cs" />
     <None Include="gen\write.cs" />
     <None Include="gen\samples.cs" />
+    <None Include="gen\tmp.cs" />
+    <Compile Include="misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="rules\eval.cs" />
-    <Compile Include="rules\rule.cs" />
-    <Compile Include="rules\tocs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="base.slp">

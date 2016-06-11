@@ -1,5 +1,5 @@
 ﻿op 15000 fx #
-op 1000 yfxx -->
+op 1100 yfxx -->
 op 500 yf ->
 op 200 yf :
 op 150 xf ?
@@ -8,7 +8,7 @@ op 100 yfx +
 op 50 yfx *
 
 module basic
-
+	// : ignore_gen
 	rule
 		read
 			write $a
@@ -16,7 +16,24 @@ module basic
 			{ Node.Replace(ref that, $1); return true; }
 				$a
 
-module samples
-	sample
-		write alma
+	rule
+		read
+			$a --> $b
+		write
+			rule
+				read $a
+				write $b
+
+	alma --> { korte }
+
+module tmp
+	: ignore_gen
 	
+
+module samples
+	: ignore_gen
+	sample
+		alma --> { korte }
+
+	sample
+		alma
