@@ -10,7 +10,13 @@ op 50 yfx *
 module basic
 
 	rule
-		# write $a
+		read
+			write $a
 		{ Node.Replace(ref that, $1); return true; }
 			{ Node.Replace(ref that, $1); return true; }
 				$a
+
+module samples
+	sample
+		write alma
+	

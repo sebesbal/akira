@@ -111,12 +111,15 @@ namespace akira
         public void LoadRulesFromCs(string fileName)
         {
             var ass = AssemblyFromCode(LoadCs(fileName));
-            foreach (var item in ass.GetTypes())
+            if (ass != null)
             {
-                if (item.IsSubclassOf(typeof(Rule)))
+                foreach (var item in ass.GetTypes())
                 {
-                    Rule r = (Rule)ass.CreateInstance(item.FullName);
-                    ActivateRule(r);
+                    if (item.IsSubclassOf(typeof(Rule)))
+                    {
+                        Rule r = (Rule)ass.CreateInstance(item.FullName);
+                        ActivateRule(r);
+                    }
                 }
             }
         }
@@ -142,10 +145,19 @@ namespace akira
             parameters.GenerateExecutable = false;
 
             CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
-            results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
-            var assembly = results.CompiledAssembly;
-            // results.
-            return assembly;
+
+            if (results.Errors.Count > 0)
+            {
+                Console.Write(code);
+
+                results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+                return null;
+            }
+            else
+            {
+                var assembly = results.CompiledAssembly;
+                return assembly;
+            }
         }
 
         public object InstanceFromCode(string code)
@@ -218,6 +230,7 @@ namespace akira
         Node root;
         public akira()
         {
+            ctx.ActivateRule(new sample());
             ctx.ActivateRule(new tocs());
 
             ctx.ActivateRule(new read());

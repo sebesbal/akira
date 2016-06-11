@@ -52,16 +52,17 @@ namespace akira
     public class module : Rule
     {
         string moduleName;
-        //public override bool Apply(Context ctx, ref Node that)
-        //{
-        //    if (Match(that) && File.Exists(ctx.PathCs(moduleName)))
-        //    {
-        //        ctx.LoadRulesFromCs(moduleName);
-        //        that.Remove();
-        //        that = null;
-        //    }
-        //    return false;
-        //}
+        public override bool Apply(Context ctx, ref Node that)
+        {
+            //if (Match(that) && File.Exists(ctx.PathCs(moduleName)))
+            //{
+            //    ctx.LoadRulesFromCs(moduleName);
+            //    that.Remove();
+            //    that = null;
+            //    return true;
+            //}
+            return false;
+        }
 
         public override bool ApplyAfter(Context ctx, ref Node that)
         {
@@ -114,6 +115,27 @@ namespace akira
             sb.End();
 
             return sb.ToString();
+        }
+    }
+
+    public class sample: Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("sample")) return false;
+            NList list = (NList)node;
+            var code = _c("\n\r\n\r/* Sample input:\n" + node.ToString(1) + "\n\n\tOutput:\n");
+            list.Items.AddAfter(list.Items.First, code);
+            code.Parent = (NList)node;
+            return false;
+        }
+
+        public override bool ApplyAfter(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("sample")) return false;
+            var code = _c("*/");
+            ((NList)node).Add(code);
+            return false;
         }
     }
 }

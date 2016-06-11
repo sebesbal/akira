@@ -12,6 +12,17 @@ namespace akira
     public class Node
     {
         public NList Parent;
+        public Node Next
+        {
+            get
+            {
+                if (Parent == null) return null;
+                var v = Parent.Items.Find(this);
+                v = v.Next;
+                if (v == null) return null;
+                return v.Value;
+            }
+        }
 
         virtual public Node Clone()
         {
@@ -129,6 +140,15 @@ namespace akira
 
         public virtual void Measure()
         {
+        }
+
+        public string ToString(int indent = 0)
+        {
+            Measure();
+            var cb = new CodeBuilder();
+            cb.Indent = indent;
+            ToStringRec(cb);
+            return cb.ToString();
         }
 
         public override string ToString()
