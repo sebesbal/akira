@@ -7,30 +7,23 @@ op 100 fx $
 op 100 yfx + 
 op 50 yfx *
 
-dummy
-
+akira
 
 module tmp
 	: ignore_gen
-	(replace_that $a) -->
-		{ Node.Replace(ref that, $1); return true; } $a
+
 
 module basic2
 	: ignore_gen
-	rule
-		read
-			write $a
-		replace_that
-			replace_that
-				$a
 
-	rule
-		read
-			$a --> $b
-		write
-			rule
-				read $a
-				write $b
+	write $a -->
+		{ Node.Replace(ref that, $1); return true; }
+			$a
+
+	($a --> $b) -->
+		rule
+			read $a
+			write $b
 
 
 module samples

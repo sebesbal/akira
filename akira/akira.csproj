@@ -40,8 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes.cs" />
-    <None Include="gen\basic.cs" />
-    <Compile Include="gen\basic2.cs" />
+    <Compile Include="gen\basic.cs" />
+    <None Include="gen\basic2.cs" />
     <Compile Include="gen\read.cs" />
     <None Include="gen\test.cs" />
     <None Include="gen\write.cs" />

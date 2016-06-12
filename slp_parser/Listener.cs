@@ -296,7 +296,18 @@ namespace slp_parser
 
             foreach (var item in list)
             {
-                if (bb)
+                if (!bb && item.Item1.Precedence > Operator.listop.Precedence)
+                {
+                    if (a.Count > 1)
+                    {
+                        var n = ParseOperators2(a);
+                        a.Clear();
+                        a.Add(n);
+                    }
+                    a.Add(item);
+                    bb = true;
+                }
+                else if (bb)
                 {
                     b.Add(item);
                 }
@@ -304,14 +315,13 @@ namespace slp_parser
                 {
                     a.Add(item);
                 }
-                bb |= item.Item1.Precedence > Operator.listop.Precedence;
+                //bb |= item.Item1.Precedence > Operator.listop.Precedence;
             }
 
             if (b.Count > 0)
             {
                 var n = ParseOperators2(b);
                 a.Add(n);
-                
             }
             return ParseOperators(a);
         }

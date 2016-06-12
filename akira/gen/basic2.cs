@@ -3,7 +3,7 @@ using akira;
 
 namespace akira.basic2
 {
-	public class gen1: Rule
+	public class gen0: Rule
 	{
 		public override bool Apply(Context ctx, ref Node that)
 		{
@@ -14,11 +14,11 @@ namespace akira.basic2
 			cur = cur.Next;
 			Node a = cur;
 			cur = cur.Parent;
-			Node.Replace(ref that, _l(_s("replace_that"), __(a))); return true;
+			Node.Replace(ref that, _l(_c("Node.Replace(ref that, $1); return true;"), __(a))); return true;
 			return false;
 		}
 	}
-	public class gen2: Rule
+	public class gen1: Rule
 	{
 		public override bool Apply(Context ctx, ref Node that)
 		{

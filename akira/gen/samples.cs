@@ -11,7 +11,7 @@ namespace akira.samples
 
 
 	Output:
-	public class gen3: Rule
+	public class gen2: Rule
 	{
 		public override bool Apply(Context ctx, ref Node that)
 		{
@@ -28,5 +28,6 @@ namespace akira.samples
 
 
 	Output:
+	korte
 	*/
 }
