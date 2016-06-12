@@ -91,6 +91,8 @@ tokens { INDENT, DEDENT }
   
 }
 
+
+
 TRUE
     :   'true'
     ;
@@ -127,9 +129,10 @@ CLOSE_BRACE : '>' {opened--;};
 COMMENT
     :   '/*' .*? '*/'    -> channel(HIDDEN) // match anything between /* and */
     ;
-
+		
 LINE_COMMENT
-	:	'//' ~[\r\n]* ( '\r'? '\n' | '\r' )? -> channel(HIDDEN)
+	:	WS* '//' ~[\r\n]* ( '\r'? '\n' | '\r' )? -> channel(HIDDEN)
+	//: '//' ~[\r\n]* ( '\r'? '\n' | '\r' )? -> channel(HIDDEN)
     ;
 
 OP
@@ -143,6 +146,7 @@ NATIVE
 SPACES
  : [ \t]+  -> channel(HIDDEN)
  ;
+ 
 
 // TREE : ':';
 OPEN_PAREN : '(' {opened++;};

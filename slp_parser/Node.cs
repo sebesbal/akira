@@ -42,32 +42,11 @@ namespace akira
             }
         }
 
-        public IEnumerable<Node> Descendants
+        virtual public IEnumerable<Node> Descendants
         {
             get
             {
-                NList list = this as NList;
-
-                if (list != null)
-                {
-                    foreach (var item in list.Items)
-                    {
-                        yield return item;
-                        foreach (var desc in item.Descendants)
-                        {
-                            yield return desc;
-                        }
-                    }
-                }
-
-                //foreach (var item in Items)
-                //{
-                //    yield return item;
-                //    foreach (var desc in item.Descendants)
-                //    {
-                //        yield return desc;
-                //    }
-                //}
+                yield break;
             }
         }
 
@@ -77,6 +56,8 @@ namespace akira
         virtual public bool Match(string key, string value) { return false; }
         virtual public bool Match(string name, int itemCount) { return false; }
         virtual public bool MatchItemCount(int itemCount) { return false; }
+        virtual public NAttribute FindAttribute(string name) { return null; }
+        virtual public NString FindString(string name) { return null; }
 
         public void Remove()
         {
@@ -209,21 +190,47 @@ namespace akira
                 }
             }
         }
-        //override public IEnumerable<Node> Descendants
-        //{
-        //    get
-        //    {
-        //        foreach (var item in Items)
-        //        {
-        //            yield return item;
-        //            foreach (var desc in item.Descendants)
-        //            {
-        //                yield return desc;
-        //            }
-        //        }
-        //    }
-        //}
 
+        override public IEnumerable<Node> Descendants
+        {
+            get
+            {
+                foreach (var item in Items)
+                {
+                    yield return item;
+                    foreach (var desc in item.Descendants)
+                    {
+                        yield return desc;
+                    }
+                }
+            }
+        }
+
+        public override NAttribute FindAttribute(string name)
+        {
+            foreach (var item in Items)
+            {
+                NAttribute att = item as NAttribute;
+                if (att != null)
+                {
+                    if (att.MatchHead(name)) return att;
+                }
+            }
+            return null;
+        }
+
+        public override NString FindString(string name)
+        {
+            foreach (var item in Items)
+            {
+                NString s = item as NString;
+                if (s != null)
+                {
+                    if (s.Match(name)) return s;
+                }
+            }
+            return null;
+        }
 
         public void Add(Node n)
         {
@@ -251,7 +258,7 @@ namespace akira
             return Items.Count == itemCount;
         }
 
-        virtual public bool Eq(Node obj)
+        override public bool Eq(Node obj)
         {
             NList n = (NList)obj;
             if (Items.Count != n.Items.Count)
@@ -376,7 +383,12 @@ namespace akira
         override public void ToCsRec(StringBuilder cb) { cb.Append("_s(\"" + Value +"\")"); }
         override public bool Match(string s) { return Value == s; }
     }
-    
+
+    public class NAttribute: NList
+    {
+
+    }
+
     public class NOperator : NList
     {
         public NOperator(slp_parser.Operator op): base(new NString(op.Name)) { Operator = op; }

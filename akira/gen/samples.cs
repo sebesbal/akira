@@ -28,6 +28,5 @@ namespace akira.samples
 
 
 	Output:
-	korte
 	*/
 }

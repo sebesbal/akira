@@ -339,7 +339,8 @@ namespace slp_parser
                     
                     Operator opa = a.Item1;
 
-                    if (opa < opb) // can push b under a
+                    if (a == root || opa < opb) // can push b under a
+                    //if (opa < opb) // can push b under a
                     {
                         if (c != null)
                         {
@@ -456,7 +457,19 @@ namespace slp_parser
 
         public override void ExitBlock(slpParser.BlockContext context)
         {
-            m.Put(context, m.Get(context.GetChild(1)));
+            Node n = m.Get(context.GetChild(1));
+            if (n == null)
+            {
+                m.Put(context, n);
+            }
+            else
+            {
+                var op = new NOperator(Operator.nullop);
+                op.Add(n);
+                m.Put(context, op);
+            }
+
+            //m.Put(context, m.Get(context.GetChild(1)));
         }
 
         public override void ExitProgram(slpParser.ProgramContext context)
@@ -466,7 +479,7 @@ namespace slp_parser
             //traverse1(program);
             //// traverse0(program);
             //traverse2(ref program);
-            //traverse3(program);
+            //traverse3(program); 
             m.Put(context, program);
         }
 
@@ -486,6 +499,19 @@ namespace slp_parser
                     list.Head.Remove();
                     list.ReplaceWith(h);
                 }
+                else
+                {
+                    NOperator op = list as NOperator;
+                    if (op != null && op.Operator == Operator.nullop)
+                    {
+                        var h = list.Second;
+                        list.Head.Remove();
+                        h.Remove();
+                        list.ReplaceWith(h);
+                    }
+                }
+
+
             }
         }
 
