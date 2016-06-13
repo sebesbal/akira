@@ -98,64 +98,69 @@ namespace akira
                     Node.Replace(ref that, att);
                     return true;
                 }
+                else if (list.Head.Match("module"))
+                {
+                    NModule module = new NModule();
+                    Node n = list.Head;
+                    Node.Replace(ref n, module);
+                    return true;
+                }
             }
             return false;
         }
     }
 
-    public class module : Rule
+    public class import : Rule
     {
-        string moduleName;
         public override bool Apply(Context ctx, ref Node that)
         {
-            if (Match(that))
+            if (that.MatchHead("import"))
             {
-                if (that.FindAttribute("ignore_gen") == null
-                    && File.Exists(ctx.PathCs(moduleName)))
-                {
-                    // load the cs file if it's existing and we don't want to ignore it.
-                    ctx.LoadRulesFromCs(moduleName);
-
-                    if (that.FindAttribute("rewrite_gen") == null)
-                    {
-                        // remove the rule if we don't want to rebuild it.
-                        that.Remove();
-                        that = null;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public override bool ApplyAfter(Context ctx, ref Node that)
-        {
-            if (Match(that))
-            {
-                var code = GenerateCode(ctx, that);
-                ctx.SaveCs(moduleName, code);
-                ctx.LoadRulesFromCs(moduleName);
+                ctx.Import(((NString)((NList)that).Second).Value);
+                that.Remove();
                 that = null;
                 return true;
             }
             return false;
         }
+    }
 
-        bool Match(Node that)
+    public class NModule: NActiveNode
+    {
+        string moduleName, path, dir;
+
+        public override bool Apply(Context ctx, ref Node node)
         {
-            NList list = that as NList;
-            if (list != null)
+            if (State >= NActiveNodeState.Applied) return false;
+            State = NActiveNodeState.Applied;
+
+            var id = node.FindAttribute("id");
+            if (id == null)
             {
-                var item = list.Items.First;
-                if (!item.Value.Match("module")) return false;
-                var str = item.Next.Value as NString;
-                if (str == null) return false;
-                moduleName = str.Value;
-                return true;
+                moduleName = ctx.GenName();
+                dir = ctx.DirGen;
             }
-            return false;
+            else
+            {
+                moduleName = (id.Second as NString).Value;
+                dir = ctx.DirWorking;
+                ctx.ImportBase(moduleName);
+            }
+            path = Path.Combine(dir, moduleName + ".cs");
+            return true;
         }
 
+        public override bool ApplyAfter(Context ctx, ref Node that)
+        {
+            if (State == NActiveNodeState.AppliedAfter) return false;
+            State = NActiveNodeState.AppliedAfter;
+
+            var code = GenerateCode(ctx, that);
+            ctx.SaveCs(path, code);
+            ctx.LoadRulesFromCs(path);
+            return true;
+        }
+        
         protected string GenerateCode(Context ctx, Node node)
         {
             bool after = node.Match("after");

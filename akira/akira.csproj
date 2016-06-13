@@ -39,21 +39,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="base\basic.cs" />
+    <Compile Include="base\read.cs" />
     <Compile Include="Classes.cs" />
-    <Compile Include="gen\basic.cs" />
-    <None Include="gen\basic2.cs" />
-    <Compile Include="gen\read.cs" />
-    <None Include="gen\test.cs" />
-    <None Include="gen\write.cs" />
-    <None Include="gen\samples.cs" />
-    <Compile Include="gen\tmp.cs" />
     <Compile Include="misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="tmp\basic.aki" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="base.slp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="base\basic.aki" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

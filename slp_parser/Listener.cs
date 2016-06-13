@@ -41,7 +41,7 @@ namespace slp_parser
         public Associativity _Associativity;
         public Associativity Associativity
         {
-            get { return Associativity; }
+            get { return _Associativity; }
             set
             {
                 _Associativity = value;
@@ -171,15 +171,9 @@ namespace slp_parser
         }
     }
 
-    class NodeData
-    {
-        public Operator Operator;
-    }
-
     class Listener: slpBaseListener
     {
         public Dictionary<string, Operator> operators = new Dictionary<string, Operator>();
-        public Dictionary<Node, NodeData> nodeData = new Dictionary<Node, NodeData>();
         Antlr4.Runtime.Tree.ParseTreeProperty<Node> m = new Antlr4.Runtime.Tree.ParseTreeProperty<Node>();
         public Node program;
 
@@ -187,6 +181,18 @@ namespace slp_parser
         {
             Operator op = Operator.listop;
             operators.Add(op.Name, op);
+            
+            Action<string, int, Associativity> f = (string s, int precedence, Associativity ass) =>
+            {
+                Operator o = new Operator();
+                o.Name = s;
+                o.Associativity = ass;
+                o.Precedence = precedence;
+                operators.Add(s, o);
+            };
+            f("-->", 11000, Associativity.yfxx);
+            f(":", 200, Associativity.yf);
+            f("$", 100, Associativity.fx);
         }
 
         //public void EnterEveryRule(Antlr4.Runtime.ParserRuleContext ctx)

@@ -1,0 +1,14 @@
+﻿module
+: id basic
+
+import read
+
+module
+	write $a -->
+		{ Node.Replace(ref that, $1); return true; } 
+			$a
+
+($a --> $b) -->
+	rule
+		read $a
+		write $b

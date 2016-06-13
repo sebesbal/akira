@@ -38,16 +38,20 @@ namespace test2
 
         static public void test_5()
         {
-            var n = Node.ParseFile("base.slp");
+            var n = Node.ParseFile("../akira/tmp/basic.aki");
             n.Save("pretty.slp");
+        }
+
+        static public void test_6()
+        {
             akira.akira a = new akira.akira();
-            a.Run(n);
+            a.Compile("../akira/tmp/basic.aki");
             a.Save("result.slp");
         }
 
         static void Main(string[] args)
         {
-            test_5();
+            test_6();
         }
     }
 }

@@ -105,14 +105,25 @@ namespace akira
             return type != null;
         }
 
-        public void SaveCs(string fileName, string code)
+        public void SaveCs(string filePath, string code)
         {
-            File.WriteAllText(PathCs(fileName), code);
+            //File.WriteAllText(PathCs(fileName), code);
+            File.WriteAllText(filePath, code);
         }
 
-        public string LoadCs(string fileName)
+        public string DirWorking;
+
+        public string DirGen { get { return "../akira/gen/"; } }
+
+        public string DirBase = "../akira/base";
+
+        public string DirTmp = "../akira/tmp";
+
+        public string DirTrash = "../akira/trash";
+
+        public string LoadCs(string filePath)
         {
-            return File.ReadAllText(PathCs(fileName));
+            return File.ReadAllText(filePath);
         }
 
         public string PathCs(string fileName)
@@ -120,10 +131,38 @@ namespace akira
             return "../akira/gen/" + fileName + ".cs";
         }
 
+        public void ImportBase(string name)
+        {
+            string path = Path.Combine(DirBase, name + ".cs");
+            if (File.Exists(path))
+            {
+                LoadRulesFromCs(path);
+            }
+        }
+
+        public void Import(string name)
+        {
+            string path = Path.Combine(DirBase, name + ".cs");
+            if (File.Exists(path))
+            {
+                LoadRulesFromCs(path);
+            }
+            path = Path.Combine(DirTmp, name + ".cs");
+            if (File.Exists(path))
+            {
+                LoadRulesFromCs(path);
+            }
+        }
+
         public void LoadRulesFromCs(string fileName)
         {
             var ass = AssemblyFromCode(LoadCs(fileName));
-            if (ass != null)
+            if (ass == null)
+            {
+                string name = Path.GetFileNameWithoutExtension(fileName);
+                File.Move(fileName, Path.Combine(DirTrash, name + ".cs"));
+            }
+            else
             {
                 foreach (var item in ass.GetTypes())
                 {
@@ -234,6 +273,20 @@ namespace akira
         public static NCode _c(string str) { return new NCode(str); }
     }
 
+    public enum NActiveNodeState
+    {
+        None,
+        Applied,
+        AppliedAfter
+    }
+    public class NActiveNode : Node
+    {
+        public int level = 2;
+        public virtual bool Apply(Context ctx, ref Node node) { return false; }
+        public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
+        public NActiveNodeState State;
+    }
+
     public class akira : Rule
     {
         // List<Rule> Rules = new List<Rule>();
@@ -248,7 +301,6 @@ namespace akira
             ctx.ActivateRule(new read());
 
             ctx.ActivateRule(new rule());
-            ctx.ActivateRule(new module());
             ctx.ActivateRule(new parse());
 
             AutoLoadRules();
@@ -289,6 +341,13 @@ namespace akira
 
         public void Run(string fileName)
         {
+            Run(Node.ParseFile(fileName));
+        }
+
+        public void Compile(string fileName)
+        {
+            FileInfo info = new FileInfo(fileName);
+            ctx.DirWorking = info.DirectoryName;
             Run(Node.ParseFile(fileName));
         }
 
@@ -371,6 +430,15 @@ namespace akira
 
         public bool ApplyRules(Context ctx, ref Node node, int level)
         {
+            if (node is NList)
+            {
+                var h = ((NList)node).Head as NActiveNode;
+                if (h != null && h.level == level)
+                {
+                    h.Apply(ctx, ref node);
+                }
+            }
+
             foreach (Rule r in ctx.ActiveRules(level).ToArray())
             {
                 if (r.Apply(ctx, ref node))
@@ -383,6 +451,15 @@ namespace akira
 
         public bool ApplyRulesAfter(Context ctx, ref Node node, int level)
         {
+            if (node is NList)
+            {
+                var h = ((NList)node).Head as NActiveNode;
+                if (h != null && h.level == level)
+                {
+                    h.ApplyAfter(ctx, ref node);
+                }
+            }
+
             foreach (Rule r in ctx.ActiveRules(level).ToArray())
             {
                 if (r.ApplyAfter(ctx, ref node))
