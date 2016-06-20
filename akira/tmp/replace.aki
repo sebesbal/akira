@@ -1,0 +1,7 @@
+﻿import read
+import basic
+
+($a --> $b) -->
+	rule
+		read $a
+		write $b

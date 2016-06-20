@@ -127,7 +127,8 @@ namespace akira
 
     public class NModule: NActiveNode
     {
-        string moduleName, path, dir;
+        public string moduleName, pathCs;
+        public int folder;
 
         public override bool Apply(Context ctx, ref Node node)
         {
@@ -138,15 +139,27 @@ namespace akira
             if (id == null)
             {
                 moduleName = ctx.GenName();
-                dir = ctx.DirGen;
+                throw new Exception("Module must have id!");
             }
             else
             {
                 moduleName = (id.Second as NString).Value;
-                dir = ctx.DirWorking;
-                ctx.ImportBase(moduleName);
+                folder = ctx.DirWorking;
+                ctx.ImportDll(moduleName);
             }
-            path = Path.Combine(dir, moduleName + ".cs");
+
+            pathCs = ctx.GetPath(folder, moduleName, "cs");// Path.Combine(dir, moduleName + ".cs");
+            var path = ctx.GetPath(folder, moduleName, "aki");
+
+            var fileCs = new FileInfo(pathCs);
+            var fileAki = new FileInfo(path);
+            if (fileCs.Exists && fileCs.LastWriteTime > fileAki.LastWriteTime)
+            {
+                // cs is newer than aki
+                node.Remove();
+                node = null;
+            }
+
             return true;
         }
 
@@ -155,9 +168,17 @@ namespace akira
             if (State == NActiveNodeState.AppliedAfter) return false;
             State = NActiveNodeState.AppliedAfter;
 
+
+
             var code = GenerateCode(ctx, that);
-            ctx.SaveCs(path, code);
-            ctx.LoadRulesFromCs(path);
+            ctx.SaveCs(pathCs, code);
+            // ctx.LoadRulesFromCs(pathCs);
+            string pathDll;
+            var ass = ctx.CompileCs(pathCs, out pathDll);
+            if (ass != null)
+            {
+                ctx.LoadRulesFromAss(ass);
+            }
             return true;
         }
         

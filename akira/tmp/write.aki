@@ -1,0 +1,6 @@
+import read
+import basic
+
+write $a -->
+	{ Node.Replace(ref that, $1); return true; } 
+		$a

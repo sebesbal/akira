@@ -30,6 +30,10 @@ namespace akira
         //public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
         public Context()
         {
+            Folders.Add("../akira/tmp");
+            Folders.Add("../akira/base");
+            BaseFolder[0] = 1;
+            BaseFolder[1] = -1;
             PushBlock();
         }
         private Stack<Block> blocks = new Stack<Block>();
@@ -111,7 +115,7 @@ namespace akira
             File.WriteAllText(filePath, code);
         }
 
-        public string DirWorking;
+        public int DirWorking;
 
         public string DirGen { get { return "../akira/gen/"; } }
 
@@ -131,32 +135,159 @@ namespace akira
             return "../akira/gen/" + fileName + ".cs";
         }
 
-        public void ImportBase(string name)
+        public List<string> Folders = new List<string>();
+        public Dictionary<int, int> BaseFolder = new Dictionary<int, int>();
+
+        ///// <summary>
+        ///// Import dll if it extists. (skip otherwise)
+        ///// </summary>
+        //public void ImportDll(string name)
+        //{
+        //    var fileDll = new FileInfo(Path.Combine(DirBase, name + ".dll"));
+        //    if (fileDll.Exists)
+        //    {
+        //        LoadRulesFromDll(fileDll.FullName);
+        //    }
+        //}
+
+        public void Import(string name, int folder = 0)
         {
-            string path = Path.Combine(DirBase, name + ".cs");
-            if (File.Exists(path))
+            while (folder < Folders.Count)
             {
-                LoadRulesFromCs(path);
+                var fileDll = new FileInfo(GetPath(folder, name, "dll"));
+                var fileCs = new FileInfo(GetPath(folder, name, "cs"));
+                var fileAki = new FileInfo(GetPath(folder, name, "aki"));
+
+                if (!fileCs.Exists && !fileAki.Exists)
+                {
+                    ++folder;
+                    continue;
+                }
+
+                DateTime dateDll = fileDll.Exists ? fileDll.LastWriteTime : DateTime.MinValue;
+                DateTime dateCs = fileCs.Exists ? fileCs.LastWriteTime : DateTime.MinValue;
+                DateTime dateAki = fileAki.Exists ? fileAki.LastWriteTime : DateTime.MinValue;
+
+                var date = new[] { dateDll, dateCs, dateAki }.Max();
+
+                if (date.Equals(dateDll))
+                {
+                    var ass = Assembly.LoadFrom(fileDll.FullName);
+                    if (ass != null)
+                    {
+                        LoadRulesFromAss(ass);
+                    }
+                    return;
+                }
+                else if (date.Equals(dateCs))
+                {
+                    string dllPath;
+                    var ass = CompileCs(fileCs.FullName, out dllPath);
+                    if (ass != null)
+                    {
+                        LoadRulesFromAss(ass);
+                    }
+                    return;
+                }
+                else if (date.Equals(dateAki))
+                {
+                    var a = new akira();
+                    string csPath = a.CompileModule(name, folder);
+                    string dllPath;
+                    var ass = CompileCs(csPath, out dllPath);
+                    if (ass != null)
+                    {
+                        LoadRulesFromAss(ass);
+                    }
+                    return;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Compiles Cs to Dll, and returns the Dll file's path
+        /// </summary>
+        public Assembly CompileCs(string csPath, out string dllPath)
+        {
+            var name = Path.GetFileNameWithoutExtension(csPath);
+            dllPath = Path.Combine(Path.GetDirectoryName(csPath), name + ".dll");
+            
+            if (File.Exists(dllPath))
+            {
+                File.Delete(dllPath);
+            }
+            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, dllPath, true);
+            parameters.GenerateExecutable = false;
+
+            CompilerResults results = csc.CompileAssemblyFromFile(parameters, csPath);
+
+            if (results.Errors.Count > 0)
+            {
+                results.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+                return null;
+            }
+            else
+            {
+                var assembly = results.CompiledAssembly;
+                return assembly;
             }
         }
 
-        public void Import(string name)
+        public string GetPath(int folder, string name, string extension)
         {
-            string path = Path.Combine(DirBase, name + ".cs");
-            if (File.Exists(path))
+            return Path.Combine(Folders[folder], name + "." + extension);
+        }
+
+        public void ImportDll(string name, int folder = 0)
+        {
+            while (folder < Folders.Count)
             {
-                LoadRulesFromCs(path);
+                var path = GetPath(folder, name, "dll");
+                if (File.Exists(path))
+                {
+                    var ass = Assembly.LoadFrom(path);
+                    LoadRulesFromAss(ass);
+                    return;
+                }
+                ++folder;
             }
-            path = Path.Combine(DirTmp, name + ".cs");
-            if (File.Exists(path))
+        }
+
+        public void Compile(int folder, string name)
+        {
+
+        }
+
+        public void LoadRulesFromAss(Assembly ass)
+        {
+            foreach (var item in ass.GetTypes())
             {
-                LoadRulesFromCs(path);
+                if (item.IsSubclassOf(typeof(Rule)))
+                {
+                    Rule r = (Rule)ass.CreateInstance(item.FullName);
+                    ActivateRule(r);
+                }
+            }
+        }
+
+        public void LoadRulesFromDll(string fileName)
+        {
+            var ass = Assembly.Load(fileName);
+            if (ass == null)
+            {
+                throw new Exception("Can't load dll: " + fileName);
+            }
+            else
+            {
+                LoadRulesFromAss(ass);
             }
         }
 
         public void LoadRulesFromCs(string fileName)
         {
             var ass = AssemblyFromCode(LoadCs(fileName));
+
             if (ass == null)
             {
                 string name = Path.GetFileNameWithoutExtension(fileName);
@@ -164,14 +295,7 @@ namespace akira
             }
             else
             {
-                foreach (var item in ass.GetTypes())
-                {
-                    if (item.IsSubclassOf(typeof(Rule)))
-                    {
-                        Rule r = (Rule)ass.CreateInstance(item.FullName);
-                        ActivateRule(r);
-                    }
-                }
+                LoadRulesFromAss(ass);
             }
         }
 
@@ -290,9 +414,9 @@ namespace akira
     public class akira : Rule
     {
         // List<Rule> Rules = new List<Rule>();
-        Context ctx = new Context();
+        public Context ctx = new Context();
         public XDocument doc { get; protected set; }
-        Node root;
+        public Node root;
         public akira()
         {
             ctx.ActivateRule(new sample());
@@ -344,11 +468,37 @@ namespace akira
             Run(Node.ParseFile(fileName));
         }
 
-        public void Compile(string fileName)
+        public static Node ParseModule(string file)
         {
-            FileInfo info = new FileInfo(fileName);
-            ctx.DirWorking = info.DirectoryName;
-            Run(Node.ParseFile(fileName));
+            string name = Path.GetFileNameWithoutExtension(file);
+            string code = File.ReadAllText(file);
+            Node n = AkiraParser.Parse(code);
+            NList list = n as NList;
+            if (list == null)
+            {
+                list = _l(n);
+            }
+
+            list.AddFirst(_l(_s(":"), _s("id"), _s(name)));
+            list.AddFirst(_s("module"));
+
+            return list;
+        }
+
+
+        public string CompileModule(string name, int folder)
+        {
+            ctx.DirWorking = folder;
+            Run(ParseModule(ctx.GetPath(folder, name, "aki")));
+            if (root != null)
+            {
+                NModule module = ((NList)root).Head as NModule;
+                return module.pathCs;
+            }
+            else
+            {
+                return "";
+            }
         }
 
         public void Run(Node node)
@@ -435,7 +585,10 @@ namespace akira
                 var h = ((NList)node).Head as NActiveNode;
                 if (h != null && h.level == level)
                 {
-                    h.Apply(ctx, ref node);
+                    if (h.Apply(ctx, ref node))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -456,7 +609,10 @@ namespace akira
                 var h = ((NList)node).Head as NActiveNode;
                 if (h != null && h.level == level)
                 {
-                    h.ApplyAfter(ctx, ref node);
+                    if (h.ApplyAfter(ctx, ref node))
+                    {
+                        return true;
+                    }
                 }
             }
 

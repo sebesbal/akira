@@ -52,6 +52,7 @@ namespace akira
 
         virtual public bool Match(string s) { return false; }
         virtual public bool MatchHead(string s) { return false; }
+        virtual public bool MatchHead(Type t) { return false; }
         virtual public bool MatchPair(string key, ref string value) { return false; }
         virtual public bool Match(string key, string value) { return false; }
         virtual public bool Match(string name, int itemCount) { return false; }
@@ -238,6 +239,12 @@ namespace akira
             n.Parent = this;
         }
 
+        public void AddFirst(Node n)
+        {
+            Items.AddFirst(n);
+            n.Parent = this;
+        }
+
         override public Node Clone()
         {
             NList result = new NList();
@@ -304,6 +311,11 @@ namespace akira
         override public bool MatchHead(string s)
         {
             return Head.Match(s);
+        }
+
+        override public bool MatchHead(Type t)
+        {
+            return Head.GetType().IsSubclassOf(t);
         }
 
         override public bool MatchPair(string key, ref string value)
