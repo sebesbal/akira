@@ -1,6 +1,13 @@
 ﻿module
 : id basic
 
+search
+	"../base"
+
+include
+	lofusz
+	lofusz2
+
 import read
 
 module

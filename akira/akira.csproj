@@ -45,6 +45,8 @@
     <Compile Include="misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="tmp\basic.aki" />
+    <None Include="tmp\lofusz2.aki" />
+    <None Include="base\lofusz.aki" />
   </ItemGroup>
   <ItemGroup>
     <None Include="base\basic.aki" />

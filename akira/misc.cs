@@ -207,4 +207,62 @@ namespace akira
             return false;
         }
     }
+
+    public class include: Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("include")) return false;
+            NList list = (NList)node;
+            NList newList = new NList();
+            foreach (var item in list.NonHeadItems)
+            {
+                var module = item as NString;
+                var file = ctx.FindFile(module.Value + ".aki");
+                if (file != null)
+                {
+                    var n = Node.ParseFile(file.FullName);
+                    newList.Add(n);
+                }
+            }
+            Node.ReplaceList(ref node, newList);
+            return true;
+        }
+    }
+
+    public class compile : Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("compile")) return false;
+            NList list = (NList)node;
+            foreach (var item in list.NonHeadItems)
+            {
+                var module = item as NString;
+                var file = ctx.FindModule(module.Value);
+                if (file != null && file.Extension == ".aki")
+                {
+                    akira.Compile(file.FullName);
+                }
+            }
+            node.Remove();
+            node = null;
+            return true;
+        }
+    }
+
+    public class search : Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("search")) return false;
+            NList list = (NList)node;
+            foreach (var item in list.NonHeadItems)
+            {
+                var path = item as NString;
+                ctx.AddSearchPath(path.Value);
+            }
+            return false;
+        }
+    }
 }

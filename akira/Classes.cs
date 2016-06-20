@@ -34,6 +34,16 @@ namespace akira
         }
         private Stack<Block> blocks = new Stack<Block>();
         private Block currentBlock;
+
+        protected List<string> searchPaths = new List<string>();
+
+        public void AddSearchPath(string path)
+        {
+            path = Path.Combine(DirWorking, path);
+            searchPaths.Remove(path);
+            searchPaths.Insert(0, path);
+        }
+
         public string GenName()
         {
             return "gen" + nameCount++;
@@ -58,6 +68,70 @@ namespace akira
         {
             currentBlock.ActiveRules[r.level].Push(r);
         }
+
+        public FileInfo FindModule(string name, string folder = "")
+        {
+            if (folder == "")
+            {
+                foreach (var path in searchPaths)
+                {
+                    FileInfo result = FindModule(name, path);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                DateTime dt = DateTime.MinValue;
+                FileInfo result = null;
+                var dir = new DirectoryInfo(folder);
+                foreach (var file in dir.GetFiles())
+                {
+                    if (Path.GetFileNameWithoutExtension(file.Name) == name
+                        && file.LastWriteTime > dt)
+                    {
+                        result = file;
+                        dt = file.LastWriteTime;
+                    }
+                }
+                return result;
+            }
+        }
+
+        public FileInfo FindFile(string fileName, string folder = "")
+        {
+            if (folder == "")
+            {
+                foreach (var path in searchPaths)
+                {
+                    FileInfo result = FindFile(fileName, path);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                DateTime dt = DateTime.MinValue;
+                FileInfo result = null;
+                var dir = new DirectoryInfo(folder);
+                foreach (var file in dir.GetFiles())
+                {
+                    if (file.Name == fileName && file.LastWriteTime > dt)
+                    {
+                        result = file;
+                        dt = file.LastWriteTime;
+                    }
+                }
+                return result;
+            }
+        }
+        
         public System.Collections.Generic.IEnumerable<Rule> DefinedRules()
         {
             foreach (var block in blocks)
@@ -153,6 +227,17 @@ namespace akira
                 LoadRulesFromCs(path);
             }
         }
+
+        //public void Import(string name)
+        //{
+        //    name = name + ".dll";
+        //    var file = FindFile(name);
+        //    if (file == null)
+        //    {
+        //        throw new Exception("Module not found: ");
+        //    }
+        //    var ass = Assembly.LoadFrom(file.FullName);
+        //}
 
         public void LoadRulesFromCs(string fileName)
         {
@@ -344,11 +429,22 @@ namespace akira
             Run(Node.ParseFile(fileName));
         }
 
-        public void Compile(string fileName)
+        //public void Compile(string fileName)
+        //{
+        //    FileInfo info = new FileInfo(fileName);
+        //    ctx.DirWorking = info.DirectoryName;
+        //    ctx.AddSearchPath(ctx.DirWorking);
+        //    Run(Node.ParseFile(fileName));
+        //}
+
+        public static akira Compile(string fileName)
         {
+            akira a = new akira();
             FileInfo info = new FileInfo(fileName);
-            ctx.DirWorking = info.DirectoryName;
-            Run(Node.ParseFile(fileName));
+            a.ctx.DirWorking = info.DirectoryName;
+            a.ctx.AddSearchPath("");
+            a.Run(Node.ParseFile(fileName));
+            return a;
         }
 
         public void Run(Node node)

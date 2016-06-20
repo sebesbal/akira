@@ -91,6 +91,31 @@ namespace akira
             }
         }
 
+        public void ReplaceWithList(NList n)
+        {
+            if (Parent == null)
+            {
+                throw new Exception("Parent == null!");
+            }
+            else if (n.Parent != null)
+            {
+                throw new Exception("n.Parent must be null!");
+            }
+            else
+            {
+                var m = Parent.Items.Find(this);
+                var o = m;
+                foreach (var item in n.Items)
+                {
+                    Parent.Items.AddAfter(m, item);
+                    item.Parent = Parent;
+                    m = m.Next;
+                }
+                Parent.Items.Remove(o);
+                Parent = null;
+            }
+        }
+
         public static void Replace(ref Node old, Node neu)
         {
             if (old.Parent != null)
@@ -98,6 +123,15 @@ namespace akira
                 old.ReplaceWith(neu);
             }
             old = neu;
+        }
+
+        public static void ReplaceList(ref Node old, NList list)
+        {
+            if (old.Parent != null)
+            {
+                old.ReplaceWithList(list);
+            }
+            old = list.Head;
         }
         
         public void Save(string file)

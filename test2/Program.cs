@@ -44,8 +44,7 @@ namespace test2
 
         static public void test_6()
         {
-            akira.akira a = new akira.akira();
-            a.Compile("../akira/tmp/basic.aki");
+            var a = akira.akira.Compile("../akira/tmp/basic.aki");
             a.Save("result.slp");
         }
 
