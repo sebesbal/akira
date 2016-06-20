@@ -44,16 +44,8 @@ namespace test2
 
         static public void test_6()
         {
-            akira.akira a = new akira.akira();
-            a.ctx.Import("write", 0);
-            a = new akira.akira();
-            a.ctx.Import("replace", 0);
-
-            //a.CompileModule("write", 0);
-            //a = new akira.akira();
-            //a.CompileModule("replace", 0);
-
-            // a.Save("result.slp");
+            var a = akira.akira.Compile("../akira/tmp/basic.aki");
+            a.Save("result.slp");
         }
 
         static void Main(string[] args)

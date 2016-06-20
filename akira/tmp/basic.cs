@@ -3,7 +3,7 @@ using akira;
 
 namespace akira.basic
 {
-	public class gen1: Rule
+	public class gen0: Rule
 	{
 		public override bool Apply(Context ctx, ref Node that)
 		{
@@ -18,7 +18,7 @@ namespace akira.basic
 			return false;
 		}
 	}
-	public class gen2: Rule
+	public class gen1: Rule
 	{
 		public override bool Apply(Context ctx, ref Node that)
 		{

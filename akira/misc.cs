@@ -127,62 +127,32 @@ namespace akira
 
     public class NModule: NActiveNode
     {
-        public string moduleName, pathCs;
-        public int folder;
-
-        public override bool Apply(Context ctx, ref Node node)
+        public override bool ApplyAfter(Context ctx, ref Node that)
         {
-            if (State >= NActiveNodeState.Applied) return false;
-            State = NActiveNodeState.Applied;
-
-            var id = node.FindAttribute("id");
+            string moduleName;
+            var id = that.FindAttribute("id");
             if (id == null)
             {
-                moduleName = ctx.GenName();
                 throw new Exception("Module must have id!");
             }
             else
             {
                 moduleName = (id.Second as NString).Value;
-                folder = ctx.DirWorking;
-                ctx.ImportDll(moduleName);
             }
 
-            pathCs = ctx.GetPath(folder, moduleName, "cs");// Path.Combine(dir, moduleName + ".cs");
-            var path = ctx.GetPath(folder, moduleName, "aki");
-
-            var fileCs = new FileInfo(pathCs);
-            var fileAki = new FileInfo(path);
-            if (fileCs.Exists && fileCs.LastWriteTime > fileAki.LastWriteTime)
-            {
-                // cs is newer than aki
-                node.Remove();
-                node = null;
-            }
-
-            return true;
-        }
-
-        public override bool ApplyAfter(Context ctx, ref Node that)
-        {
-            if (State == NActiveNodeState.AppliedAfter) return false;
-            State = NActiveNodeState.AppliedAfter;
-
-
-
-            var code = GenerateCode(ctx, that);
-            ctx.SaveCs(pathCs, code);
-            // ctx.LoadRulesFromCs(pathCs);
+            var code = GenerateCode(ctx, moduleName, that);
+            string pathCs = Path.Combine(ctx.DirWorking, moduleName + ".cs");
+            File.WriteAllText(pathCs, code);
             string pathDll;
-            var ass = ctx.CompileCs(pathCs, out pathDll);
-            if (ass != null)
-            {
-                ctx.LoadRulesFromAss(ass);
-            }
+            ctx.CompileCs(pathCs, out pathDll);
+
+            that.Remove();
+            that = null;
+
             return true;
         }
         
-        protected string GenerateCode(Context ctx, Node node)
+        protected string GenerateCode(Context ctx, string moduleName, Node node)
         {
             bool after = node.Match("after");
             CodeBuilder sb = new CodeBuilder();
@@ -225,6 +195,64 @@ namespace akira
             if (!node.MatchHead("sample")) return false;
             var code = _c("*/");
             ((NList)node).Add(code);
+            return false;
+        }
+    }
+
+    public class include: Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("include")) return false;
+            NList list = (NList)node;
+            NList newList = new NList();
+            foreach (var item in list.NonHeadItems)
+            {
+                var module = item as NString;
+                var file = ctx.FindFile(module.Value + ".aki");
+                if (file != null)
+                {
+                    var n = Node.ParseFile(file.FullName);
+                    newList.Add(n);
+                }
+            }
+            Node.ReplaceList(ref node, newList);
+            return true;
+        }
+    }
+
+    public class compile : Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("compile")) return false;
+            NList list = (NList)node;
+            foreach (var item in list.NonHeadItems)
+            {
+                var module = item as NString;
+                var file = ctx.FindModule(module.Value);
+                if (file != null && file.Extension == ".aki")
+                {
+                    akira.Compile(file.FullName);
+                }
+            }
+            node.Remove();
+            node = null;
+            return true;
+        }
+    }
+
+    public class search : Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.MatchHead("search")) return false;
+            NList list = (NList)node;
+            foreach (var item in list.NonHeadItems)
+            {
+                var path = item as NString;
+                ctx.AddSearchPath(path.Value);
+            }
             return false;
         }
     }

@@ -437,6 +437,7 @@ namespace slp_parser
             }
             else if (context.STRING() != null)
             {
+                txt = txt.Substring(1, txt.Length - 2); // remove surrounding " "
                 n = new NString(txt);
             }
             else if (context.ID() != null)

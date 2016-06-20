@@ -12,7 +12,7 @@ namespace akira
             slpParser parser;
             Listener listener;
 
-            AntlrInputStream input = new AntlrInputStream(code);
+            AntlrInputStream input = new AntlrInputStream("\n" + code);
             lexer = new slpLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 

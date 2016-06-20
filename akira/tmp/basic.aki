@@ -1,12 +1,10 @@
-﻿module
-: id basic
-
+﻿ search "../base"
 import read
+import basic
 
-module
-	write $a -->
-		{ Node.Replace(ref that, $1); return true; } 
-			$a
+write $a -->
+	{ Node.Replace(ref that, $1); return true; } 
+		$a
 
 ($a --> $b) -->
 	rule

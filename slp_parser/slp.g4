@@ -154,11 +154,7 @@ CLOSE_PAREN : ')' {opened--;};
 OPEN_BRACK : '[' {opened++;};
 CLOSE_BRACK : ']' {opened--;};
 
-
-NEWLINE
- : ( {atStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' )+ SPACES?
-   )
+NEWLINE : ( '\r'? '\n' | '\r' )+ SPACES?
    {
      string newLine = Regex.Replace(Text, "[^\r\n]", "");
      string spaces = Regex.Replace(Text, "[\r\n]", "");

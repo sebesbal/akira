@@ -38,6 +38,16 @@ namespace akira
         }
         private Stack<Block> blocks = new Stack<Block>();
         private Block currentBlock;
+
+        protected List<string> searchPaths = new List<string>();
+
+        public void AddSearchPath(string path)
+        {
+            path = Path.Combine(DirWorking, path);
+            searchPaths.Remove(path);
+            searchPaths.Insert(0, path);
+        }
+
         public string GenName()
         {
             return "gen" + nameCount++;
@@ -62,6 +72,70 @@ namespace akira
         {
             currentBlock.ActiveRules[r.level].Push(r);
         }
+
+        public FileInfo FindModule(string name, string folder = "")
+        {
+            if (folder == "")
+            {
+                foreach (var path in searchPaths)
+                {
+                    FileInfo result = FindModule(name, path);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                DateTime dt = DateTime.MinValue;
+                FileInfo result = null;
+                var dir = new DirectoryInfo(folder);
+                foreach (var file in dir.GetFiles())
+                {
+                    if (Path.GetFileNameWithoutExtension(file.Name) == name
+                        && file.LastWriteTime > dt)
+                    {
+                        result = file;
+                        dt = file.LastWriteTime;
+                    }
+                }
+                return result;
+            }
+        }
+
+        public FileInfo FindFile(string fileName, string folder = "")
+        {
+            if (folder == "")
+            {
+                foreach (var path in searchPaths)
+                {
+                    FileInfo result = FindFile(fileName, path);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                DateTime dt = DateTime.MinValue;
+                FileInfo result = null;
+                var dir = new DirectoryInfo(folder);
+                foreach (var file in dir.GetFiles())
+                {
+                    if (file.Name == fileName && file.LastWriteTime > dt)
+                    {
+                        result = file;
+                        dt = file.LastWriteTime;
+                    }
+                }
+                return result;
+            }
+        }
+        
         public System.Collections.Generic.IEnumerable<Rule> DefinedRules()
         {
             foreach (var block in blocks)
@@ -115,7 +189,7 @@ namespace akira
             File.WriteAllText(filePath, code);
         }
 
-        public int DirWorking;
+        public string DirWorking;
 
         public string DirGen { get { return "../akira/gen/"; } }
 
@@ -150,60 +224,70 @@ namespace akira
         //    }
         //}
 
-        public void Import(string name, int folder = 0)
+        public void Import(string name)
         {
-            while (folder < Folders.Count)
+            var module = FindModule(name);
+            if (module != null && module.Extension == ".dll")
             {
-                var fileDll = new FileInfo(GetPath(folder, name, "dll"));
-                var fileCs = new FileInfo(GetPath(folder, name, "cs"));
-                var fileAki = new FileInfo(GetPath(folder, name, "aki"));
-
-                if (!fileCs.Exists && !fileAki.Exists)
-                {
-                    ++folder;
-                    continue;
-                }
-
-                DateTime dateDll = fileDll.Exists ? fileDll.LastWriteTime : DateTime.MinValue;
-                DateTime dateCs = fileCs.Exists ? fileCs.LastWriteTime : DateTime.MinValue;
-                DateTime dateAki = fileAki.Exists ? fileAki.LastWriteTime : DateTime.MinValue;
-
-                var date = new[] { dateDll, dateCs, dateAki }.Max();
-
-                if (date.Equals(dateDll))
-                {
-                    var ass = Assembly.LoadFrom(fileDll.FullName);
-                    if (ass != null)
-                    {
-                        LoadRulesFromAss(ass);
-                    }
-                    return;
-                }
-                else if (date.Equals(dateCs))
-                {
-                    string dllPath;
-                    var ass = CompileCs(fileCs.FullName, out dllPath);
-                    if (ass != null)
-                    {
-                        LoadRulesFromAss(ass);
-                    }
-                    return;
-                }
-                else if (date.Equals(dateAki))
-                {
-                    var a = new akira();
-                    string csPath = a.CompileModule(name, folder);
-                    string dllPath;
-                    var ass = CompileCs(csPath, out dllPath);
-                    if (ass != null)
-                    {
-                        LoadRulesFromAss(ass);
-                    }
-                    return;
-                }
+                var ass = Assembly.LoadFrom(module.FullName);
+                LoadRulesFromAss(ass);
             }
         }
-        
+
+        //public void Import(string name, int folder = 0)
+        //{
+        //    while (folder < Folders.Count)
+        //    {
+        //        var fileDll = new FileInfo(GetPath(folder, name, "dll"));
+        //        var fileCs = new FileInfo(GetPath(folder, name, "cs"));
+        //        var fileAki = new FileInfo(GetPath(folder, name, "aki"));
+
+        //        if (!fileCs.Exists && !fileAki.Exists)
+        //        {
+        //            ++folder;
+        //            continue;
+        //        }
+
+        //        DateTime dateDll = fileDll.Exists ? fileDll.LastWriteTime : DateTime.MinValue;
+        //        DateTime dateCs = fileCs.Exists ? fileCs.LastWriteTime : DateTime.MinValue;
+        //        DateTime dateAki = fileAki.Exists ? fileAki.LastWriteTime : DateTime.MinValue;
+
+        //        var date = new[] { dateDll, dateCs, dateAki }.Max();
+
+        //        if (date.Equals(dateDll))
+        //        {
+        //            var ass = Assembly.LoadFrom(fileDll.FullName);
+        //            if (ass != null)
+        //            {
+        //                LoadRulesFromAss(ass);
+        //            }
+        //            return;
+        //        }
+        //        else if (date.Equals(dateCs))
+        //        {
+        //            string dllPath;
+        //            var ass = CompileCs(fileCs.FullName, out dllPath);
+        //            if (ass != null)
+        //            {
+        //                LoadRulesFromAss(ass);
+        //            }
+        //            return;
+        //        }
+        //        else if (date.Equals(dateAki))
+        //        {
+        //            var a = new akira();
+        //            string csPath = a.CompileModule(name, folder);
+        //            string dllPath;
+        //            var ass = CompileCs(csPath, out dllPath);
+        //            if (ass != null)
+        //            {
+        //                LoadRulesFromAss(ass);
+        //            }
+        //            return;
+        //        }
+        //    }
+        //}
+
         /// <summary>
         /// Compiles Cs to Dll, and returns the Dll file's path
         /// </summary>
@@ -283,6 +367,17 @@ namespace akira
                 LoadRulesFromAss(ass);
             }
         }
+
+        //public void Import(string name)
+        //{
+        //    name = name + ".dll";
+        //    var file = FindFile(name);
+        //    if (file == null)
+        //    {
+        //        throw new Exception("Module not found: ");
+        //    }
+        //    var ass = Assembly.LoadFrom(file.FullName);
+        //}
 
         public void LoadRulesFromCs(string fileName)
         {
@@ -396,19 +491,12 @@ namespace akira
         public static NString _s(string str) { return new NString(str); }
         public static NCode _c(string str) { return new NCode(str); }
     }
-
-    public enum NActiveNodeState
-    {
-        None,
-        Applied,
-        AppliedAfter
-    }
+    
     public class NActiveNode : Node
     {
         public int level = 2;
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
-        public NActiveNodeState State;
     }
 
     public class akira : Rule
@@ -468,6 +556,14 @@ namespace akira
             Run(Node.ParseFile(fileName));
         }
 
+        //public void Compile(string fileName)
+        //{
+        //    FileInfo info = new FileInfo(fileName);
+        //    ctx.DirWorking = info.DirectoryName;
+        //    ctx.AddSearchPath(ctx.DirWorking);
+        //    Run(Node.ParseFile(fileName));
+        //}
+
         public static Node ParseModule(string file)
         {
             string name = Path.GetFileNameWithoutExtension(file);
@@ -485,21 +581,31 @@ namespace akira
             return list;
         }
 
-
-        public string CompileModule(string name, int folder)
+        public static akira Compile(string fileName)
         {
-            ctx.DirWorking = folder;
-            Run(ParseModule(ctx.GetPath(folder, name, "aki")));
-            if (root != null)
-            {
-                NModule module = ((NList)root).Head as NModule;
-                return module.pathCs;
-            }
-            else
-            {
-                return "";
-            }
+            akira a = new akira();
+            FileInfo info = new FileInfo(fileName);
+            a.ctx.DirWorking = info.DirectoryName;
+            a.ctx.AddSearchPath("");
+            a.Run(ParseModule(fileName));
+            return a;
         }
+
+
+        //public string CompileModule(string name, int folder)
+        //{
+        //    ctx.DirWorking = folder;
+        //    Run(ParseModule(ctx.GetPath(folder, name, "aki")));
+        //    if (root != null)
+        //    {
+        //        NModule module = ((NList)root).Head as NModule;
+        //        return module.pathCs;
+        //    }
+        //    else
+        //    {
+        //        return "";
+        //    }
+        //}
 
         public void Run(Node node)
         {
