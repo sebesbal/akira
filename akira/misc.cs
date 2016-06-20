@@ -110,21 +110,6 @@ namespace akira
         }
     }
 
-    public class import : Rule
-    {
-        public override bool Apply(Context ctx, ref Node that)
-        {
-            if (that.MatchHead("import"))
-            {
-                ctx.Import(((NString)((NList)that).Second).Value);
-                that.Remove();
-                that = null;
-                return true;
-            }
-            return false;
-        }
-    }
-
     public class NModule: NActiveNode
     {
         public override bool ApplyAfter(Context ctx, ref Node that)
@@ -217,6 +202,25 @@ namespace akira
                 }
             }
             Node.ReplaceList(ref node, newList);
+            return true;
+        }
+    }
+
+    public class import : Rule
+    {
+        public override bool Apply(Context ctx, ref Node that)
+        {
+            if (that.MatchHead("import"))
+            {
+                NList list = (NList)that;
+                foreach (var item in list.NonHeadItems)
+                {
+                    var module = item as NString;
+                    ctx.Import(module.Value);
+                }
+            }
+            that.Remove();
+            that = null;
             return true;
         }
     }

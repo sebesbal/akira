@@ -1,6 +1,8 @@
-﻿ search "../base"
-import read
-import basic
+﻿search
+	"../base"
+import
+	read
+	basic
 
 write $a -->
 	{ Node.Replace(ref that, $1); return true; } 

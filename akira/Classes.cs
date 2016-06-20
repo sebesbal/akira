@@ -30,10 +30,6 @@ namespace akira
         //public Dictionary<string, Rule> Rules = new Dictionary<string, Rule>();
         public Context()
         {
-            Folders.Add("../akira/tmp");
-            Folders.Add("../akira/base");
-            BaseFolder[0] = 1;
-            BaseFolder[1] = -1;
             PushBlock();
         }
         private Stack<Block> blocks = new Stack<Block>();
@@ -193,37 +189,13 @@ namespace akira
 
         public string DirGen { get { return "../akira/gen/"; } }
 
-        public string DirBase = "../akira/base";
-
-        public string DirTmp = "../akira/tmp";
-
         public string DirTrash = "../akira/trash";
 
         public string LoadCs(string filePath)
         {
             return File.ReadAllText(filePath);
         }
-
-        public string PathCs(string fileName)
-        {
-            return "../akira/gen/" + fileName + ".cs";
-        }
-
-        public List<string> Folders = new List<string>();
-        public Dictionary<int, int> BaseFolder = new Dictionary<int, int>();
-
-        ///// <summary>
-        ///// Import dll if it extists. (skip otherwise)
-        ///// </summary>
-        //public void ImportDll(string name)
-        //{
-        //    var fileDll = new FileInfo(Path.Combine(DirBase, name + ".dll"));
-        //    if (fileDll.Exists)
-        //    {
-        //        LoadRulesFromDll(fileDll.FullName);
-        //    }
-        //}
-
+        
         public void Import(string name)
         {
             var module = FindModule(name);
@@ -233,61 +205,7 @@ namespace akira
                 LoadRulesFromAss(ass);
             }
         }
-
-        //public void Import(string name, int folder = 0)
-        //{
-        //    while (folder < Folders.Count)
-        //    {
-        //        var fileDll = new FileInfo(GetPath(folder, name, "dll"));
-        //        var fileCs = new FileInfo(GetPath(folder, name, "cs"));
-        //        var fileAki = new FileInfo(GetPath(folder, name, "aki"));
-
-        //        if (!fileCs.Exists && !fileAki.Exists)
-        //        {
-        //            ++folder;
-        //            continue;
-        //        }
-
-        //        DateTime dateDll = fileDll.Exists ? fileDll.LastWriteTime : DateTime.MinValue;
-        //        DateTime dateCs = fileCs.Exists ? fileCs.LastWriteTime : DateTime.MinValue;
-        //        DateTime dateAki = fileAki.Exists ? fileAki.LastWriteTime : DateTime.MinValue;
-
-        //        var date = new[] { dateDll, dateCs, dateAki }.Max();
-
-        //        if (date.Equals(dateDll))
-        //        {
-        //            var ass = Assembly.LoadFrom(fileDll.FullName);
-        //            if (ass != null)
-        //            {
-        //                LoadRulesFromAss(ass);
-        //            }
-        //            return;
-        //        }
-        //        else if (date.Equals(dateCs))
-        //        {
-        //            string dllPath;
-        //            var ass = CompileCs(fileCs.FullName, out dllPath);
-        //            if (ass != null)
-        //            {
-        //                LoadRulesFromAss(ass);
-        //            }
-        //            return;
-        //        }
-        //        else if (date.Equals(dateAki))
-        //        {
-        //            var a = new akira();
-        //            string csPath = a.CompileModule(name, folder);
-        //            string dllPath;
-        //            var ass = CompileCs(csPath, out dllPath);
-        //            if (ass != null)
-        //            {
-        //                LoadRulesFromAss(ass);
-        //            }
-        //            return;
-        //        }
-        //    }
-        //}
-
+        
         /// <summary>
         /// Compiles Cs to Dll, and returns the Dll file's path
         /// </summary>
@@ -317,32 +235,7 @@ namespace akira
                 return assembly;
             }
         }
-
-        public string GetPath(int folder, string name, string extension)
-        {
-            return Path.Combine(Folders[folder], name + "." + extension);
-        }
-
-        public void ImportDll(string name, int folder = 0)
-        {
-            while (folder < Folders.Count)
-            {
-                var path = GetPath(folder, name, "dll");
-                if (File.Exists(path))
-                {
-                    var ass = Assembly.LoadFrom(path);
-                    LoadRulesFromAss(ass);
-                    return;
-                }
-                ++folder;
-            }
-        }
-
-        public void Compile(int folder, string name)
-        {
-
-        }
-
+        
         public void LoadRulesFromAss(Assembly ass)
         {
             foreach (var item in ass.GetTypes())
@@ -367,18 +260,7 @@ namespace akira
                 LoadRulesFromAss(ass);
             }
         }
-
-        //public void Import(string name)
-        //{
-        //    name = name + ".dll";
-        //    var file = FindFile(name);
-        //    if (file == null)
-        //    {
-        //        throw new Exception("Module not found: ");
-        //    }
-        //    var ass = Assembly.LoadFrom(file.FullName);
-        //}
-
+        
         public void LoadRulesFromCs(string fileName)
         {
             var ass = AssemblyFromCode(LoadCs(fileName));
@@ -555,15 +437,7 @@ namespace akira
         {
             Run(Node.ParseFile(fileName));
         }
-
-        //public void Compile(string fileName)
-        //{
-        //    FileInfo info = new FileInfo(fileName);
-        //    ctx.DirWorking = info.DirectoryName;
-        //    ctx.AddSearchPath(ctx.DirWorking);
-        //    Run(Node.ParseFile(fileName));
-        //}
-
+        
         public static Node ParseModule(string file)
         {
             string name = Path.GetFileNameWithoutExtension(file);
@@ -590,27 +464,9 @@ namespace akira
             a.Run(ParseModule(fileName));
             return a;
         }
-
-
-        //public string CompileModule(string name, int folder)
-        //{
-        //    ctx.DirWorking = folder;
-        //    Run(ParseModule(ctx.GetPath(folder, name, "aki")));
-        //    if (root != null)
-        //    {
-        //        NModule module = ((NList)root).Head as NModule;
-        //        return module.pathCs;
-        //    }
-        //    else
-        //    {
-        //        return "";
-        //    }
-        //}
-
+        
         public void Run(Node node)
         {
-            //root = new Node("root");
-            //root.Add(node);
             root = node;
             Apply(ctx, ref root);
         }
