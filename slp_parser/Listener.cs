@@ -23,7 +23,7 @@ namespace slp_parser
         n, x, y
     }
 
-    public class Operator
+    public class Operator: ICloneable
     {
         static Operator()
         {
@@ -168,6 +168,15 @@ namespace slp_parser
                 }
             }
             return false;
+        }
+
+        public object Clone()
+        {
+            var result = new Operator();
+            result.Associativity = Associativity;
+            result.Name = Name;
+            result.Precedence = Precedence;
+            return result;
         }
     }
 
@@ -335,7 +344,7 @@ namespace slp_parser
         protected Tuple<Operator, Node> ParseOperators(List<Tuple<Operator, Node>> list)
         {
             var open = new Stack<Tuple<Operator, Node>>();
-            var root = new Tuple<Operator, Node>(Operator.listop, new NList());
+            var root = new Tuple<Operator, Node>(Operator.listop, new Node());
             open.Push(root);
 
             //      a
@@ -351,7 +360,7 @@ namespace slp_parser
                 while (open.Count > 0)
                 {
                     var a = open.Peek();
-                    NList alist = a.Item2 as NList;
+                    Node alist = a.Item2;
                     
                     Operator opa = a.Item1;
 
@@ -370,7 +379,7 @@ namespace slp_parser
                                 c.Item2.Remove();
 
                                 // add c to b
-                                (b.Item2 as NList).Add(c.Item2);
+                                b.Item2.Add(c.Item2);
                             }
                             else
                             {
@@ -402,9 +411,9 @@ namespace slp_parser
                 var n = m.Get(item);
                 if (n == null) continue;
 
-                if (n is NOperator)
+                if (n.Data is Operator)
                 {
-                     list.Add(new Tuple<Operator, Node>(((NOperator)n).Operator, n));
+                     list.Add(new Tuple<Operator, Node>((Operator)n.Data, n));
                 }
                 else
                 {
@@ -429,20 +438,20 @@ namespace slp_parser
             Node n = null;
             if (context.FLOAT() != null)
             {
-                n = new NString(txt);
+                n = new Node(txt);
             }
             else if (context.INT() != null)
             {
-                n = new NString(txt);
+                n = new Node(txt);
             }
             else if (context.STRING() != null)
             {
                 txt = txt.Substring(1, txt.Length - 2); // remove surrounding " "
-                n = new NString(txt);
+                n = new Node(txt);
             }
             else if (context.ID() != null)
             {
-                n = new NString(txt);
+                n = new Node(txt);
             }
             else if (context.NEWLINE() != null)
             {
@@ -453,7 +462,7 @@ namespace slp_parser
                 if (operators.ContainsKey(txt))
                 {
                     Operator op = operators[txt];
-                    n = new NOperator(op);
+                    n = new Node(op);
                 }
                 else
                 {
@@ -481,7 +490,7 @@ namespace slp_parser
             }
             else
             {
-                var op = new NOperator(Operator.nullop);
+                var op = new Node(Operator.nullop);
                 op.Add(n);
                 m.Put(context, op);
             }
@@ -493,6 +502,7 @@ namespace slp_parser
         {
             program = m.Get(context.exp());
             traverse0(program);
+            traverse1(program);
             //traverse1(program);
             //// traverse0(program);
             //traverse2(ref program);
@@ -502,52 +512,61 @@ namespace slp_parser
 
         void traverse0(Node n)
         {
-            var list = n as NList;
-            if (list != null)
+            foreach (var item in n.Items)
             {
-                foreach (var item in list.Items)
-                {
-                    traverse0(item);
-                }
+                traverse0(item);
+            }
 
-                if (list.Items.Count == 1)
-                {
-                    var h = list.Head;
-                    list.Head.Remove();
-                    list.ReplaceWith(h);
-                }
-                else
-                {
-                    NOperator op = list as NOperator;
-                    if (op != null && op.Operator == Operator.nullop)
-                    {
-                        var h = list.Second;
-                        list.Head.Remove();
-                        h.Remove();
-                        list.ReplaceWith(h);
-                    }
-                }
-
-
+            if (n.Items.Count == 1 && (n.Data == null || n.Data == Operator.nullop))
+            {
+                var h = n.First;
+                h.Remove();
+                n.ReplaceWith(h);
             }
         }
 
-        //public override void ExitLList([NotNull] slpParser.LListContext context)
-        //{
-        //    Node n = m.Get(context.GetChild(0));
-        //    XAttribute id;
-        //    if (n.GetAttribute("id", out id) && id.Value == "list")
-        //    {
-        //        n.Add(m.Get(context.GetChild(1)));
-        //        m.Put(context, n);
-        //    }
-        //    else
-        //    {
-        //        Node list = new Node("op");
-        //        list.SetAttributeValue("id", "list");
-        //        add(context, list);
-        //    }
-        //}
-    }
+        void traverse1(Node n)
+        {
+            foreach (var item in n.Items)
+            {
+                traverse1(item);
+            }
+
+            if (n.Data == null && n.Items.Count > 0 && n.First.Items.Count == 0)
+            {
+                var h = n.First;
+                h.Remove();
+                foreach (var item in n.Items)
+                {
+                    h.Add(item);
+                }
+                n.ReplaceWith(h);
+                //n.Data = n.First.Data;
+                //n.First.Remove();
+            }
+
+            if (n.Data is Operator)
+            {
+                n.Data = (n.Data as Operator).Name;
+            }
+        }
+
+            //public override void ExitLList([NotNull] slpParser.LListContext context)
+            //{
+            //    Node n = m.Get(context.GetChild(0));
+            //    XAttribute id;
+            //    if (n.GetAttribute("id", out id) && id.Value == "list")
+            //    {
+            //        n.Add(m.Get(context.GetChild(1)));
+            //        m.Put(context, n);
+            //    }
+            //    else
+            //    {
+            //        Node list = new Node("op");
+            //        list.SetAttributeValue("id", "list");
+            //        add(context, list);
+            //    }
+            //}
+        }
 }
 

@@ -9,9 +9,23 @@ using System.Xml.Linq;
 
 namespace akira
 {
-    public class Node
+    public class Node : ICloneable
     {
-        public NList Parent;
+        public Node Parent;
+        public ICloneable Data;
+        public string SData { get { return Data as string; } }
+
+        public LinkedList<Node> Items = new LinkedList<Node>();
+        public Node() { }
+        public Node(ICloneable data, params Node[] items)
+        {
+            Data = data;
+            foreach (var item in items)
+            {
+                Add(item);
+            }
+        }
+
         public Node Next
         {
             get
@@ -24,15 +38,13 @@ namespace akira
             }
         }
 
-        virtual public Node Clone()
-        {
-            return null;
-        }
+        public Node First { get { return Items.First(); } }
+        public Node Second { get { return Items.First.Next.Value; } }
 
         public void GetTree(List<Node> tree)
         {
             tree.Add(this);
-            NList list = this as NList;
+            Node list = this as Node;
             if (list != null)
             {
                 foreach (var item in list.Items)
@@ -42,23 +54,30 @@ namespace akira
             }
         }
 
-        virtual public IEnumerable<Node> Descendants
+        public IEnumerable<Node> Descendants
         {
             get
             {
-                yield break;
+                foreach (var item in Items)
+                {
+                    yield return item;
+                    foreach (var desc in item.Descendants)
+                    {
+                        yield return desc;
+                    }
+                }
             }
         }
 
-        virtual public bool Match(string s) { return false; }
-        virtual public bool MatchHead(string s) { return false; }
-        virtual public bool MatchHead(Type t) { return false; }
-        virtual public bool MatchPair(string key, ref string value) { return false; }
-        virtual public bool Match(string key, string value) { return false; }
-        virtual public bool Match(string name, int itemCount) { return false; }
-        virtual public bool MatchItemCount(int itemCount) { return false; }
-        virtual public NAttribute FindAttribute(string name) { return null; }
-        virtual public NString FindString(string name) { return null; }
+        virtual public bool Match(string s) { return s.Equals(Data); }
+        //virtual public bool MatchHead(string s) { return false; }
+        //virtual public bool MatchHead(Type t) { return false; }
+        //virtual public bool MatchPair(string key, ref string value) { return false; }
+        //virtual public bool Match(string key, string value) { return false; }
+        //virtual public bool Match(string name, int itemCount) { return false; }
+        //virtual public bool MatchItemCount(int itemCount) { return false; }
+        //virtual public NAttribute FindAttribute(string name) { return null; }
+        //virtual public NString FindString(string name) { return null; }
 
         public void Remove()
         {
@@ -92,7 +111,7 @@ namespace akira
             }
         }
 
-        public void ReplaceWithList(NList n)
+        public void ReplaceWithList(Node n)
         {
             if (Parent == null)
             {
@@ -126,15 +145,15 @@ namespace akira
             old = neu;
         }
 
-        public static void ReplaceList(ref Node old, NList list)
+        public static void ReplaceList(ref Node old, Node list)
         {
             if (old.Parent != null)
             {
                 old.ReplaceWithList(list);
             }
-            old = list.Head;
+            old = list.First;
         }
-        
+
         public void Save(string file)
         {
             File.WriteAllText(file, ToString());
@@ -153,11 +172,7 @@ namespace akira
         }
 
         public int Size = 1;
-
-        public virtual void Measure()
-        {
-        }
-
+        
         public string ToString(int indent = 0)
         {
             Measure();
@@ -175,93 +190,20 @@ namespace akira
             return cb.ToString();
         }
         
-        public virtual void ToStringRec(CodeBuilder cb)
-        {
-
-        }
-
-        public virtual bool Eq(Node obj)
-        {
-            return false;
-        }
-
-        virtual public void ToCsRec(StringBuilder sb)
-        {
-        }
-        
         public string ToCs()
         {
             var sb = new StringBuilder();
             ToCsRec(sb);
             return sb.ToString();
         }
-    }
 
-    public class NList: Node
-    {
-        public LinkedList<Node> Items = new LinkedList<Node>();
-        public Node Head { get { return Items.First.Value; } }
-        public Node Second { get { return Items.First.Next.Value; } }
-        
-        public NList() { }
-        public NList(params Node[] items)
-        {
-            foreach (var item in items)
-            {
-                Add(item);
-            }
-        }
-
-        public IEnumerable<Node> NonHeadItems
-        {
-            get
-            {
-                var n = Items.First;
-                n = n.Next;
-                while (n != null)
-                {
-                    yield return n.Value;
-                    n = n.Next;
-                }
-            }
-        }
-
-        override public IEnumerable<Node> Descendants
-        {
-            get
-            {
-                foreach (var item in Items)
-                {
-                    yield return item;
-                    foreach (var desc in item.Descendants)
-                    {
-                        yield return desc;
-                    }
-                }
-            }
-        }
-
-        public override NAttribute FindAttribute(string name)
+        public Node FindAttribute(string name)
         {
             foreach (var item in Items)
             {
-                NAttribute att = item as NAttribute;
-                if (att != null)
+                if (item.Data is NAttribute && item.Items.First.Value.Match(name))
                 {
-                    if (att.MatchHead(name)) return att;
-                }
-            }
-            return null;
-        }
-
-        public override NString FindString(string name)
-        {
-            foreach (var item in Items)
-            {
-                NString s = item as NString;
-                if (s != null)
-                {
-                    if (s.Match(name)) return s;
+                    return item;
                 }
             }
             return null;
@@ -279,29 +221,30 @@ namespace akira
             n.Parent = this;
         }
 
-        override public Node Clone()
+        virtual public object Clone()
         {
-            NList result = new NList();
+            Node result = new Node();
+            result.Data = (ICloneable)Data.Clone();
             foreach (var item in Items)
             {
-                result.Add(item.Clone());
+                result.Add((Node)item.Clone());
             }
             return result;
         }
 
-        override public bool Match(string name, int childCount)
+        public bool Match(string name, int childCount)
         {
-            return Head.Match(name) && Items.Count == childCount;
+            return Match(name) && Items.Count == childCount;
         }
 
-        override public bool MatchItemCount(int itemCount)
+        public bool MatchItemCount(int itemCount)
         {
             return Items.Count == itemCount;
         }
 
-        override public bool Eq(Node obj)
+        public bool Eq(Node obj)
         {
-            NList n = (NList)obj;
+            Node n = (Node)obj;
             if (Items.Count != n.Items.Count)
             {
                 return false;
@@ -323,60 +266,13 @@ namespace akira
             after = Items.AddAfter(after, n);
             n.Parent = this;
         }
-
-        override public bool Match(string key, string value)
+     
+        public bool Match(Type t)
         {
-            return Head.Match(key) && Second.Match(value);
-
-            //foreach (var item in Items)
-            //{
-            //    var p = item as NList;
-            //    if (p != null
-            //        && p.Head.Match(key)
-            //        && p.Items.Count == 1
-            //        && p.Second.Match(value))
-            //    {
-            //        return true;
-            //    }
-            //}
-            //return false;
+            return Data.GetType().IsSubclassOf(t);
         }
 
-        override public bool MatchHead(string s)
-        {
-            return Head.Match(s);
-        }
-
-        override public bool MatchHead(Type t)
-        {
-            return Head.GetType().IsSubclassOf(t);
-        }
-
-        override public bool MatchPair(string key, ref string value)
-        {
-            var item = Items.First;
-            if (!item.Value.Match(key)) return false;
-            item = item.Next;
-            var str = item.Value as NString;
-            if (str == null) return false;
-            value = str.Value;
-            return true;
-        }
-
-        public bool HasString(string str)
-        {
-            foreach (var item in Items)
-            {
-                var s = item as NString;
-                if (s != null && s.Value == str)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        override public void Measure()
+        public void Measure()
         {
             Size = 1;
             foreach (var item in Items)
@@ -386,27 +282,29 @@ namespace akira
             }
         }
 
-        override public void ToStringRec(CodeBuilder cb)
+        virtual public string DataToString()
         {
-            var item = Items.First;
-            item.Value.ToStringRec(cb);
-            item = item.Next;
+            return Data == null ? "null" : Data.ToString();
+        }
+
+        virtual public void ToStringRec(CodeBuilder cb)
+        {
+            cb.AddLine(DataToString());
             cb.PushInline(Size <= 2);
             cb.Begin();
-            while (item != null)
+            foreach (var item in Items)
             {
-                item.Value.ToStringRec(cb);
-                item = item.Next;
+                item.ToStringRec(cb);
             }
             cb.End();
             cb.PopInline();
         }
-
-        override public void ToCsRec(StringBuilder sb)
+        
+        virtual public void ToCsRec(StringBuilder sb)
         {
             sb.Append("_l(");
-            Head.ToCsRec(sb);
-            foreach (var item in NonHeadItems)
+            sb.Append(DataToString());
+            foreach (var item in Items)
             {
                 sb.Append(", ");
                 item.ToCsRec(sb);
@@ -415,61 +313,43 @@ namespace akira
         }
     }
 
-    public interface IString
+    public class NAttribute : ICloneable
     {
-        string Value { get; set; }
+        public object Clone() { return new NAttribute(); }
     }
 
-    public class NString : Node
-    {
-        public NString(string value) { Value = value; }
-        virtual public string Value { get; set; }
-        override public Node Clone() { return new NString(Value); }
-        override public void ToStringRec(CodeBuilder cb) { cb.AddLine(Value); }
-        override public void ToCsRec(StringBuilder cb) { cb.Append("_s(\"" + Value +"\")"); }
-        override public bool Match(string s) { return Value == s; }
-    }
-
-    public class NAttribute: NList
-    {
-
-    }
-
-    public class NOperator : NList
-    {
-        public NOperator(slp_parser.Operator op): base(new NString(op.Name)) { Operator = op; }
-        public slp_parser.Operator Operator;
-        // override public Node Clone() { return new NOperator(Operator); }
-    }
-
-    public class NCode : NString
+    public class NCode : Node
     {
         public NCode(string value): base(value.Trim()) { }
-        override public Node Clone() { return new NCode(Value); }
-        override public void ToStringRec(CodeBuilder cb)
+        override public object Clone() { return new NCode(Data as string); }
+        public override string DataToString()
         {
-            cb.PushInline(true);
-            cb.BeginCurly();
-            cb.AddLine(Value);
-            cb.End();
-            cb.PopInline();
+            return "{ " + Data + " }";
         }
-        override public void ToCsRec(StringBuilder cb) { cb.Append("_c(\"" + Value + "\")"); }
+        //override public void ToStringRec(CodeBuilder cb)
+        //{
+        //    cb.PushInline(true);
+        //    cb.BeginCurly();
+        //    cb.AddLine(Data as string);
+        //    cb.End();
+        //    cb.PopInline();
+        //}
+        override public void ToCsRec(StringBuilder cb) { cb.Append("_c(\"" + Data + "\")"); }
         public void InsertChildren()
         {
             int i = 0;
-            foreach (var item in Parent.NonHeadItems)
+            foreach (var item in Items)
             {
-                Value = Regex.Replace(Value, "\\$" + ++i, item.ToCs());
+                Data = Regex.Replace(Data as string, "\\$" + ++i, item.ToCs());
             }
         }
     }
 
-    public class NRef : NString
+    public class NRef : Node
     {
         public NRef(string value): base(value) { }
-        override public Node Clone() { return new NRef(Value); }
-        override public void ToStringRec(CodeBuilder cb) { cb.AddLine("$" + Value); }
-        override public void ToCsRec(StringBuilder cb) { cb.Append("__(" + Value + ")"); }
+        override public object Clone() { return new NRef(Data as string); }
+        override public void ToStringRec(CodeBuilder cb) { cb.AddLine("$" + Data); }
+        override public void ToCsRec(StringBuilder cb) { cb.Append("__(" + Data + ")"); }
     }
 }

@@ -25,8 +25,8 @@ namespace test2
 
         static public void test_3()
         {
-            var n = Node.ParseFile("base.slp");
-            n.SaveToXml("result.xml");
+            var n = Node.ParseFile("../akira/tmp/basic.aki");
+            n.Save("result.xml");
         }
 
         static public void test_4()
@@ -50,7 +50,7 @@ namespace test2
 
         static void Main(string[] args)
         {
-            test_6();
+            test_3();
         }
     }
 }

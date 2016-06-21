@@ -359,26 +359,25 @@ namespace akira
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
         
-        public static NList _l(params Node[] items)
+        public static Node __(ICloneable data, params Node[] items)
         {
-            return new NList(items);
-        }
-
-        public static Node __(Node n)
-        {
-            return n.Clone();
+            return new Node(data, items);
         }
         
-
-        public static NString _s(string str) { return new NString(str); }
         public static NCode _c(string str) { return new NCode(str); }
     }
     
-    public class NActiveNode : Node
+    public class NActiveNode: ICloneable
     {
         public int level = 2;
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
+        public object Clone()
+        {
+            var result = new NActiveNode();
+            result.level = 2;
+            return result;
+        }
     }
 
     public class akira : Rule
@@ -443,16 +442,9 @@ namespace akira
             string name = Path.GetFileNameWithoutExtension(file);
             string code = File.ReadAllText(file);
             Node n = AkiraParser.Parse(code);
-            NList list = n as NList;
-            if (list == null)
-            {
-                list = _l(n);
-            }
-
-            list.AddFirst(_l(_s(":"), _s("id"), _s(name)));
-            list.AddFirst(_s("module"));
-
-            return list;
+            n.AddFirst(__(__(":"), __("id"), __(name)));
+            n.Data = "module";
+            return n;
         }
 
         public static akira Compile(string fileName)
@@ -519,16 +511,12 @@ namespace akira
                     level = 0;
                     goto begin;
                 }
-
-                var list = node as NList;
-                if (list != null)
+                
+                var v = node.Items.ToArray();
+                foreach (Node n in v)
                 {
-                    var v = list.Items.ToArray();
-                    foreach (Node n in v)
-                    {
-                        Node m = n;
-                        Apply(ctx, ref m, level);
-                    }
+                    Node m = n;
+                    Apply(ctx, ref m, level);
                 }
 
                 if (ApplyRulesAfter(ctx, ref node, level))
@@ -542,15 +530,12 @@ namespace akira
 
         public bool ApplyRules(Context ctx, ref Node node, int level)
         {
-            if (node is NList)
+            var h = node.Data as NActiveNode;
+            if (h != null && h.level == level)
             {
-                var h = ((NList)node).Head as NActiveNode;
-                if (h != null && h.level == level)
+                if (h.Apply(ctx, ref node))
                 {
-                    if (h.Apply(ctx, ref node))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -566,15 +551,12 @@ namespace akira
 
         public bool ApplyRulesAfter(Context ctx, ref Node node, int level)
         {
-            if (node is NList)
+            var h = node.Data as NActiveNode;
+            if (h != null && h.level == level)
             {
-                var h = ((NList)node).Head as NActiveNode;
-                if (h != null && h.level == level)
+                if (h.ApplyAfter(ctx, ref node))
                 {
-                    if (h.ApplyAfter(ctx, ref node))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
