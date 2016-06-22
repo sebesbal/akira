@@ -1,0 +1,8 @@
+﻿import
+	boot3
+
+rule
+	read
+		alma $a
+	write
+		korte $a

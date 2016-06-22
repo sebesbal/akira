@@ -1,0 +1,10 @@
+﻿import
+	boot1
+
+rule
+	read
+		$a --> $b
+	write
+		rule
+			read $a
+			write $b

@@ -1,0 +1,12 @@
+﻿import
+	boot3
+
+rule
+	read import
+	{
+		foreach (var item in that.Items)
+        {
+			ctx.Import(item.SData);
+        }
+	}
+	remove

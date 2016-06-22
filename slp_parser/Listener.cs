@@ -475,7 +475,7 @@ namespace slp_parser
                 {
                     txt = txt.Substring(1, txt.Length - 2); // remove surrounding { }
                 }
-                n = new NCode(txt);
+                n = new Node(new NCode(txt));
             }
 
             m.Put(context, n);
@@ -501,6 +501,15 @@ namespace slp_parser
         public override void ExitProgram(slpParser.ProgramContext context)
         {
             program = m.Get(context.exp());
+            if (program.Data == null)
+            {
+                program.Data = "program";
+            }
+            else
+            {
+                program = new Node("program", program);
+            }
+
             traverse0(program);
             traverse1(program);
             //traverse1(program);

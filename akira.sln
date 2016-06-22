@@ -5,15 +5,11 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "akira", "akira\akira.csproj", "{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{F562869F-2D9B-4289-8F37-5D2BF18113AE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "slp_ast", "slp_parser\slp_ast.csproj", "{507598C9-AC33-499D-8C41-2EAB3C79F905}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{FE072CC1-83C9-4BD2-8473-E8CC78C3E200}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test2", "test2\test2.csproj", "{6475256C-675C-48F7-8C5E-18F8E4559025}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "akira2", "akira2\akira2.csproj", "{5481738C-8A33-4405-8462-28AC8569C4DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +21,6 @@ Global
 		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A143BA8D-C92A-4F82-B55B-D78F4F43C48B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F562869F-2D9B-4289-8F37-5D2BF18113AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{507598C9-AC33-499D-8C41-2EAB3C79F905}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,10 +33,6 @@ Global
 		{6475256C-675C-48F7-8C5E-18F8E4559025}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6475256C-675C-48F7-8C5E-18F8E4559025}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6475256C-675C-48F7-8C5E-18F8E4559025}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5481738C-8A33-4405-8462-28AC8569C4DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5481738C-8A33-4405-8462-28AC8569C4DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5481738C-8A33-4405-8462-28AC8569C4DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5481738C-8A33-4405-8462-28AC8569C4DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

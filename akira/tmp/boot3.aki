@@ -1,0 +1,23 @@
+﻿import
+	boot1
+	boot2
+
+write $a -->
+	{ Node.Replace(ref that, $1); return true; } 
+			$a
+
+($a --> $b) -->
+	rule
+		read $a
+		write $b
+
+remove -->
+	{ that.Remove(); that = null; return true; }
+
+
+
+/*
+read $ $a -->
+	{ Node #1 = cur; }
+		$a
+*/

@@ -39,14 +39,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="tmp\bootstrap.cs" />
+    <None Include="tmp\boot1.cs" />
+    <None Include="tmp\boot2.cs" />
+    <None Include="tmp\test.cs" />
+    <None Include="tmp\boot4.cs" />
+    <None Include="tmp\boot3.cs" />
     <None Include="base\basic.cs" />
     <Compile Include="base\read.cs" />
     <Compile Include="Classes.cs" />
     <Compile Include="misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="tmp\basic.aki" />
-    <None Include="tmp\lofusz2.aki" />
+    <None Include="tmp\boot4.aki" />
+    <None Include="tmp\bootstrap.aki" />
+    <None Include="tmp\boot2.aki" />
+    <None Include="tmp\boot1.aki" />
     <None Include="base\lofusz.aki" />
+    <None Include="tmp\boot3.aki" />
+    <None Include="tmp\test.aki" />
   </ItemGroup>
   <ItemGroup>
     <None Include="base\basic.aki" />

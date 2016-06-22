@@ -13,16 +13,32 @@ namespace akira
     {
         public Node Parent;
         public ICloneable Data;
-        public string SData { get { return Data as string; } }
+        public string SData { get { return escape(Data.ToString()); } }
 
         public LinkedList<Node> Items = new LinkedList<Node>();
         public Node() { }
-        public Node(ICloneable data, params Node[] items)
+        //public Node(ICloneable data, params Node[] items)
+        //{
+        //    Data = data;
+        //    foreach (var item in items)
+        //    {
+        //        Add(item);
+        //    }
+        //}
+
+        public Node(ICloneable data, params ICloneable[] items)
         {
             Data = data;
             foreach (var item in items)
             {
-                Add(item);
+                if (item is Node)
+                {
+                    Add((Node)item);
+                }
+                else
+                {
+                    Add(new Node(item));
+                }
             }
         }
 
@@ -70,14 +86,6 @@ namespace akira
         }
 
         virtual public bool Match(string s) { return s.Equals(Data); }
-        //virtual public bool MatchHead(string s) { return false; }
-        //virtual public bool MatchHead(Type t) { return false; }
-        //virtual public bool MatchPair(string key, ref string value) { return false; }
-        //virtual public bool Match(string key, string value) { return false; }
-        //virtual public bool Match(string name, int itemCount) { return false; }
-        //virtual public bool MatchItemCount(int itemCount) { return false; }
-        //virtual public NAttribute FindAttribute(string name) { return null; }
-        //virtual public NString FindString(string name) { return null; }
 
         public void Remove()
         {
@@ -197,11 +205,38 @@ namespace akira
             return sb.ToString();
         }
 
+        public string Deref
+        {
+            get
+            {
+                if (Match("$") && First.Data is string)
+                {
+                    return (string)First.Data;
+                }
+                else
+                {
+                    return "?";
+                }
+            }
+        }
+
+        //public Node FindAttribute(string name)
+        //{
+        //    foreach (var item in Items)
+        //    {
+        //        if (item.Data is NAttribute && item.Items.First.Value.Match(name))
+        //        {
+        //            return item;
+        //        }
+        //    }
+        //    return null;
+        //}
+
         public Node FindAttribute(string name)
         {
             foreach (var item in Items)
             {
-                if (item.Data is NAttribute && item.Items.First.Value.Match(name))
+                if (item.Match(":") && item.First.Match(name))
                 {
                     return item;
                 }
@@ -282,28 +317,58 @@ namespace akira
             }
         }
 
+        public static string escape(string s)
+        {
+            return s.Replace("\"", "\\\"");
+        }
+
         virtual public string DataToString()
         {
-            return Data == null ? "null" : Data.ToString();
+            return Data == null ? "null" : SData;
         }
 
         virtual public void ToStringRec(CodeBuilder cb)
         {
-            cb.AddLine(DataToString());
-            cb.PushInline(Size <= 2);
-            cb.Begin();
-            foreach (var item in Items)
+            if (Data is NodeData)
             {
-                item.ToStringRec(cb);
+                ((NodeData)Data).ToStringRec(cb);
             }
-            cb.End();
-            cb.PopInline();
+            else
+            {
+                cb.AddLine(DataToString());
+            }
+            if (Items.Count > 0)
+            {
+                cb.PushInline(Size <= 2);
+                cb.Begin();
+                foreach (var item in Items)
+                {
+                    item.ToStringRec(cb);
+                }
+                cb.End();
+                cb.PopInline();
+            }
         }
         
         virtual public void ToCsRec(StringBuilder sb)
         {
-            sb.Append("_l(");
-            sb.Append(DataToString());
+            if ("$".Equals(Data))
+            {
+                sb.Append("__(" + First.SData + ")");
+                return;
+            }
+
+            sb.Append("__(");
+
+            if (Data is NodeData)
+            {
+                ((NodeData)Data).ToCsRec(sb);
+            }
+            else
+            {
+                sb.Append("\"" + DataToString() + "\"");
+            }
+            
             foreach (var item in Items)
             {
                 sb.Append(", ");
@@ -313,43 +378,49 @@ namespace akira
         }
     }
 
-    public class NAttribute : ICloneable
+    //public class NAttribute : ICloneable
+    //{
+    //    public object Clone() { return new NAttribute(); }
+    //}
+
+    public abstract class NodeData: ICloneable
     {
-        public object Clone() { return new NAttribute(); }
+        public abstract object Clone();
+        public abstract void ToStringRec(CodeBuilder cb);
+        public abstract void ToCsRec(StringBuilder cb);
     }
 
-    public class NCode : Node
+    public class NCode : NodeData
     {
-        public NCode(string value): base(value.Trim()) { }
-        override public object Clone() { return new NCode(Data as string); }
-        public override string DataToString()
+        public NCode(string value) { Value = value.Trim(); }
+        override public object Clone() { return new NCode(Value); }
+        override public void ToStringRec(CodeBuilder cb)
         {
-            return "{ " + Data + " }";
+            cb.PushInline(true);
+            cb.BeginCurly();
+            cb.AddLine(Value);
+            cb.End();
+            cb.PopInline();
         }
-        //override public void ToStringRec(CodeBuilder cb)
-        //{
-        //    cb.PushInline(true);
-        //    cb.BeginCurly();
-        //    cb.AddLine(Data as string);
-        //    cb.End();
-        //    cb.PopInline();
-        //}
-        override public void ToCsRec(StringBuilder cb) { cb.Append("_c(\"" + Data + "\")"); }
-        public void InsertChildren()
+        override public void ToCsRec(StringBuilder cb) { cb.Append("__c(\"" + Node.escape(Value) + "\")"); }
+        public void InsertChildren(Node node)
         {
             int i = 0;
-            foreach (var item in Items)
+            foreach (var item in node.Items)
             {
-                Data = Regex.Replace(Data as string, "\\$" + ++i, item.ToCs());
+                Value = Regex.Replace(Value, "\\$" + ++i, item.ToCs());
+                Value = Regex.Replace(Value, "\\#" + ++i, item.Deref);
             }
+            Value = Regex.Replace(Value, @"\${\d+}", "__\\($1\\)");
         }
+        public string Value;
     }
 
-    public class NRef : Node
-    {
-        public NRef(string value): base(value) { }
-        override public object Clone() { return new NRef(Data as string); }
-        override public void ToStringRec(CodeBuilder cb) { cb.AddLine("$" + Data); }
-        override public void ToCsRec(StringBuilder cb) { cb.Append("__(" + Data + ")"); }
-    }
+    //public class NRef : Node
+    //{
+    //    public NRef(string value): base(value) { }
+    //    override public object Clone() { return new NRef(Data as string); }
+    //    override public void ToStringRec(CodeBuilder cb) { cb.AddLine("$" + Data); }
+    //    override public void ToCsRec(StringBuilder cb) { cb.Append("__(" + Data + ")"); }
+    //}
 }

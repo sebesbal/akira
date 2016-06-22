@@ -16,7 +16,7 @@ namespace akira
             string className = id == null ? ctx.GenName() : id.Second.Data as string;
             var code = GenerateCode(ctx, that, className);
             NCode n = new NCode(code);
-            Node.Replace(ref that, n);
+            Node.Replace(ref that, new Node(n));
             return true;
         }
 
@@ -36,10 +36,14 @@ namespace akira
             node.GetTree(v);
             foreach (var item in v)
             {
-                NCode code = item as NCode;
-                if (code != null)
+                NCode code = item.Data as NCode;
+                if (code == null)
                 {
-                    sb.AddLine(code.SData);
+                    // sb.AddLine("//" + item.Data);
+                }
+                else
+                {
+                    sb.AddLine(code.Value);
                 }
             }
             sb.AddLine("return false;");
@@ -54,12 +58,11 @@ namespace akira
     {
         public override bool Apply(Context ctx, ref Node that)
         {
-            NCode code = that as NCode;
-            if (code != null && that.Items.Count > 1 && code.SData.IndexOf("$") > -1)
+            NCode code = that.Data as NCode;
+            if (code != null && that.Items.Count > 0 && code.Value.IndexOf("$") > -1)
             {
-                code.InsertChildren();
-                //code.Remove();
-                //Node.Replace(ref that, code);
+                code.InsertChildren(that);
+                that.Items.Clear();
                 return true;
             }
             return false;
@@ -74,18 +77,20 @@ namespace akira
         }
         public override bool Apply(Context ctx, ref Node that)
         {
-            if (that.Match("$"))
-            {
-                Node.Replace(ref that, new NRef(that.First.SData));
-                return true;
-            }
-            else if (that.Match(":"))
-            {
-                NAttribute att = new NAttribute();
-                that.Data = att;
-                return true;
-            }
-            else if (that.Match("module"))
+            //if (that.Match("$"))
+            //{
+            //    Node.Replace(ref that, new NRef(that.First.SData));
+            //    return true;
+            //}
+            //else 
+            //if (that.Match(":"))
+            //{
+            //    NAttribute att = new NAttribute();
+            //    that.Data = att;
+            //    return true;
+            //}
+            //else 
+            if (that.Match("module"))
             {
                 that.Data = new NModule();
                 return true;
@@ -106,7 +111,7 @@ namespace akira
             }
             else
             {
-                moduleName = id.First.SData;
+                moduleName = id.Second.SData;
             }
 
             var code = GenerateCode(ctx, moduleName, that);
@@ -134,10 +139,10 @@ namespace akira
 
             foreach (var item in node.Descendants)
             {
-                NCode code = item as NCode;
+                NCode code = item.Data as NCode;
                 if (code != null)
                 {
-                    sb.AddLine(code.SData);
+                    sb.AddLine(code.Value);
                 }
             }
 
@@ -152,7 +157,7 @@ namespace akira
         public override bool Apply(Context ctx, ref Node node)
         {
             if (!node.Match("sample")) return false;
-            var code = _c("\n\r\n\r/* Sample input:\n" + node.ToString(1) + "\n\n\tOutput:\n");
+            var code = _c("\n/*\n\tSample input:\n" + node.First.ToString(1) + "\n\tOutput:\n");
             node.AddFirst(code);
             return false;
         }
@@ -160,9 +165,21 @@ namespace akira
         public override bool ApplyAfter(Context ctx, ref Node node)
         {
             if (!node.Match("sample")) return false;
-            var code = _c("*/");
-            node.Add(code);
-            return false;
+            var output = new Node();
+            foreach (var item in node.Items)
+            {
+                if (item == node.First)
+                {
+                    output.Add(item);
+                }
+                else
+                {
+                    output.Add(_c(item.ToString(1)));
+                }
+            }
+            output.Add(_c("*/"));
+            Node.Replace(ref node, output);
+            return true;
         }
     }
 
@@ -191,12 +208,10 @@ namespace akira
     {
         public override bool Apply(Context ctx, ref Node that)
         {
-            if (that.Match("import"))
+            if (!that.Match("import")) return false;
+            foreach (var item in that.Items)
             {
-                foreach (var item in that.Items)
-                {
-                    ctx.Import(item.SData);
-                }
+                ctx.Import(item.SData);
             }
             that.Remove();
             that = null;
@@ -208,10 +223,11 @@ namespace akira
     {
         public override bool Apply(Context ctx, ref Node node)
         {
-            if (!node.Match("compile")) return false;
+            bool recompile = node.Match("recompile");
+            if (!recompile && !node.Match("compile")) return false;
             foreach (var item in node.Items)
             {
-                var file = ctx.FindModule(item.SData);
+                var file = recompile ? ctx.FindFile(item.SData + ".aki") : ctx.FindModule(item.SData);
                 if (file != null && file.Extension == ".aki")
                 {
                     akira.Compile(file.FullName);

@@ -195,17 +195,27 @@ namespace akira
         {
             return File.ReadAllText(filePath);
         }
-        
+
+        //public void Import(string name)
+        //{
+        //    var module = FindModule(name);
+        //    if (module != null && module.Extension == ".dll")
+        //    {
+        //        var ass = Assembly.LoadFrom(module.FullName);
+        //        LoadRulesFromAss(ass);
+        //    }
+        //}
+
         public void Import(string name)
         {
-            var module = FindModule(name);
-            if (module != null && module.Extension == ".dll")
+            var module = FindFile(name + ".dll");
+            if (module != null)
             {
                 var ass = Assembly.LoadFrom(module.FullName);
                 LoadRulesFromAss(ass);
             }
         }
-        
+
         /// <summary>
         /// Compiles Cs to Dll, and returns the Dll file's path
         /// </summary>
@@ -293,7 +303,7 @@ namespace akira
                 File.Delete(dllName);
             }
             var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, dllName, true);
+            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll", "System.Xml.dll", "System.Xml.Linq.dll", "akira.dll", "slp_ast.dll" }, dllName, false);
             parameters.GenerateExecutable = false;
 
             CompilerResults results = csc.CompileAssemblyFromSource(parameters, code);
@@ -359,12 +369,18 @@ namespace akira
         public virtual bool Apply(Context ctx, ref Node node) { return false; }
         public virtual bool ApplyAfter(Context ctx, ref Node node) { return false; }
         
-        public static Node __(ICloneable data, params Node[] items)
+        public static Node __(Node node)
+        {
+            return (Node)node.Clone();
+        }
+
+        public static Node __(ICloneable data, params ICloneable[] items)
         {
             return new Node(data, items);
         }
-        
-        public static NCode _c(string str) { return new NCode(str); }
+
+        public static Node _c(string str) { return new Node(new NCode(str)); }
+        public static NCode __c(string str) { return new NCode(str); }
     }
     
     public class NActiveNode: ICloneable
@@ -442,18 +458,22 @@ namespace akira
             string name = Path.GetFileNameWithoutExtension(file);
             string code = File.ReadAllText(file);
             Node n = AkiraParser.Parse(code);
-            n.AddFirst(__(__(":"), __("id"), __(name)));
+            n.AddFirst(__(":", __("id"), __(name)));
             n.Data = "module";
             return n;
         }
 
         public static akira Compile(string fileName)
         {
+            Console.WriteLine();
+            Console.WriteLine("Compile " + fileName);
             akira a = new akira();
             FileInfo info = new FileInfo(fileName);
             a.ctx.DirWorking = info.DirectoryName;
             a.ctx.AddSearchPath("");
-            a.Run(ParseModule(fileName));
+            var n = ParseModule(fileName);
+            // n.Save(Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(fileName) + "_parse.txt"));
+            a.Run(n);
             return a;
         }
         
@@ -528,6 +548,11 @@ namespace akira
             }
         }
 
+        void LogApply(object o)
+        {
+            Console.WriteLine("Apply rule:" + o.GetType());
+        }
+
         public bool ApplyRules(Context ctx, ref Node node, int level)
         {
             var h = node.Data as NActiveNode;
@@ -535,6 +560,7 @@ namespace akira
             {
                 if (h.Apply(ctx, ref node))
                 {
+                    LogApply(h);
                     return true;
                 }
             }
@@ -543,6 +569,7 @@ namespace akira
             {
                 if (r.Apply(ctx, ref node))
                 {
+                    LogApply(r);
                     return true;
                 }
             }
@@ -556,6 +583,7 @@ namespace akira
             {
                 if (h.ApplyAfter(ctx, ref node))
                 {
+                    LogApply(h);
                     return true;
                 }
             }
@@ -564,6 +592,7 @@ namespace akira
             {
                 if (r.ApplyAfter(ctx, ref node))
                 {
+                    LogApply(r);
                     return true;
                 }
             }

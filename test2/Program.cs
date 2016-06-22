@@ -48,9 +48,17 @@ namespace test2
             a.Save("result.slp");
         }
 
+        static public void test_7()
+        {
+            //var a = akira.akira.Compile("../akira/tmp/write1.aki");
+            //a = akira.akira.Compile("../akira/tmp/replace1.aki");
+            var a = akira.akira.Compile("../akira/tmp/bootstrap.aki");
+            a.Save("result.slp");
+        }
+
         static void Main(string[] args)
         {
-            test_3();
+            test_7();
         }
     }
 }
