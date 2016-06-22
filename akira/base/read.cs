@@ -9,22 +9,14 @@ namespace akira
         {
             if (!that.Match("read", 2)) return false;
             Node a = that.First;
-            var list = new Node();
-            var p = that.Parent;
-            var n = p.Items.Find(that);
-
             if (a is NRef)
             {
-                //list.Add(_c("Node " + ((NRef)a).Value + " = cur;"));
                 Node.Replace(ref that, _c("Node " + a.Data + " = cur;"));
                 return true;
             }
-            //else if (a is NString)
-            //{
-            //    list.Add(_c("if (!cur.Match(\"" + ((NString)a).Value + "\")) return false;"));
-            //}
             else
             {
+                var list = new Node();
                 //list.Add(_c("if (!cur.MatchItemCount(" + a.Items.Count + ")) return false;"));
                 list.Add(_c("if (!cur.Match(" + a.Data + "," + a.Items.Count + ")) return false;"));
                 list.Add(_c("cur = cur.First;"));
@@ -39,9 +31,9 @@ namespace akira
                     item = item.Next;
                 }
                 list.Add(_c("cur = cur.Parent;"));
+                Node.Replace(ref that, list);
+                return true;
             }
-            Node.Replace(ref that, list);
-            return true;
         }
     }
 }
