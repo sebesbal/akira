@@ -304,7 +304,8 @@ namespace akira
      
         public bool Match(Type t)
         {
-            return Data.GetType().IsSubclassOf(t);
+            //return Data != null && Data.GetType().IsSubclassOf(t);
+            return Data != null && Data.GetType().Equals(t);
         }
 
         public void Measure()
@@ -421,14 +422,30 @@ namespace akira
 
             // Value = Regex.Replace(Value, @"\${\d+}", "__\\($1\\)");
         }
+
+        public bool CreateChildren(Node node)
+        {
+            bool changed = false;
+            while (true)
+            {
+                var m = Regex.Match(Value, "\\$([a-zA-Z][a-zA-Z0-9]*)");
+                if (m.Success)
+                {
+                    var n = m.Groups[1];
+                    var name = n.Value;
+                    int count = node.Items.Count + 1;
+                    Value = Regex.Replace(Value, "\\$" + name, "$" + count);
+                    node.Add(new Node("$", name));
+                    changed = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return changed;
+        }
+
         public string Value;
     }
-
-    //public class NRef : Node
-    //{
-    //    public NRef(string value): base(value) { }
-    //    override public object Clone() { return new NRef(Data as string); }
-    //    override public void ToStringRec(CodeBuilder cb) { cb.AddLine("$" + Data); }
-    //    override public void ToCsRec(StringBuilder cb) { cb.Append("__(" + Data + ")"); }
-    //}
 }

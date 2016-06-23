@@ -96,6 +96,10 @@ namespace akira
                 that.Data = new NModule();
                 return true;
             }
+            else if (that.Match(typeof(NCode)))
+            {
+                return ((NCode)that.Data).CreateChildren(that);
+            }
             return false;
         }
     }
