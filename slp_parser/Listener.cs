@@ -200,7 +200,7 @@ namespace slp_parser
                 operators.Add(s, o);
             };
             f("-->", 11000, Associativity.yfxx);
-            f(":", 200, Associativity.yf);
+            f(":", 200, Associativity.fxx);
             f("$", 100, Associativity.fx);
         }
 

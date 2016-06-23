@@ -1,0 +1,32 @@
+﻿
+module : id boots2_1
+	rule
+		read
+			write $a
+		{ Node.Replace(ref that, $1); return true; }
+			{ Node.Replace(ref that, $1); return true; } 
+				$a
+
+module : id boots2_2
+	import boots2_1
+	rule
+		read
+			$a --> $b
+		write
+			rule
+				read $a
+				write $b
+
+module : id boots2_3
+	import
+		boots2_1
+		boots2_2
+
+	write $a -->
+		{ Node.Replace(ref that, $1); return true; } 
+				$a
+
+	($a --> $b) -->
+		rule
+			read $a
+			write $b

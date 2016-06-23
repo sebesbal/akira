@@ -472,7 +472,7 @@ namespace akira
             a.ctx.DirWorking = info.DirectoryName;
             a.ctx.AddSearchPath("");
             var n = ParseModule(fileName);
-            // n.Save(Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(fileName) + "_parse.txt"));
+            n.Save(Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(fileName) + "_parse.txt"));
             a.Run(n);
             return a;
         }

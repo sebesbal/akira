@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="tmp\boots2.aki" />
     <None Include="tmp\bootstrap.cs" />
     <None Include="tmp\boot1.cs" />
     <None Include="tmp\boot2.cs" />

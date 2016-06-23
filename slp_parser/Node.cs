@@ -405,13 +405,21 @@ namespace akira
         override public void ToCsRec(StringBuilder cb) { cb.Append("__c(\"" + Node.escape(Value) + "\")"); }
         public void InsertChildren(Node node)
         {
-            int i = 0;
+            Value = Regex.Replace(Value, "\\$(\\d+)", "___$$1");
+            Value = Regex.Replace(Value, "\\#(\\d+)", "___#$1");
+
+            int i = 1;
             foreach (var item in node.Items)
             {
-                Value = Regex.Replace(Value, "\\$" + ++i, item.ToCs());
-                Value = Regex.Replace(Value, "\\#" + ++i, item.Deref);
+                Value = Regex.Replace(Value, "___\\$" + i, item.ToCs());
+                if (Value.IndexOf("___#") > -1)
+                {
+                    Value = Regex.Replace(Value, "___#" + i, item.SData);
+                }
+                ++i;
             }
-            Value = Regex.Replace(Value, @"\${\d+}", "__\\($1\\)");
+
+            // Value = Regex.Replace(Value, @"\${\d+}", "__\\($1\\)");
         }
         public string Value;
     }

@@ -59,7 +59,8 @@ namespace akira
         public override bool Apply(Context ctx, ref Node that)
         {
             NCode code = that.Data as NCode;
-            if (code != null && that.Items.Count > 0 && code.Value.IndexOf("$") > -1)
+            if (code != null && that.Items.Count > 0 
+                && (code.Value.IndexOf("$") > -1 || code.Value.IndexOf("#") > -1))
             {
                 code.InsertChildren(that);
                 that.Items.Clear();

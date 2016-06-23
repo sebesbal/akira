@@ -11,13 +11,37 @@ write $a -->
 		read $a
 		write $b
 
+/*
+module_name -->
+	#eval { ctx.ModuleName }
+
+==>
+
+rule
+	read module_name
+	{ Node x = ctx.ModuleName; }
+	write 
+
+gen $a -->
+	#eval { ctx.GeName($a) }
+
+private ->
+	add
+		: id #(gen module_name)
+
+*/
+
 remove -->
 	{ that.Remove(); that = null; return true; }
 
+module
+	: id boot3_1
+	citrom $ $a -->
+		{ Node #1 = cur; }
+			$a
 
+import boot3_1
 
-/*
-read $ $a -->
-	{ Node #1 = cur; }
-		$a
-*/
+sample
+	citrom $b
+	
