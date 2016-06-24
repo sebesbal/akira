@@ -408,24 +408,38 @@ namespace akira
             cb.End();
             cb.PopInline();
         }
-        override public void ToCsRec(StringBuilder cb) { cb.Append("__c(\"" + Node.escape(Value) + "\")"); }
+        //override public void ToCsRec(StringBuilder cb) { cb.Append("__c(\"" + Node.escape(Value) + "\")"); }
+        override public void ToCsRec(StringBuilder cb) { cb.Append("__c(\"" + Value + "\")"); }
         public void InsertChildren(Node node)
         {
             Value = Regex.Replace(Value, "\\$(\\d+)", "___$$1");
-            Value = Regex.Replace(Value, "\\#(\\d+)", "___#$1");
-
             int i = 1;
             foreach (var item in node.Items)
             {
                 Value = Regex.Replace(Value, "___\\$" + i, item.ToCs());
-                if (Value.IndexOf("___#") > -1)
-                {
-                    Value = Regex.Replace(Value, "___#" + i, item.SData);
-                }
                 ++i;
             }
+        }
 
-            // Value = Regex.Replace(Value, @"\${\d+}", "__\\($1\\)");
+        public void InsertChildren2(Node node)
+        {
+            if (node.Items.Count > 0 && Value.IndexOf("#") > -1)
+            {
+                Value = Regex.Replace(Value, "\\#(\\d+)", "___#$1");
+                int i = 1;
+                var v = node.Items.ToArray();
+                foreach (var item in v)
+                {
+                    // Value = Regex.Replace(Value, "___#" + i, item.SData);
+                    var newValue = Regex.Replace(Value, "___#" + i, @""" + " +  item.Deref + @".SData + """);
+                    if (newValue != Value)
+                    {
+                        item.Remove();
+                        Value = newValue;
+                    }
+                    ++i;
+                }
+            }
         }
 
         public bool CreateChildren(Node node)

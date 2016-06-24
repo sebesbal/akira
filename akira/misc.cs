@@ -98,7 +98,10 @@ namespace akira
             }
             else if (that.Match(typeof(NCode)))
             {
-                return ((NCode)that.Data).CreateChildren(that);
+                var code = ((NCode)that.Data);
+                bool b = code.CreateChildren(that);
+                code.InsertChildren2(that);
+                return b;
             }
             return false;
         }
