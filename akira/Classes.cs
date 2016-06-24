@@ -185,6 +185,14 @@ namespace akira
             File.WriteAllText(filePath, code);
         }
 
+        public string ModuleName;
+
+        int submoduleCount = 0;
+        public string GenSubmodule()
+        {
+            return ModuleName + "_" + ++submoduleCount;
+        }
+
         public string DirWorking;
 
         public string DirGen { get { return "../akira/gen/"; } }
@@ -465,11 +473,12 @@ namespace akira
 
         public static akira Compile(string fileName)
         {
-            Console.WriteLine();
-            Console.WriteLine("Compile " + fileName);
+            //Console.WriteLine();
+            //Console.WriteLine("Compile " + fileName);
             akira a = new akira();
             FileInfo info = new FileInfo(fileName);
             a.ctx.DirWorking = info.DirectoryName;
+            a.ctx.ModuleName = Path.GetFileNameWithoutExtension(fileName);
             a.ctx.AddSearchPath("");
             var n = ParseModule(fileName);
             n.Save(Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(fileName) + "_parse.txt"));

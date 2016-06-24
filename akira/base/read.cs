@@ -4,7 +4,6 @@ namespace akira
 {
     public class read : Rule
     {
-        //public read() { level = 2; }
         public override bool Apply(Context ctx, ref Node that)
         {
             if (!that.Match("read", 1)) return false;
@@ -17,8 +16,6 @@ namespace akira
             else
             {
                 var list = new Node();
-                //list.Add(_c("if (!cur.MatchItemCount(" + a.Items.Count + ")) return false;"));
-                //list.Add(_c("if (!cur.Match(\"" + a.Data + "\" ," + a.Items.Count + ")) return false;"));
                 list.Add(_c("if (!cur.Match(\"" + a.Data + "\")) return false;"));
                 if (a.Items.Count > 0)
                 {

@@ -1,0 +1,56 @@
+﻿
+module
+
+	rule
+		read
+			write $a
+		{ Node.Replace(ref that, $1); return true; }
+			{ Node.Replace(ref that, $a); return true; }
+
+module
+
+	rule
+		read
+			$a --> $b
+		write
+			rule
+				read $a
+				write $b
+
+module
+	write $a -->
+		{ Node.Replace(ref that, $a); return true; }
+
+	($a --> $b) -->
+		rule
+			read $a
+			write $b
+
+module
+	: id lofusz
+
+	rule
+		read
+			read $a
+		{
+			var list = new Node();
+			list.Add(_c("if (!cur.Match(\"" + a.Data + "\")) return false;"));
+			list.Add(_c("cur = cur.First;"));
+			foreach (var item in a.Items)
+			{
+				list.Add(__("read", __(item)));
+				if (item != a.Items.Last.Value) list.Add(_c("cur = cur.Next;"));
+			}
+			list.Add(_c("cur = cur.Parent;"));
+		}
+		write $list
+
+	read $ $a -->
+		{ Node #a = cur; }
+
+module
+	alma $a -->
+		korte $a
+
+print
+	alma citrom

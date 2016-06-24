@@ -31,3 +31,20 @@ module
 		rule
 			read $a
 			write $b
+
+	compile -->
+		
+
+	// read $ $a -->
+	//	{ Node #a = cur; }
+
+module
+	: id boots2_4
+	import
+		boots2_3
+
+	alma $a -->
+		korte $a
+
+	sample
+		alma citrom

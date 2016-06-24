@@ -259,7 +259,7 @@ namespace akira
         virtual public object Clone()
         {
             Node result = new Node();
-            result.Data = (ICloneable)Data.Clone();
+            result.Data = Data == null ? null : (ICloneable)Data.Clone();
             foreach (var item in Items)
             {
                 result.Add((Node)item.Clone());
@@ -358,6 +358,11 @@ namespace akira
                 sb.Append("__(" + First.SData + ")");
                 return;
             }
+            //else if (Data is NCode)
+            //{
+            //    var code = (NCode)Data;
+            //    code.InsertChildren(this);
+            //}
 
             sb.Append("__(");
 
@@ -428,13 +433,13 @@ namespace akira
             bool changed = false;
             while (true)
             {
-                var m = Regex.Match(Value, "\\$([a-zA-Z][a-zA-Z0-9]*)");
+                var m = Regex.Match(Value, "(\\$|#)([a-zA-Z][a-zA-Z0-9]*)");
                 if (m.Success)
                 {
-                    var n = m.Groups[1];
-                    var name = n.Value;
+                    var sign = m.Groups[1].Value;
+                    var name = m.Groups[2].Value;
                     int count = node.Items.Count + 1;
-                    Value = Regex.Replace(Value, "\\$" + name, "$" + count);
+                    Value = Regex.Replace(Value, "\\" + sign + name, sign + count);
                     node.Add(new Node("$", name));
                     changed = true;
                 }

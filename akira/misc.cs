@@ -106,25 +106,33 @@ namespace akira
 
     public class NModule: NActiveNode
     {
-        public override bool ApplyAfter(Context ctx, ref Node that)
+        string moduleName;
+        public override bool Apply(Context ctx, ref Node that)
         {
-            string moduleName;
             var id = that.FindAttribute("id");
             if (id == null)
             {
-                throw new Exception("Module must have id!");
+                moduleName = ctx.GenSubmodule();
+                // throw new Exception("Module must have id!");
             }
             else
             {
                 moduleName = id.Second.SData;
             }
 
+            Console.WriteLine();
+            Console.WriteLine("Compile " + moduleName);
+
+            return false;
+        }
+        public override bool ApplyAfter(Context ctx, ref Node that)
+        {
             var code = GenerateCode(ctx, moduleName, that);
             string pathCs = Path.Combine(ctx.DirWorking, moduleName + ".cs");
             File.WriteAllText(pathCs, code);
             string pathDll;
-            ctx.CompileCs(pathCs, out pathDll);
-
+            var ass = ctx.CompileCs(pathCs, out pathDll);
+            ctx.LoadRulesFromAss(ass);
             that.Remove();
             that = null;
 
@@ -184,6 +192,25 @@ namespace akira
             }
             output.Add(_c("*/"));
             Node.Replace(ref node, output);
+            return true;
+        }
+    }
+
+    public class print : Rule
+    {
+        public override bool Apply(Context ctx, ref Node node)
+        {
+            if (!node.Match("print")) return false;
+            Console.WriteLine("before: \n" + node.First.ToString(1));
+            return false;
+        }
+
+        public override bool ApplyAfter(Context ctx, ref Node node)
+        {
+            if (!node.Match("print")) return false;
+            Console.WriteLine("after: \n" + node.First.ToString(1));
+            node.Remove();
+            node = null;
             return true;
         }
     }

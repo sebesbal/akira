@@ -52,7 +52,7 @@ namespace test2
         {
             //var a = akira.akira.Compile("../akira/tmp/write1.aki");
             //a = akira.akira.Compile("../akira/tmp/replace1.aki");
-            var a = akira.akira.Compile("../akira/tmp/boots2.aki");
+            var a = akira.akira.Compile("../akira/tmp/boots3.aki");
             a.Save("result.slp");
         }
 
